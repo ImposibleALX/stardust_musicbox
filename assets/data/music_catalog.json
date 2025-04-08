@@ -1,0 +1,272 @@
+[
+  {
+    "id": "dezariam_dezariam_hammer",
+    "file": "dezariam_hammer.flac",
+    "faction": "Dezariam",
+    "titles": {
+      "en": "Dezariam Hammer",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "dezariam_gorba_his_form",
+    "file": "gorba_his_form.flac",
+    "faction": "Dezariam",
+    "titles": {
+      "en": "Gorba, His Form",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gamilas_desler_attack",
+    "file": "desler_attack.mp3",
+    "faction": "Gamilas",
+    "titles": {
+      "en": "Desler Attack",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gamilas_fleet_gathering",
+    "file": "fleet_gathering.mp3",
+    "faction": "Gamilas",
+    "titles": {
+      "en": "Fleet Gathering",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gamilas_garmillas_dimensional_submarine",
+    "file": "garmillas_dimensional_submarine.mp3",
+    "faction": "Gamilas",
+    "titles": {
+      "en": "Garmillas Dimensional Submarine",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gamilas_imperial_city_defense",
+    "file": "imperial_city_defense.mp3",
+    "faction": "Gamilas",
+    "titles": {
+      "en": "Imperial City Defense",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gamilas_new_baleras",
+    "file": "new_baleras.mp3",
+    "faction": "Gamilas",
+    "titles": {
+      "en": "New Baleras",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gamilas_praise_be_our_eternal_glory_gamilas_anthem_without_vocals",
+    "file": "praise_be_our_eternal_glory_gamilas_anthem_without_vocals.mp3",
+    "faction": "Gamilas",
+    "titles": {
+      "en": "Praise Be Our Eternal Glory (Gamilas Anthem) (Without Vocals)",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gamilas_praise_be_our_eternal_glory_gamilas_anthem",
+    "file": "praise_be_our_eternal_glory_gamilas_anthem.mp3",
+    "faction": "Gamilas",
+    "titles": {
+      "en": "Praise Be Our Eternal Glory (Gamilas Anthem)",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_a_pleasant_battle_new_recording",
+    "file": "a_pleasant_battle_new_recording.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "A Pleasant Battle (New Recording)",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_barbarian_invasion",
+    "file": "barbarian_invasion.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "Barbarian Invasion",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_emergence",
+    "file": "emergence.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "Emergence",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_flame_strike_cannon",
+    "file": "flame_strike_cannon.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "Flame Strike Cannon",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_gatlantis_surprise_attack",
+    "file": "gatlantis_surprise_attack.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "Gatlantis Surprise Attack",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_gatlantis",
+    "file": "gatlantis.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "Gatlantis",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_the_white_comet_appears",
+    "file": "the_white_comet_appears.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "The White Comet Appears",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "gatlantis_white_comet_disco",
+    "file": "white_comet_disco.mp3",
+    "faction": "Gatlantis",
+    "titles": {
+      "en": "White Comet (Disco)",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_dogfight",
+    "file": "dogfight.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "Dogfight",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_sortie_of_the_enemy_spacecraft",
+    "file": "sortie_of_the_enemy_spacecraft.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "Sortie of The Enemy Spacecraft",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_the_galactic_pilot_bg",
+    "file": "the_galactic_pilot_bg.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "The Galactic Pilot (BG)",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_the_galactic_pilot_without_vocals",
+    "file": "the_galactic_pilot_without_vocals.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "The Galactic Pilot (Without Vocals)",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_the_galactic_pilot",
+    "file": "the_galactic_pilot.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "The Galactic Pilot",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_the_recon_plane_takes_off",
+    "file": "the_recon_plane_takes_off.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "The Recon Plane Takes Off",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_the_recon_plane",
+    "file": "the_recon_plane.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "The Recon Plane",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_the_yamato_sleeps_under_the_setting_sun",
+    "file": "the_yamato_sleeps_under_the_setting_sun.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "The Yamato Sleeps Under the Setting Sun",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_yamato_into_the_vortex",
+    "file": "yamato_into_the_vortex.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "Yamato Into the Vortex",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "uncf_yamato_launch",
+    "file": "yamato_launch.mp3",
+    "faction": "UNCF",
+    "titles": {
+      "en": "Yamato Launch",
+      "es": "",
+      "jp": ""
+    }
+  }
+]
