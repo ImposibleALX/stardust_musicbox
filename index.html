@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Battleship Yamato Music Player</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <h1>Space Battleship Yamato</h1>
+            <p class="subheading">Faction Music Player</p>
+        </header>
+
+        <div class="faction-buttons">
+            <button onclick="playFaction('Gatlantis')">Gatlantis</button>
+            <button onclick="playFaction('Gamilas')">Gamilas</button>
+            <button onclick="playFaction('Dezariam')">Dezariam</button>
+            <button onclick="playFaction('Bolar_Federation')">Bolar Federation</button>
+        </div>
+
+        <div class="player-container">
+            <audio id="audioPlayer" controls>
+                Your browser does not support the audio element.
+            </audio>
+
+            <div class="track-info">
+                <p id="trackName">Track Name</p>
+                <p id="factionName">Faction</p>
+                <p id="timeDisplay">00:00</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tracks = {
+            'Gatlantis': [
+                'A Pleasant Battle (New Recording).mp3',
+                'Barbarian Invasion.mp3',
+                'Emergence.mp3',
+                'Flame Strike Cannon.mp3',
+                'Gatlantis Invasion.mp3',
+                'Gatlantis.mp3',
+                'The White Comet Appears.mp3',
+                'White Comet (Disco).mp3'
+            ],
+            'Gamilas': [
+                'Desler Attack.mp3',
+                'Fleet Gathering.mp3',
+                'Garmillas Dimensional Submarine.mp3',
+                'Imperial City Defense.mp3',
+                'New Baleras.mp3',
+                'Praise Be Our Eternal Glory (Gamilas Anthem) (Without Vocals).mp3',
+                'Praise Be Our Eternal Glory (Gamilas Anthem).mp3'
+            ],
+            'Dezariam': [
+                'Dezariam Hammer.flac',
+                'Golba, His Form.flac'
+            ],
+            'Bolar_Federation': []
+        };
+
+        const audioPlayer = document.getElementById("audioPlayer");
+        const trackName = document.getElementById("trackName");
+        const factionName = document.getElementById("factionName");
+        const timeDisplay = document.getElementById("timeDisplay");
+
+        function playFaction(faction) {
+            const factionTracks = tracks[faction];
+            if (factionTracks && factionTracks.length > 0) {
+                let currentTrackIndex = Math.floor(Math.random() * factionTracks.length);
+                const track = factionTracks[currentTrackIndex];
+                audioPlayer.src = `assets/music/${faction}/${track}`;
+                audioPlayer.play();
+
+                trackName.textContent = track;
+                factionName.textContent = `Faction: ${faction}`;
+            } else {
+                alert("No tracks available for this faction.");
+            }
+        }
+
+        audioPlayer.ontimeupdate = function() {
+            let minutes = Math.floor(audioPlayer.currentTime / 60);
+            let seconds = Math.floor(audioPlayer.currentTime % 60);
+            if (seconds < 10) seconds = '0' + seconds;
+            timeDisplay.textContent = `${minutes}:${seconds}`;
+        };
+    </script>
+</body>
+</html>
