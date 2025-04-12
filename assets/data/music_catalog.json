@@ -1,5 +1,55 @@
 [
   {
+    "id": "bolar_bolar_battle",
+    "file": "bolar_battle.flac",
+    "faction": "Bolar",
+    "titles": {
+      "en": "Bolar Battle",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "bolar_bolar_blitzkrieg",
+    "file": "bolar_blitzkrieg.flac",
+    "faction": "Bolar",
+    "titles": {
+      "en": "Bolar Blitzkrieg",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "bolar_bolar_federation_2nd_version",
+    "file": "bolar_federation_2nd_version.flac",
+    "faction": "Bolar",
+    "titles": {
+      "en": "Bolar Federation (2nd Version)",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "bolar_imperial_forces_of_galman_gamilas",
+    "file": "imperial_forces_of_galman_gamilas.flac",
+    "faction": "Bolar",
+    "titles": {
+      "en": "Imperial Forces of Galman Gamilas",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "bolar_the_threat_of_bemlarze",
+    "file": "the_threat_of_bemlarze.flac",
+    "faction": "Bolar",
+    "titles": {
+      "en": "The Threat of Bemlarze",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
     "id": "dezariam_dezariam_hammer",
     "file": "dezariam_hammer.flac",
     "faction": "Dezariam",
@@ -15,6 +65,26 @@
     "faction": "Dezariam",
     "titles": {
       "en": "Gorba, His Form",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "dezariam_earth_under_siege",
+    "file": "earth_under_siege.flac",
+    "faction": "Dezariam",
+    "titles": {
+      "en": "Earth Under Siege",
+      "es": "",
+      "jp": ""
+    }
+  },
+  {
+    "id": "dezariam_giant_battleship_grodez",
+    "file": "giant_battleship_grodez.flac",
+    "faction": "Dezariam",
+    "titles": {
+      "en": "Giant Battleship Grodez",
       "es": "",
       "jp": ""
     }

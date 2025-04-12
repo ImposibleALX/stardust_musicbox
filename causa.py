@@ -1,59 +1,55 @@
 import os
-import re
 import json
+import re
 
-# Ruta base de tu música
-base_path = "assets\music"  # <--- AJUSTA ESTO
+root_dir = 'assets/music'
+output_file = 'assets/data/music_catalog.json'
 
-# Donde guardar los archivos generados
-output_txt = "music_catalog_raw.txt"
-output_json = "music_catalog.json"
+def slugify(text):
+    text = os.path.splitext(text)[0]  # Remove extension
+    text = re.sub(r'[^\w\s-]', '', text)  # Remove special characters
+    text = text.lower().replace(' ', '_')  # Replace spaces with underscores
+    return text
 
-def slugify(name):
-    name = os.path.splitext(name)[0]  # Remove extension
-    name = re.sub(r'[^\w\s-]', '', name)  # Remove punctuation
-    name = re.sub(r'\s+', '_', name)  # Spaces to _
-    return name.lower()
+def make_titles(original_name):
+    return {
+        "en": original_name,
+        "es": "",
+        "jp": ""
+    }
 
-catalog = []
-raw_list = []
+music_data = []
 
-for root, dirs, files in os.walk(base_path):
-    for file in files:
-        if file.endswith(('.mp3', '.flac')):  # Soporta .flac también
-            faction = os.path.basename(root)
-            slug = slugify(file)
-            
-            # Guardar nombre original
-            raw_list.append(f"{faction}/{file}")
-            
-            # Renombrar el archivo físicamente
-            old_path = os.path.join(root, file)
-            new_filename = f"{slug}{os.path.splitext(file)[1]}"  # Conservar extensión original
-            new_path = os.path.join(root, new_filename)
-            
-            # Renombrar archivo
-            os.rename(old_path, new_path)
-            
-            # Añadir a la lista del catálogo
-            catalog.append({
-                "id": f"{faction.lower()}_{slug}",
-                "file": new_filename,
-                "faction": faction,
-                "titles": {
-                    "en": os.path.splitext(file)[0],  # Título en inglés (nombre original)
-                    "es": "",
-                    "jp": ""
+for faction in os.listdir(root_dir):
+    faction_path = os.path.join(root_dir, faction)
+    if os.path.isdir(faction_path):
+        for filename in os.listdir(faction_path):
+            if filename.lower().endswith(('.mp3', '.flac', '.wav', '.ogg')):
+                original_name = os.path.splitext(filename)[0]
+                extension = os.path.splitext(filename)[1]
+                slug_name = slugify(original_name) + extension.lower()
+
+                old_path = os.path.join(faction_path, filename)
+                new_path = os.path.join(faction_path, slug_name)
+
+                # Renombrar archivo si es necesario
+                if old_path != new_path:
+                    os.rename(old_path, new_path)
+                    print(f"Renombrado: {filename} -> {slug_name}")
+
+                track = {
+                    "id": slugify(f"{faction}_{original_name}"),
+                    "file": slug_name,
+                    "faction": faction,
+                    "titles": make_titles(original_name)
                 }
-            })
+                music_data.append(track)
 
-# Guardar nombres originales
-with open(output_txt, "w", encoding="utf-8") as f:
-    for line in raw_list:
-        f.write(line + "\n")
+# Crear carpeta si no existe
+os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
 # Guardar JSON
-with open(output_json, "w", encoding="utf-8") as f:
-    json.dump(catalog, f, indent=2, ensure_ascii=False)
+with open(output_file, 'w', encoding='utf-8') as f:
+    json.dump(music_data, f, ensure_ascii=False, indent=2)
 
-print("✅ Archivos renombrados y generados: music_catalog_raw.txt y music_catalog.json")
+print(f"\n✅ Catálogo generado: {output_file} con {len(music_data)} pistas.")

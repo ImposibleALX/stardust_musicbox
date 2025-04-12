@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;800&display=swap');
+
 body {
     background: #0b0b1e;
     font-family: 'Orbitron', sans-serif;
@@ -5,6 +7,7 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
+    font-weight: 400; /* Base general */
 }
 
 .main-container {
@@ -20,14 +23,38 @@ header {
 
 h1 {
     font-size: 3rem;
-    color: #6cf;
-    text-shadow: 0 0 10px #00ffffaa;
+    font-weight: 800;
+    color: white;
+     /* text-shadow: 0 0 10px greenyellow;*/
+    margin: 0;
 }
 
 .subheading {
     font-size: 1.2rem;
+    font-weight: 500;
     color: #aaa;
     margin-top: 5px;
+}
+
+.language-selector {
+    margin: 20px 0;
+}
+
+.language-selector select {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #1a1a2f;
+    color: #fff;
+    border: 1px solid #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.language-selector select:hover {
+    border-color: #6cf;
 }
 
 .faction-buttons {
@@ -80,11 +107,13 @@ audio {
 
 #trackName, #factionName {
     font-size: 1.1rem;
+    font-weight: 500;
     margin: 5px 0;
 }
 
 #timeDisplay {
     font-size: 1.5rem;
+    font-weight: 600;
     color: #6cf;
     margin-top: 10px;
 }
