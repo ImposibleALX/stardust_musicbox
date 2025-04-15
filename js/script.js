@@ -1,6 +1,7 @@
 // Variables globales
 let catalog = [];
 let currentLang = 'en'; // Idioma por defecto
+let currentFaction = ''; // Facción actualmente activa
 
 // Cargar el catálogo de música desde el archivo JSON
 fetch('assets/data/music_catalog.json')
@@ -18,6 +19,12 @@ const timeDisplay = document.getElementById("timeDisplay");
 
 // Reproducir música de una facción seleccionada
 function playFaction(faction) {
+    currentFaction = faction; // Guardar la facción activa
+    playRandomTrackFromFaction(faction);
+}
+
+// Reproducir una pista aleatoria de una facción específica
+function playRandomTrackFromFaction(faction) {
     const factionTracks = catalog.filter(track => track.faction === faction);
     if (factionTracks.length > 0) {
         const selected = factionTracks[Math.floor(Math.random() * factionTracks.length)];
@@ -40,6 +47,13 @@ audioPlayer.ontimeupdate = function () {
     let seconds = Math.floor(audioPlayer.currentTime % 60);
     if (seconds < 10) seconds = '0' + seconds;
     timeDisplay.textContent = `${minutes}:${seconds}`;
+};
+
+// Cuando termina una canción, reproducir otra de la misma facción
+audioPlayer.onended = function () {
+    if (currentFaction) {
+        playRandomTrackFromFaction(currentFaction);
+    }
 };
 
 // Cambiar el idioma
