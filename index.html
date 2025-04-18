@@ -14,25 +14,24 @@
         </header>
 
         <!-- Selector de idioma -->
-        <div class="language-selector">
-            <select onchange="setLang(this.value)">
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="jp">日本語</option>
-            </select>
-        </div>
+    <div class="language-selector">
+        <select onchange="setLang(this.value)">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+        </select>
+    </div>
 
         <!-- Botones de facciones -->
         <div class="faction-buttons">
-            <img src="assets/images/logos/gatlantis_logo.png" alt="Gatlantis" onclick="playFaction('Gatlantis')" title="Gatlantis">
-            <img src="assets/images/logos/gamilas_logo.png" alt="Gamilas" onclick="playFaction('Gamilas')" title="Gamilas">
-            <img src="assets/images/logos/dezariam_logo.png" alt="Dezariam" onclick="playFaction('Dezariam')" title="Dezariam">
-            <img src="assets/images/logos/bolar_logo.png" alt="Bolar Federation" onclick="playFaction('Bolar')" title="Bolar Federation">
             <img src="assets/images/logos/uncf_logo.webp" alt="UNCF" onclick="playFaction('UNCF')" title="UNCF">
+            <img src="assets/images/logos/gamilas_logo.png" alt="Gamilas" onclick="playFaction('Gamilas')" title="Gamilas">
+            <img src="assets/images/logos/gatlantis_logo.png" alt="Gatlantis" onclick="playFaction('Gatlantis')" title="Gatlantis">
+            <img src="assets/images/logos/bolar_logo.png" alt="Bolar Federation" onclick="playFaction('Bolar')" title="Bolar Federation">
+            <img src="assets/images/logos/dezariam_logo.png" alt="Dezariam" onclick="playFaction('Dezariam')" title="Dezariam">
         </div>
 
         <!-- Contenedor del reproductor -->
-        <div class="player-container">
+        <div class="player-container" id="playerContainer">
             <audio id="audioPlayer" controls></audio>
 
             <div class="track-info">

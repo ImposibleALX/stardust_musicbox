@@ -16,10 +16,11 @@ const audioPlayer = document.getElementById("audioPlayer");
 const trackName = document.getElementById("trackName");
 const factionName = document.getElementById("factionName");
 const timeDisplay = document.getElementById("timeDisplay");
+const playerContainer = document.getElementById("playerContainer");
 
 // Reproducir música de una facción seleccionada
 function playFaction(faction) {
-    currentFaction = faction; // Guardar la facción activa
+    currentFaction = faction;
     playRandomTrackFromFaction(faction);
 }
 
@@ -29,7 +30,12 @@ function playRandomTrackFromFaction(faction) {
     if (factionTracks.length > 0) {
         const selected = factionTracks[Math.floor(Math.random() * factionTracks.length)];
         const filePath = `assets/music/${faction}/${selected.file}`;
-        const title = selected.titles[currentLang] || selected.titles['en'];
+
+        // Manejo de título con respaldo en inglés si está vacío
+        let title = selected.titles[currentLang];
+        if (!title || title.trim() === "") {
+            title = selected.titles['en'] || "Unknown Title";
+        }
 
         audioPlayer.src = filePath;
         audioPlayer.play();
@@ -60,3 +66,12 @@ audioPlayer.onended = function () {
 function setLang(lang) {
     currentLang = lang;
 }
+
+// Animación sutil al reproducir
+audioPlayer.onplay = function () {
+    playerContainer.classList.add("pulsing");
+};
+
+audioPlayer.onpause = function () {
+    playerContainer.classList.remove("pulsing");
+};
