@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBY</title>
+    <link rel="stylesheet" href="../css/sby.css">
+    <link rel="shortcut icon" href="https://imposiblealx.github.io/stardust_musicbox/favicon.ico" type="image/x-icon">
+</head>
+<body data-catalog="music_catalog_sby.json">
+    <div class="main-container">
+        <header>
+            <h1>SPACE BATTLESHIP YAMATO</h1>
+            <p class="subheading">F A C T I O N M U S I C P L A Y E R</p>
+            <!-- Botón/enlace para ir a /manual sin JS, esquina superior derecha -->
+            <a href="/stardust_musicbox/manual" class="manual-btn-topright">Manual Mode</a>
+        </header>
+        <div class="faction-buttons">
+            <img src="../assets/images/logos/uncf_logo.webp" alt="UNCF" onclick="playFaction('uncf')" title="UNCF">
+            <img src="../assets/images/logos/gamilas_logo.webp" alt="Gamilas" onclick="playFaction('gamilas')" title="GAMILAS">
+            <img src="../assets/images/logos/gatlantis_logo.png" alt="Gatlantis" onclick="playFaction('gatlantis')" title="GATLANTIS">
+            <img src="../assets/images/logos/bolar_logo.png" alt="Bolar Federation" onclick="playFaction('bolar')" title="BOLAR FEDERATION">
+            <img src="../assets/images/logos/dezariam_logo.png" alt="Dezariam" onclick="playFaction('dezariam')" title="DEZARIAM NATION">
+            <img src="../assets/images/logos/dinguil_logo.png" alt="Dinguil" onclick="playFaction('dinguil')" title="DINGUIL EMPIRE">
+            <img src="../assets/images/logos/guia_logo.webp" alt="SUS EMPIRE" onclick="playFaction('guia')" title="GREAT URUP Interstellar Alliance">
+            <img src="../assets/images/logos/nofactions.png" alt="Random" onclick="playNoFactions()" title="Random">
+        </div>
+        <div class="player-container" id="playerContainer">
+            <div class="audio-hidden">
+                <audio id="audioPlayer"></audio>
+            </div>
+            <div class="player-sections">
+                <div class="track-name-section">
+                    <span id="trackName">Track Name</span>
+                </div>
+                <div class="faction-section">
+                    <span id="factionName"></span>
+                </div>
+                <div class="timer-section">
+                    <span id="timeDisplay">00:00</span>
+                </div>
+                <div class="volume-section">
+                    <div id="volumeSliderContainer">
+                        <div id="volumeBarBg">
+                            <div id="volumeBar"></div>
+                        </div>
+                        <span id="volumeValue">90%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  <script src="../js/catalogLoader.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/volumecontrol.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVANGELION</title>
+    <link rel="stylesheet" href="../css/sby.css">
+    <link rel="shortcut icon" type="image/x-icon" href="stardust_musicbox/favicon.ico">
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <h1>NEON GENESIS EVANGELION</h1>
+            <p class="subheading">F A C T I O N M U S I C P L A Y E R</p>
+        </header>
+        <div class="faction-buttons">
+            <img src="../assets/images/logos/evangelion_logo.webp" alt="NERV" onclick="playFaction('nerv')" title="NERV">
+            <img src="../assets/images/logos/evangelion_logo.webp" alt="SEELE" onclick="playFaction('seele')" title="SEELE">
+            <img src="../assets/images/logos/evangelion_logo.webp" alt="ANGELS" onclick="playFaction('seele')" title="ANGELS">
+            <img src="../assets/images/logos/evangelion_logo.webp" alt="WILLE" onclick="playFaction('wille')" title="WILLE">
+        </div>
+        <div class="player-container" id="playerContainer">
+            <div class="audio-hidden">
+                <audio id="audioPlayer"></audio>
+            </div>
+            <div class="player-sections">
+                <div class="track-name-section">
+                    <span id="trackName">Track Name</span>
+                </div>
+                <div class="faction-section">
+                    <span id="factionName"></span>
+                </div>
+                <div class="timer-section">
+                    <span id="timeDisplay">00:00</span>
+                </div>
+                <div class="volume-section">
+                    <div id="volumeSliderContainer">
+                        <div id="volumeBarBg">
+                            <div id="volumeBar"></div>
+                        </div>
+                        <span id="volumeValue">90%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/sw.js"></script>
+    <script src="../js/volumecontrol.js"></script>
+</body>
+</html>
