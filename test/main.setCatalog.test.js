@@ -41,20 +41,23 @@ test('setCatalog wires the volume control to the slider background element', () 
   const originalConsoleError = console.error;
   console.error = () => {};
 
-  delete require.cache[require.resolve('../js/main.js')];
-  require('../js/main.js');
+  try {
+    delete require.cache[require.resolve('../js/main.js')];
+    require('../js/main.js');
 
-  assert.strictEqual(typeof global.setCatalog, 'function');
-  global.setCatalog([]);
+    assert.strictEqual(typeof global.setCatalog, 'function');
+    global.setCatalog([]);
 
-  assert.ok(capturedOptions, 'initVolumeControl should be invoked after setting the catalog');
-  assert.strictEqual(capturedOptions.bgEl, volumeBarBg, 'Volume control must target the slider background');
-  assert.strictEqual(capturedOptions.audioEl, audioEl);
-  assert.strictEqual(capturedOptions.barEl, volumeBar);
-  assert.strictEqual(capturedOptions.labelEl, volumeValue);
-
-  console.error = originalConsoleError;
-  restore();
-  delete global.initVolumeControl;
-  delete global.setCatalog;
+    assert.ok(capturedOptions, 'initVolumeControl should be invoked after setting the catalog');
+    assert.strictEqual(capturedOptions.bgEl, volumeBarBg, 'Volume control must target the slider background');
+    assert.strictEqual(capturedOptions.audioEl, audioEl);
+    assert.strictEqual(capturedOptions.barEl, volumeBar);
+    assert.strictEqual(capturedOptions.labelEl, volumeValue);
+  } finally {
+    console.error = originalConsoleError;
+    restore();
+    delete global.initVolumeControl;
+    delete global.setCatalog;
+    delete global.volumeController;
+  }
 });

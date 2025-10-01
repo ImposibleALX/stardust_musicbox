@@ -189,9 +189,26 @@ function createPointerEvent({ type = 'pointerdown', clientY = 0, button = 0, poi
   };
 }
 
+function flushAsyncOperations() {
+  const scheduleImmediate = cb => (typeof setImmediate === 'function' ? setImmediate(cb) : setTimeout(cb, 0));
+
+  const nextFrame = new Promise(resolve => {
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => resolve());
+    } else {
+      scheduleImmediate(resolve);
+    }
+  });
+
+  const afterMacrotask = new Promise(resolve => scheduleImmediate(resolve));
+
+  return Promise.all([nextFrame, afterMacrotask]).then(() => undefined);
+}
+
 module.exports = {
   createStubElement,
   createAudioElementStub,
   stubGlobalEnvironment,
-  createPointerEvent
+  createPointerEvent,
+  flushAsyncOperations
 };

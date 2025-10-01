@@ -33,25 +33,27 @@ test('chooseTrackStart clamps offsets for micro-duration tracks', () => {
   const originalConsoleError = console.error;
   console.error = () => {};
 
-  global.initVolumeControl = () => ({ destroy() {} });
+  try {
+    global.initVolumeControl = () => ({ destroy() {} });
 
-  delete require.cache[require.resolve('../js/main.js')];
-  require('../js/main.js');
+    delete require.cache[require.resolve('../js/main.js')];
+    require('../js/main.js');
 
-  const { chooseTrackStart } = global.__musicboxInternals;
-  const tracks = [
-    { id: 'micro', duration: 0.005, factions: ['micro'], folder: 'micro', file: 'track.ogg' }
-  ];
+    const { chooseTrackStart } = global.__musicboxInternals;
+    const tracks = [
+      { id: 'micro', duration: 0.005, factions: ['micro'], folder: 'micro', file: 'track.ogg' }
+    ];
 
-  const result = chooseTrackStart(tracks, 0.005, 0.002);
+    const result = chooseTrackStart(tracks, 0.005, 0.002);
 
-  assert.strictEqual(result.index, 0);
-  assert.strictEqual(result.offset, 0, 'offset should be clamped to zero for sub-10ms tracks');
-
-  console.error = originalConsoleError;
-  restore();
-  delete global.initVolumeControl;
-  delete global.setCatalog;
-  delete global.volumeController;
-  delete global.__musicboxInternals;
+    assert.strictEqual(result.index, 0);
+    assert.strictEqual(result.offset, 0, 'offset should be clamped to zero for sub-10ms tracks');
+  } finally {
+    console.error = originalConsoleError;
+    restore();
+    delete global.initVolumeControl;
+    delete global.setCatalog;
+    delete global.volumeController;
+    delete global.__musicboxInternals;
+  }
 });
