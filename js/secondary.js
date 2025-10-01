@@ -178,8 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. OBTENER ELEMENTOS DEL DOM
   const {
     audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause,
-    btnLoop, imgLoop, allTracksList, secondList, volumeSliderContainer, volumeValue, volumeBar
-  } = ['audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'btnPlayPause', 'imgPlayPause', 'btnLoop', 'imgLoop', 'allTracksList', 'secondList', 'volumeSliderContainer', 'volumeValue', 'volumeBar']
+    btnLoop, imgLoop, allTracksList, secondList, volumeSliderContainer, volumeBarBg, volumeValue, volumeBar
+  } = ['audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'btnPlayPause', 'imgPlayPause', 'btnLoop', 'imgLoop', 'allTracksList', 'secondList', 'volumeSliderContainer', 'volumeBarBg', 'volumeValue', 'volumeBar']
     .reduce((o, id) => (o[id] = document.getElementById(id), o), {});
 
   // 2. INSTANCIAR GESTORES Y PRECargador
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initVolumeControl === 'function') {
       initVolumeControl({
         audioEl: audioPlayer,
-        bgEl: volumeSliderContainer,
+        bgEl: volumeBarBg,
         barEl: volumeBar,
         labelEl: volumeValue
       });

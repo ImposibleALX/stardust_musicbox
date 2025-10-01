@@ -256,7 +256,7 @@ window.setCatalog = function(data) {
       // Guardamos la instancia por si se necesita en el futuro
       window.volumeController = initVolumeControl({
         audioEl: audioPlayer,
-        bgEl: volumeSliderContainer, // El elemento se llama 'volumeSliderContainer' en el HTML
+        bgEl: volumeBarBg,
         barEl: volumeBar,
         labelEl: volumeValue
       });
