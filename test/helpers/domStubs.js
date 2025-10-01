@@ -77,17 +77,30 @@ function createAudioElementStub(id = 'audioPlayer') {
     element.paused = true;
   };
   element.load = () => {};
+  element.addEventListener = function(type, handler, options = {}) {
+    const once = typeof options === 'object' && options?.once === true;
+    (element._events[type] = element._events[type] || []).push({ handler, once });
   element.addEventListener = function(type, handler) {
     (element._events[type] = element._events[type] || []).push(handler);
   };
   element.removeEventListener = function(type, handler) {
     const arr = element._events[type];
     if (!arr) return;
+    const idx = arr.findIndex(entry => entry.handler === handler);
     const idx = arr.indexOf(handler);
     if (idx >= 0) arr.splice(idx, 1);
   };
   element.dispatchEvent = function(event) {
     event.target = event.target || element;
+    const listeners = element._events[event.type] || [];
+    for (let i = 0; i < listeners.length; i++) {
+      const entry = listeners[i];
+      entry.handler.call(element, event);
+      if (entry.once) {
+        listeners.splice(i, 1);
+        i--;
+      }
+    }
     (element._events[event.type] || []).forEach(fn => fn.call(element, event));
     return true;
   };
@@ -180,9 +193,28 @@ function createPointerEvent({ type = 'pointerdown', clientY = 0, button = 0, poi
   };
 }
 
+function flushAsyncOperations() {
+  const scheduleImmediate = cb => (typeof setImmediate === 'function' ? setImmediate(cb) : setTimeout(cb, 0));
+
+  const nextFrame = new Promise(resolve => {
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => resolve());
+    } else {
+      scheduleImmediate(resolve);
+    }
+  });
+
+  const afterMacrotask = new Promise(resolve => scheduleImmediate(resolve));
+
+  return Promise.all([nextFrame, afterMacrotask]).then(() => undefined);
+}
+
 module.exports = {
   createStubElement,
   createAudioElementStub,
   stubGlobalEnvironment,
+
+  createPointerEvent,
+  flushAsyncOperations
   createPointerEvent
 };
