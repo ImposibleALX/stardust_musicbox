@@ -1,6 +1,6 @@
 // —— Al principio de main.js ——
-const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay'];
-const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay] = ids.map(id => document.getElementById(id));
+const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'volumeSliderContainer'];
+const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay, volumeSliderContainer] = ids.map(id => document.getElementById(id));
 
 const factionCache   = {};
 
@@ -256,7 +256,7 @@ window.setCatalog = function(data) {
       // Guardamos la instancia por si se necesita en el futuro
       window.volumeController = initVolumeControl({
         audioEl: audioPlayer,
-        bgEl: volumeSliderContainer, // El elemento se llama 'volumeSliderContainer' en el HTML
+        bgEl: volumeBarBg,
         barEl: volumeBar,
         labelEl: volumeValue
       });
