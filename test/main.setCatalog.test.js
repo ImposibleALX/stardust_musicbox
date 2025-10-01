@@ -40,7 +40,6 @@ test('setCatalog wires the volume control to the slider background element', () 
   // Silence console output invoked during module load in the test environment
   const originalConsoleError = console.error;
   console.error = () => {};
-
   try {
     delete require.cache[require.resolve('../js/main.js')];
     require('../js/main.js');
@@ -149,4 +148,20 @@ test('setCatalog resets cached faction playlists when new data arrives', () => {
     delete global.volumeController;
     delete global.__musicboxInternals;
   }
+  delete require.cache[require.resolve('../js/main.js')];
+  require('../js/main.js');
+
+  assert.strictEqual(typeof global.setCatalog, 'function');
+  global.setCatalog([]);
+
+  assert.ok(capturedOptions, 'initVolumeControl should be invoked after setting the catalog');
+  assert.strictEqual(capturedOptions.bgEl, volumeBarBg, 'Volume control must target the slider background');
+  assert.strictEqual(capturedOptions.audioEl, audioEl);
+  assert.strictEqual(capturedOptions.barEl, volumeBar);
+  assert.strictEqual(capturedOptions.labelEl, volumeValue);
+
+  console.error = originalConsoleError;
+  restore();
+  delete global.initVolumeControl;
+  delete global.setCatalog;
 });

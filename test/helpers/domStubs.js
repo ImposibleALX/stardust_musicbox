@@ -80,11 +80,14 @@ function createAudioElementStub(id = 'audioPlayer') {
   element.addEventListener = function(type, handler, options = {}) {
     const once = typeof options === 'object' && options?.once === true;
     (element._events[type] = element._events[type] || []).push({ handler, once });
+  element.addEventListener = function(type, handler) {
+    (element._events[type] = element._events[type] || []).push(handler);
   };
   element.removeEventListener = function(type, handler) {
     const arr = element._events[type];
     if (!arr) return;
     const idx = arr.findIndex(entry => entry.handler === handler);
+    const idx = arr.indexOf(handler);
     if (idx >= 0) arr.splice(idx, 1);
   };
   element.dispatchEvent = function(event) {
@@ -98,6 +101,7 @@ function createAudioElementStub(id = 'audioPlayer') {
         i--;
       }
     }
+    (element._events[event.type] || []).forEach(fn => fn.call(element, event));
     return true;
   };
   Object.defineProperty(element, 'ontimeupdate', {
@@ -209,6 +213,8 @@ module.exports = {
   createStubElement,
   createAudioElementStub,
   stubGlobalEnvironment,
+
   createPointerEvent,
   flushAsyncOperations
+  createPointerEvent
 };
