@@ -277,7 +277,19 @@ const bannedNoFactions = new Set([
 
 // Recibe el catálogo de tracks
 window.setCatalog = function(data) {
-    catalog = data;
+    catalog = Array.isArray(data) ? data : [];
+
+    for (const key of Object.keys(factionCache)) {
+        delete factionCache[key];
+    }
+
+    currentFaction = '';
+    lastPlayRequestId = 0;
+
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+    audioPlayer._playRequestId = 0;
+
     trackName.textContent = "Choose your faction to start";
     factionName.textContent = "Choose your faction to start";
 
