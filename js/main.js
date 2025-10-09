@@ -1,6 +1,6 @@
 // —— Al principio de main.js ——
-const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay'];
-const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay] = ids.map(id => document.getElementById(id));
+const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'volumeSliderContainer'];
+const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay, volumeSliderContainer] = ids.map(id => document.getElementById(id));
 
 const factionCache   = {};
 
@@ -109,27 +109,57 @@ function playFactionTrack(faction, shuffledTracks, trackIndex, offset = 0, dispN
 
     const remainingTime = (shuffledTracks[trackIndex].duration || 0) - offset;
     if (remainingTime < 0.05 || !isFinite(remainingTime)) {
-        audioPlayer.dispatchEvent(new Event('ended')); // Evita el uso de setTimeout
+        Promise.resolve().then(() => {
+            if (audioPlayer._playRequestId === playRequestId) {
+                audioPlayer.dispatchEvent(new Event('ended'));
+            }
+        });
     }
+}
+
+// Determina qué track reproducir y el offset inicial seguro
+function chooseTrackStart(tracks, totalDuration, elapsedSeconds) {
+    const validTracks = tracks.filter(t => t && t.duration > 0);
+    if (!validTracks.length) {
+        return { tracks: validTracks, index: 0, offset: 0, totalDuration: 0 };
+    }
+
+    const suppliedTotal = Number(totalDuration);
+    const computedTotal = validTracks.reduce((sum, track) => sum + track.duration, 0);
+    const safeTotal = Number.isFinite(suppliedTotal) && suppliedTotal > 0 ? suppliedTotal : computedTotal;
+
+    if (!(safeTotal > 0) || !Number.isFinite(elapsedSeconds)) {
+        return { tracks: validTracks, index: 0, offset: 0, totalDuration: safeTotal };
+    }
+
+    const normalizedElapsed = ((elapsedSeconds % safeTotal) + safeTotal) % safeTotal;
+
+    let accumulated = 0;
+    for (let i = 0; i < validTracks.length; i++) {
+        const duration = validTracks[i].duration;
+        if (accumulated + duration > normalizedElapsed) {
+            const relative = Math.max(normalizedElapsed - accumulated, 0);
+            const maxOffset = Math.max(duration - 0.01, 0);
+            return {
+                tracks: validTracks,
+                index: i,
+                offset: Math.min(relative, maxOffset),
+                totalDuration: safeTotal
+            };
+        }
+        accumulated += duration;
+    }
+
+    return { tracks: validTracks, index: 0, offset: 0, totalDuration: safeTotal };
 }
 
 // Pre-filtra tracks válidos y calcula la duración total
 function startRadio(tracks, totalDuration, label, dispName = null) {
-    const validTracks = tracks.filter(t => t.duration > 0); // Filtra tracks válidos
-    if (!validTracks.length || totalDuration <= 0) return;
+    const { tracks: validTracks, index, offset, totalDuration: safeTotal } =
+        chooseTrackStart(tracks, totalDuration, getElapsedSeconds());
+    if (!validTracks.length || !(safeTotal > 0)) return;
 
-    const t0 = getElapsedSeconds() % totalDuration;
-    let accumulated = 0, idx = 0, offset = 0;
-
-    for (const [i, { duration }] of validTracks.entries()) {
-        if (accumulated + duration > t0) {
-            idx = i;
-            offset = Math.min(Math.max(t0 - accumulated, 0), duration - 0.01);
-            break;
-        }
-        accumulated += duration;
-    }
-    playFactionTrack(label, validTracks, idx, offset, dispName);
+    playFactionTrack(label, validTracks, index, offset, dispName);
 }
 
 // Inicia la radio sincronizada para una facción
@@ -247,7 +277,19 @@ const bannedNoFactions = new Set([
 
 // Recibe el catálogo de tracks
 window.setCatalog = function(data) {
-    catalog = data;
+    catalog = Array.isArray(data) ? data : [];
+
+    for (const key of Object.keys(factionCache)) {
+        delete factionCache[key];
+    }
+
+    currentFaction = '';
+    lastPlayRequestId = 0;
+
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+    audioPlayer._playRequestId = 0;
+
     trackName.textContent = "Choose your faction to start";
     factionName.textContent = "Choose your faction to start";
 
@@ -256,9 +298,18 @@ window.setCatalog = function(data) {
       // Guardamos la instancia por si se necesita en el futuro
       window.volumeController = initVolumeControl({
         audioEl: audioPlayer,
-        bgEl: volumeSliderContainer, // El elemento se llama 'volumeSliderContainer' en el HTML
+        bgEl: volumeBarBg,
         barEl: volumeBar,
         labelEl: volumeValue
       });
     }
 };
+
+if (typeof window !== 'undefined') {
+    window.__musicboxInternals = Object.assign(window.__musicboxInternals || {}, {
+        chooseTrackStart,
+        playFaction,
+        startRadio,
+        setCurrentFaction: faction => { currentFaction = faction; }
+    });
+}

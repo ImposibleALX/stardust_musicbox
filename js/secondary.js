@@ -171,12 +171,16 @@ function createListLogoManager() {
 
 // —— App —— //
 document.addEventListener('DOMContentLoaded', () => {
-  const ids = ['audioPlayer','trackName','factionName','timeDisplay','btnPlayPause','imgPlayPause','btnLoop','imgLoop','allTracksList','secondList','volumeSliderContainer','volumeValue','volumeBar'];
-  const refs = ids.reduce((o, id) => (o[id] = document.getElementById(id), o), {});
-  const { audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause, btnLoop, imgLoop, allTracksList, secondList, volumeSliderContainer, volumeValue, volumeBar } = refs;
 
-  const factionImg = document.querySelector('.faction-section .faction-logo');
-  const playerLogoRotator = createPlayerLogoRotator(factionImg);
+  // 1. OBTENER ELEMENTOS DEL DOM
+  const {
+    audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause,
+    btnLoop, imgLoop, allTracksList, secondList, volumeSliderContainer, volumeValue, volumeBar
+  } = ['audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'btnPlayPause', 'imgPlayPause', 'btnLoop', 'imgLoop', 'allTracksList', 'secondList', 'volumeSliderContainer', 'volumeValue', 'volumeBar']
+    .reduce((o, id) => (o[id] = document.getElementById(id), o), {});
+
+  // 2. INSTANCIAR GESTORES Y PRECargador
+  const playerLogoRotator = createPlayerLogoRotator(document.querySelector('.faction-section img'));
   const listLogoManager = createListLogoManager();
 
   // Preloader muy ligero
@@ -426,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initVolumeControl === 'function') {
       const inst = initVolumeControl({
         audioEl: audioPlayer,
-        bgEl: document.getElementById('volumeBarBg'),
+        bgEl: volumeSliderContainer,
         barEl: volumeBar,
         labelEl: volumeValue
       });
