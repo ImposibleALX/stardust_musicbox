@@ -1353,17 +1353,16 @@
     "duration": 180.767347
   },
   {
-    "id": "guia_counterattack",
-    "file": "counterattack.mp3",
-    "folder": "guia",
-    "factions": [
-      "guia"
-    ],
-    "titles": {
-      "en": "Counterattack",
-      "es": "Contraataque",
-      "jp": ""
-    }
+  "id": "guia_counterattack",
+  "file": "counterattack.mp3",
+  "folder": "guia",
+  "factions": ["guia"],
+  "titles": {
+    "en": "CounterAttack",
+    "es": "CounterAttack",
+    "jp": ""
+  },
+  "duration": 101.666667
   },
   {
     "id": "guia_mega_fortress_sus",
