@@ -1,6 +1,6 @@
 // —— Al principio de main.js ——
-const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'volumeSliderContainer'];
-const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay, volumeSliderContainer] = ids.map(id => document.getElementById(id));
+const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay'];
+const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay] = ids.map(id => document.getElementById(id));
 
 const factionCache   = {};
 
