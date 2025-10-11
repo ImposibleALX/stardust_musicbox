@@ -1709,131 +1709,131 @@
     },
     "duration": 171.781224
   },
-  {
-    "id": "various_what_did_you_do",
-    "file": "what_did_you_do.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+{
+  "id": "expanse_what_did_you_do",
+  "file": "what_did_you_do.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "What Did You Do (Julie and Miller Theme)",
-      "es": "What Did You Do",
-      "jp": ""
+  "titles": {
+    "en": "What Did You Do (Julie and Miller Theme)",
+    "es": "What Did You Do",
+    "jp": ""
   },
-    "duration": 190.197542
-  },
-  {
-    "id": "various_do_it_together",
-    "file": "do_it_together.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 190.197542
+},
+{
+  "id": "expanse_do_it_together",
+  "file": "do_it_together.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "Do It Together",
-      "es": "Do It Together",
-      "jp": ""
+  "titles": {
+    "en": "Do It Together",
+    "es": "Do It Together",
+    "jp": ""
   },
-    "duration": 159.111833
-  },
-  {
-    "id": "various_another_way",
-    "file": "another_way.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 159.111833
+},
+{
+  "id": "expanse_another_way",
+  "file": "another_way.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "Another Way",
-      "es": "Another Way",
-      "jp": ""
+  "titles": {
+    "en": "Another Way",
+    "es": "Another Way",
+    "jp": ""
   },
-    "duration": 131.658208
-  },
-  {
-    "id": "various_we_have_to_kill_it",
-    "file": "we_have_to_kill_it.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 131.658208
+},
+{
+  "id": "expanse_we_have_to_kill_it",
+  "file": "we_have_to_kill_it.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "We Have To Kill It",
-      "es": "We Have To Kill It",
-      "jp": ""
+  "titles": {
+    "en": "We Have To Kill It",
+    "es": "We Have To Kill It",
+    "jp": ""
   },
-    "duration": 250.984479
-  },
-  {
-    "id": "various_room",
-    "file": "room.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 250.984479
+},
+{
+  "id": "expanse_room",
+  "file": "room.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "The Room Eats You",
-      "es": "The Room Eats You",
-      "jp": ""
+  "titles": {
+    "en": "The Room Eats You",
+    "es": "The Room Eats You",
+    "jp": ""
   },
-    "duration": 57.156979
-  },
-  {
-    "id": "various_coming_home",
-    "file": "coming_home.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 57.156979
+},
+{
+  "id": "expanse_coming_home",
+  "file": "coming_home.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "Coming Home",
-      "es": "Coming Home",
-      "jp": ""
+  "titles": {
+    "en": "Coming Home",
+    "es": "Coming Home",
+    "jp": ""
   },
-    "duration": 135.863917
-  },
-  {
-    "id": "various_need_a_ride",
-    "file": "need_a_ride.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 135.863917
+},
+{
+  "id": "expanse_need_a_ride",
+  "file": "need_a_ride.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "I Need A Ride",
-      "es": "I Need A Ride",
-      "jp": ""
+  "titles": {
+    "en": "I Need A Ride",
+    "es": "I Need A Ride",
+    "jp": ""
   },
-    "duration": 282.254125
-  },
-  {
-    "id": "various_ilus",
-    "file": "ilus.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 282.254125
+},
+{
+  "id": "expanse_ilus",
+  "file": "ilus.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "To Ilus",
-      "es": "To Ilus",
-      "jp": ""
+  "titles": {
+    "en": "To Ilus",
+    "es": "To Ilus",
+    "jp": ""
   },
-    "duration": 161.96
-  },
-  {
-    "id": "various_highway_star",
-    "file": "highway_star.mp3",
-    "folder": "expanse",
-    "factions": [
-      "various"
+  "duration": 161.96
+},
+{
+  "id": "expanse_highway_star",
+  "file": "highway_star.mp3",
+  "folder": "expanse",
+  "factions": [
+    "expanse"
   ],
-    "titles": {
-      "en": "Highway Star (Belter Version)",
-      "es": "Highway Star (Belter Version)",
-      "jp": ""
+  "titles": {
+    "en": "Highway Star (Belter Version)",
+    "es": "Highway Star (Belter Version)",
+    "jp": ""
   },
-    "duration": 371.16
+  "duration": 371.16
   },
   {
     "id": "atlantis_nautilus_vocal",
