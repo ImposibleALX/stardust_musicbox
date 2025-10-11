@@ -42,8 +42,7 @@
     }
 
     // Estado interno
-    const initialNumeric = Number(initial);
-    let linear = clamp(Number.isFinite(initialNumeric) ? initialNumeric : 0.9);
+    let linear = clamp(Number(initial) || 0.9);
     let cachedRect = null;           // bounding rect cache usado durante drag
     let isDragging = false;
     let pendingY = null;             // Y más reciente (viewport) recibido por pointermove
@@ -99,8 +98,7 @@
     }
 
     function setLinearValue(v, { skipAudio = false } = {}) {
-      const numeric = Number(v);
-      linear = clamp(Number.isFinite(numeric) ? numeric : 0);
+      linear = clamp(Number(v) || 0);
       if (!skipAudio) applyVolumeToAudio();
       scheduleRender();
       return linear;
