@@ -5,19 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EVANGELION</title>
     <link rel="stylesheet" href="../css/sby.css">
-    <link rel="shortcut icon" type="image/x-icon" href="stardust_musicbox/favicon.ico">
+    <!-- Corrige la ruta del favicon para evitar un 404 -->
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
 </head>
-<body>
+<body data-catalog="music_catalog_all.json">
     <div class="main-container">
         <header>
             <h1>NEON GENESIS EVANGELION</h1>
-            <p class="subheading">F A C T I O N M U S I C P L A Y E R</p>
+            <p class="subheading">F A C T I O N&nbsp;M U S I C&nbsp;P L A Y E R</p>
+            <!-- Agrega el acceso rápido a modo manual para mantener la navegación consistente -->
+            <a href="/stardust_musicbox/manual" class="manual-btn-topright">Manual Mode</a>
         </header>
-        <div class="faction-buttons">
-            <img src="../assets/images/logos/evangelion_logo.webp" alt="NERV" onclick="playFaction('nerv')" title="NERV">
-            <img src="../assets/images/logos/evangelion_logo.webp" alt="SEELE" onclick="playFaction('seele')" title="SEELE">
-            <img src="../assets/images/logos/evangelion_logo.webp" alt="ANGELS" onclick="playFaction('seele')" title="ANGELS">
-            <img src="../assets/images/logos/evangelion_logo.webp" alt="WILLE" onclick="playFaction('wille')" title="WILLE">
+        <div class="faction-buttons" role="group" aria-label="Available factions">
+            <!-- Sustituimos los manejadores inline por botones accesibles -->
+            <button type="button" class="faction-button" data-faction="nerv" aria-pressed="false">
+                <img src="../assets/images/logos/evangelion_logo.webp" alt="NERV emblem" loading="lazy">
+                <span class="faction-button__label">NERV</span>
+            </button>
+            <button type="button" class="faction-button" data-faction="seele" aria-pressed="false">
+                <img src="../assets/images/logos/evangelion_logo.webp" alt="SEELE emblem" loading="lazy">
+                <span class="faction-button__label">SEELE</span>
+            </button>
+            <button type="button" class="faction-button" data-faction="angels" aria-pressed="false">
+                <img src="../assets/images/logos/evangelion_logo.webp" alt="ANGELS emblem" loading="lazy">
+                <span class="faction-button__label">ANGELS</span>
+            </button>
+            <button type="button" class="faction-button" data-faction="wille" aria-pressed="false">
+                <img src="../assets/images/logos/evangelion_logo.webp" alt="WILLE emblem" loading="lazy">
+                <span class="faction-button__label">WILLE</span>
+            </button>
         </div>
         <div class="player-container" id="playerContainer">
             <div class="audio-hidden">
@@ -25,13 +41,13 @@
             </div>
             <div class="player-sections">
                 <div class="track-name-section">
-                    <span id="trackName">Track Name</span>
+                    <span id="trackName" role="status" aria-live="polite">Track Name</span>
                 </div>
                 <div class="faction-section">
-                    <span id="factionName"></span>
+                    <span id="factionName" role="status" aria-live="polite"></span>
                 </div>
                 <div class="timer-section">
-                    <span id="timeDisplay">00:00</span>
+                    <span id="timeDisplay" aria-live="off">00:00</span>
                 </div>
                 <div class="volume-section">
                     <div id="volumeSliderContainer">
@@ -45,8 +61,10 @@
         </div>
     </div>
 
+    <script src="../js/catalogLoader.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/sw.js"></script>
+    <!-- Nuevo inicializador específico con manejo de errores y delegación de eventos -->
+    <script src="../js/evangelion.js"></script>
     <script src="../js/volumecontrol.js"></script>
 </body>
 </html>

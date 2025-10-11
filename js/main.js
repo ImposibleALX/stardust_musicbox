@@ -1,21 +1,46 @@
 // —— Al principio de main.js ——
-const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'volumeSliderContainer'];
-const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay, volumeSliderContainer] = ids.map(id => document.getElementById(id));
+(function initMainPlayer(window) {
+  'use strict';
 
-const factionCache   = {};
+  const ids = ['volumeBarBg', 'volumeBar', 'volumeValue', 'audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'volumeSliderContainer'];
+  const elements = ids.map(id => document.getElementById(id));
+  const [volumeBarBg, volumeBar, volumeValue, audioPlayer, trackName, factionName, timeDisplay, volumeSliderContainer] = elements;
 
-function handleCanPlay() {
-  if (audioPlayer._playRequestId === lastPlayRequestId) {
-    audioPlayer.play().catch(err => console.error(err));
+  const missingElements = ids.filter((id, index) => !elements[index]);
+  if (missingElements.length) {
+    console.warn(`main.js: faltan nodos del DOM requeridos -> ${missingElements.join(', ')}`);
   }
-}
-audioPlayer.addEventListener('canplay', handleCanPlay);
 
-let catalog = [];
-let currentFaction = '';
-const START_DATE_MS = Date.UTC(2025, 0, 1);
-const perfOrigin    = performance.timeOrigin || (Date.now() - performance.now());
-const baseEpoch     = START_DATE_MS - perfOrigin;
+  let catalog = [];
+  let currentFaction = '';
+  const factionCache = {};
+  let lastPlayRequestId = 0;
+
+  const warnUnavailable = (fnName) => {
+    console.warn(`main.js: no se puede ejecutar ${fnName} porque #audioPlayer no está disponible.`);
+  };
+
+  // Verificación defensiva para evitar fallos en páginas que aún no montan el reproductor
+  if (!audioPlayer) {
+    window.playFaction = () => warnUnavailable('playFaction');
+    window.playNoFactions = () => warnUnavailable('playNoFactions');
+    window.setCatalog = (data) => { catalog = Array.isArray(data) ? data : []; };
+    if (typeof window !== 'undefined') {
+      window.__musicboxInternals = Object.assign(window.__musicboxInternals || {}, {});
+    }
+    return;
+  }
+
+  function handleCanPlay() {
+    if (audioPlayer._playRequestId === lastPlayRequestId) {
+      audioPlayer.play().catch(err => console.error(err));
+    }
+  }
+  audioPlayer.addEventListener('canplay', handleCanPlay);
+
+  const START_DATE_MS = Date.UTC(2025, 0, 1);
+  const perfOrigin    = performance.timeOrigin || (Date.now() - performance.now());
+  const baseEpoch     = START_DATE_MS - perfOrigin;
 
 const startMs = performance.now();
 function getElapsedSeconds() {
@@ -66,8 +91,6 @@ function mulberry32(a) {
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 }
-
-let lastPlayRequestId = 0;
 
 // Reproducir música de una facción seleccionada
 function playFaction(faction) {
@@ -313,3 +336,4 @@ if (typeof window !== 'undefined') {
         setCurrentFaction: faction => { currentFaction = faction; }
     });
 }
+})(typeof window !== 'undefined' ? window : globalThis);

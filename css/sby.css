@@ -51,6 +51,37 @@ h1 {
     justify-content: center;
 }
 
+/* Nuevos botones accesibles sin perder compatibilidad con las vistas antiguas */
+.faction-button {
+    background: none;
+    border: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    color: inherit;
+    text-align: center;
+}
+
+.faction-button:focus-visible {
+    outline: 3px solid #6cf;
+    outline-offset: 6px;
+}
+
+.faction-button__label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: #ccd;
+    text-transform: uppercase;
+}
+
+.faction-button.is-active .faction-button__label {
+    color: #6cf;
+}
+
 .faction-buttons img {
     width: 120px;
     height: 120px;
@@ -63,10 +94,26 @@ h1 {
     box-shadow: 0 0 10px #000;
 }
 
+.faction-button img {
+    pointer-events: none; /* evita doble foco en el nuevo marcado con botones */
+}
+
 .faction-buttons img:hover {
     transform: scale(1.1);
     box-shadow: 0 0 20px rgb(74, 148, 185);
     border-color: rgb(65, 128, 160);
+}
+
+.faction-button:hover .faction-button__label,
+.faction-button:focus-visible .faction-button__label {
+    color: #e8f6ff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .faction-buttons img,
+    .faction-button {
+        transition: none;
+    }
 }
 
 .player-container {
