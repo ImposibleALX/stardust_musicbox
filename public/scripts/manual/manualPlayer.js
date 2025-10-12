@@ -49,9 +49,16 @@ let currentlyPlayingCatalogIndex = -1;
 let isLooping = false;
 let animationFrameId_timer;
 
-const baseURL = "https://imposiblealx.github.io/stardust_musicbox/assets/images";
-const musicBaseURL = "../assets/music";
-const dataURL = "../assets/data/music_catalog_all.json";
+function ensureTrailingSlash(path) {
+  if (!path) return '';
+  return path.endsWith('/') ? path : `${path}/`;
+}
+
+const imageBaseURL = (window.IMAGE_BASE_PATH || '../assets/images');
+const musicBaseURL = ensureTrailingSlash(window.AUDIO_BASE_PATH || '../assets/music/');
+const catalogBaseURL = ensureTrailingSlash(window.CATALOG_BASE_PATH || '../assets/catalogs/');
+const baseURL = imageBaseURL.replace(/\/$/, '');
+const dataURL = `${catalogBaseURL}music_catalog_all.json`;
 
 // Facciones (sin duplicados)
 const factionDisplayNames = {
@@ -189,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
     init() { this.element.preload = 'metadata'; },
     preload(track) {
       if (!track) return;
-      const filePath = `${musicBaseURL}/${track.folder}/${track.file}`;
+      const filePath = `${musicBaseURL}${track.folder}/${track.file}`;
       if (this.element.src !== filePath) {
         this.element.src = filePath;
         this.element.load();
@@ -245,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentlyPlayingCatalogIndex = catalogIndex;
     currentIndexInQueue = playQueue.indexOf(catalogIndex);
 
-    const filePath = `${musicBaseURL}/${track.folder}/${track.file}`;
+    const filePath = `${musicBaseURL}${track.folder}/${track.file}`;
     if (audioPlayer.src !== filePath) {
       audioPlayer.src = filePath;
       audioPlayer.load();
