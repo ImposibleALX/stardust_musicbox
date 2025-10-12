@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SMB Manual</title>
-  <link rel="stylesheet" href="../../styles/manual.css">
-  <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../styles/manual.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body>
   <div class="main-container">
@@ -27,12 +27,12 @@
           <div class="controls">
             <button id="btnPlayPause" title="Play/Pause">
               <img id="imgPlayPause"
-                   src="../../assets/images/buttons/play_button.png"
+                   src="../assets/images/buttons/play_button.png"
                    alt="Play/Pause">
             </button>
             <button id="btnLoop" title="Loop Off">
               <img id="imgLoop"
-                   src="../../assets/images/buttons/loop_button.png"
+                   src="../assets/images/buttons/loop_button.png"
                    alt="Loop">
             </button>
           </div>
@@ -58,15 +58,15 @@
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.js"></script>
-    <script src="../../scripts/core/config.js"></script>
+    <script src="../scripts/core/config.js"></script>
     <script>
       configureFactionPage({
-        catalogBasePath: '../../assets/catalogs/',
-        audioBasePath: '../../assets/music/',
-        imageBasePath: '../../assets/images/'
+        catalogBasePath: '../assets/catalogs/',
+        audioBasePath: '../assets/music/',
+        imageBasePath: '../assets/images/'
       });
     </script>
-    <script src="../../scripts/manual/manualPlayer.js"></script>
-    <script src="../../scripts/core/volumeControl.js"></script>
+    <script src="../scripts/manual/manualPlayer.js"></script>
+    <script src="../scripts/core/volumeControl.js"></script>
 </body>
 </html>

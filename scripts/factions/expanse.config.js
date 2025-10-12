@@ -1,7 +1,7 @@
 (function () {
   configureFactionPage({
-    catalogBasePath: '../../../assets/catalogs/',
-    audioBasePath: '../../../assets/music/',
+    catalogBasePath: '../../assets/catalogs/',
+    audioBasePath: '../../assets/music/',
     displayNames: {
       unn: 'United Nations Navy',
       mcrn: 'Martian Congressional Republic Navy',
