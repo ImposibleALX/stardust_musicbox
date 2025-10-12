@@ -3,19 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>THE EXPANSE</title>
-  <link rel="stylesheet" href="../../../styles/factions.css">
-  <link rel="shortcut icon" href="../../../favicon.ico" type="image/x-icon">
+  <title>NADIA</title>
+  <link rel="stylesheet" href="../../styles/factions.css">
+  <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
 </head>
-<body data-catalog="music_catalog_expanse.json">
+<body data-catalog="music_catalog_n.json">
   <div class="main-container">
     <header>
-      <h1>THE EXPANSE</h1>
+      <h1>NADIA: THE SECRET OF THE BLUE WATER</h1>
       <p class="subheading">FACTION MUSIC PLAYER</p>
       <a href="../../manual/" class="manual-btn-topright">Manual Mode</a>
     </header>
     <div class="faction-buttons">
-      <img src="../../../assets/images/logos/nofactions.png" alt="No Factions" onclick="playNoFactions()" title="NO FACTIONS?">
+      <img src="../../assets/images/mini_logos/neoatlantis_logo.png" alt="NEOATLANTIS" onclick="playFaction('neoatlantis')" title="NEOATLANTIS">
+      <img src="../../assets/images/mini_logos/atlantis_logo.png" alt="ATLANTIS" onclick="playFaction('atlantis')" title="ATLANTIS">
+      <img src="../../assets/images/logos/nofactions.png" alt="No Factions" onclick="playNoFactions()" title="NO FACTIONS?">
     </div>
     <div class="player-container" id="playerContainer">
       <div class="audio-hidden">
@@ -42,10 +44,10 @@
       </div>
     </div>
   </div>
-  <script src="../../../scripts/core/config.js"></script>
-  <script src="../../../scripts/factions/expanse.config.js"></script>
-  <script src="../../../scripts/core/catalogLoader.js"></script>
-  <script src="../../../scripts/core/radioPlayer.js"></script>
-  <script src="../../../scripts/core/volumeControl.js"></script>
+  <script src="../../scripts/core/config.js"></script>
+  <script src="../../scripts/factions/nadia.config.js"></script>
+  <script src="../../scripts/core/catalogLoader.js"></script>
+  <script src="../../scripts/core/radioPlayer.js"></script>
+  <script src="../../scripts/core/volumeControl.js"></script>
 </body>
 </html>

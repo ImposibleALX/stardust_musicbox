@@ -1,7 +1,7 @@
 (function () {
   configureFactionPage({
-    catalogBasePath: '../../../assets/catalogs/',
-    audioBasePath: '../../../assets/music/',
+    catalogBasePath: '../../assets/catalogs/',
+    audioBasePath: '../../assets/music/',
     displayNames: {
       bolar: 'Bolar Federation',
       dezariam: 'Dezariam Nation',
