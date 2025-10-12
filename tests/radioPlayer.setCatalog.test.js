@@ -41,8 +41,8 @@ test('setCatalog wires the volume control to the slider background element', () 
   const originalConsoleError = console.error;
   console.error = () => {};
 
-  delete require.cache[require.resolve('../public/scripts/core/radioPlayer.js')];
-  require('../public/scripts/core/radioPlayer.js');
+  delete require.cache[require.resolve('../scripts/core/radioPlayer.js')];
+  require('../scripts/core/radioPlayer.js');
 
   assert.strictEqual(typeof global.setCatalog, 'function');
   global.setCatalog([]);

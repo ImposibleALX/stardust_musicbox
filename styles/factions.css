@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;800&display=swap');
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #080816;
+    font-family: 'Orbitron', sans-serif;
+    color: #ddd;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+header {
+    margin: 20px 0;
+    position: relative;
+}
+
+h1 {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.subheading {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+.faction-buttons {
+    display: flex;
+    gap: 20px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.faction-buttons img {
+    width: 120px;
+    height: 120px;
+    border: 1.5px solid #353535;
+    border-radius: 8px;
+    padding: 10px;
+    background: #11111f;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 10px #000;
+}
+
+.faction-buttons img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgb(74, 148, 185);
+    border-color: rgb(65, 128, 160);
+}
+
+.player-container {
+    background: #151527;
+    padding: 25px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 0 25px rgba(108, 255, 255, 0.1);
+    margin-bottom: 5px;
+    position: relative;
+    border-radius: 3px;
+}
+
+.player-sections {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 40px auto;
+    gap: 16px 16px;
+    align-items: center;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+}
+
+.track-name-section {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+    background: #0f0f1a;
+    padding: 15px;
+    border: 1px solid #333;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.track-name-section #trackName {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #fff;
+    display: block;
+}
+
+.faction-section {
+    grid-column: 1 / 2;
+    grid-row: 2;
+    background: #0f0f1a;
+    padding: 15px;
+    border: 1px solid #333;
+    text-align: left;
+}
+
+.faction-section #factionName {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #6cf;
+}
+
+.timer-section {
+    width: 100px;
+    grid-column: 2 / 3;
+    grid-row: 2;
+    background: #0f0f1a;
+    padding: 15px;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.timer-section #timeDisplay {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #6cf;
+}
+
+/*audio {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+*/
+/* ocultar audio */
+
+.audio-hidden {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+.volume-section {
+    grid-column: 3 / 4;
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    margin-left: 10px;
+    width: 45px;
+}
+
+#volumeSliderContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+}
+
+#volumeBarBg {
+    width: 28px;
+    height: 100px;
+    background: #222;
+    border-radius: 12px;
+    border: 2px solid #333;
+    position: relative;
+    margin-bottom: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+}
+
+#volumeBar {
+    width: 100%;
+    background: linear-gradient(to top, #6cf, #fff 80%);
+    border-radius: 10px 10px 12px 12px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 80%; /* valor inicial 80% */
+    transition: height 0.1s;
+}
+
+#volumeValue {
+    color: #6cf;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 2px;
+    width: 48px;
+    text-align: center;
+}
+
+.manual-btn-topright {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #0f0f1a;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 2px #000;
+  text-decoration: none;
+  transition: background 0.2s, box-shadow 0.1s;
+  z-index: 1000;
+}
+
+.manual-btn-topright:hover {
+  background: #151527;
+  box-shadow: 0 0 20px #6cf;
+}
+

@@ -4,9 +4,9 @@ const { execSync } = require('child_process');
 
 // Ruta base de la música y del catálogo
 const projectRoot = path.resolve(__dirname, '..');
-const musicBasePath = path.join(projectRoot, 'public/assets/music');
-const catalogPath = path.join(projectRoot, 'public/assets/catalogs/music_catalog.json');
-const outputPath = path.join(projectRoot, 'public/assets/catalogs/music_catalog_with_duration.json');
+const musicBasePath = path.join(projectRoot, 'assets/music');
+const catalogPath = path.join(projectRoot, 'assets/catalogs/music_catalog.json');
+const outputPath = path.join(projectRoot, 'assets/catalogs/music_catalog_with_duration.json');
 
 // Leer el catálogo original
 let catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));

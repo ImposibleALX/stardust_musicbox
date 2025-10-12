@@ -1,0 +1,156 @@
+[
+  {
+    "id": "atlantis_nautilus_vocal",
+    "file": "nautilus_vocal.flac",
+    "folder": "atlantis",
+    "factions": [
+      "atlantis"
+    ],
+    "titles": {
+      "en": "Our almighty battleship N-Nautilus",
+      "es": "Nuestro poderoso acorazado N-Nautilus",
+      "jp": ""
+    },
+    "duration": 208.36
+  },
+  {
+    "id": "atlantis_bad_trio",
+    "file": "bad_trio.flac",
+    "folder": "atlantis",
+    "factions": [
+      "atlantis"
+    ],
+    "titles": {
+      "en": "Bad Trio",
+      "es": "Mal Trio",
+      "jp": ""
+    },
+    "duration": 90.266667
+  },
+  {
+    "id": "atlantis_nautilus_original_theme",
+    "file": "nautilus_original_theme.flac",
+    "folder": "atlantis",
+    "factions": [
+      "atlantis"
+    ],
+    "titles": {
+      "en": "Nautilus Original Theme",
+      "es": "Tema Original del Nautilus",
+      "jp": ""
+    },
+    "duration": 183.826667
+  },
+  {
+    "id": "atlantis_nadias_awakening",
+    "file": "nadias_awakening.flac",
+    "folder": "atlantis",
+    "factions": [
+      "atlantis"
+    ],
+    "titles": {
+      "en": "Nadia's Awakening",
+      "es": "El despertar de Nadia",
+      "jp": ""
+    },
+    "duration": 135.466667
+  },
+  {
+    "id": "nadia_resurrection",
+    "file": "resurrection.flac",
+    "folder": "atlantis",
+    "factions": [
+      "atlantis"
+    ],
+    "titles": {
+      "en": "NAUTILUS RESURRECT'S",
+      "es": "NAUTLIUS RESURGE",
+      "jp": ""
+    },
+    "duration": 130.306667
+  },
+  {
+    "id": "neoatlantis_red_noah",
+    "file": "red_noah.flac",
+    "folder": "neoatlantis",
+    "factions": [
+      "neoatlantis"
+    ],
+    "titles": {
+      "en": "RED NOAH",
+      "es": "RED NOAH",
+      "jp": ""
+    },
+    "duration": 160.133333
+  },
+  {
+    "id": "neoatlantis_1",
+    "file": "neo_atlantis_1.flac",
+    "folder": "neoatlantis",
+    "factions": [
+      "neoatlantis"
+    ],
+    "titles": {
+      "en": "NEO ATLANTIS I",
+      "es": "NUEVO ATLANTIS I",
+      "jp": ""
+    },
+    "duration": 134.226667
+  },
+  {
+    "id": "neoatlantis_2",
+    "file": "neo_atlantis_2.flac",
+    "folder": "neoatlantis",
+    "factions": [
+      "neoatlantis"
+    ],
+    "titles": {
+      "en": "NEO ATLANTIS II",
+      "es": "NUEVO ATLANTIS II",
+      "jp": ""
+    },
+    "duration": 92.506667
+  },
+  {
+    "id": "neoatlantis_3",
+    "file": "neo_atlantis_3.flac",
+    "folder": "neoatlantis",
+    "factions": [
+      "neoatlantis"
+    ],
+    "titles": {
+      "en": "NEO ATLANTIS III",
+      "es": "NUEVO ATLANTIS III",
+      "jp": ""
+    },
+    "duration": 121.64
+  },
+  {
+    "id": "neoatlantis_babel",
+    "file": "light_of_babel.flac",
+    "folder": "neoatlantis",
+    "factions": [
+      "neoatlantis"
+    ],
+    "titles": {
+      "en": "LIGHT OF BABEL",
+      "es": "LA LUZ DE BABEL",
+      "jp": ""
+    },
+    "duration": 115.866667
+  },
+  {
+    "id": "neoatlantis_gargoyle",
+    "file": "gargoyle_1.flac",
+    "folder": "neoatlantis",
+    "factions": [
+      "neoatlantis"
+    ],
+    "titles": {
+      "en": "GARGOYLE",
+      "es": "GARGOYLE",
+      "jp": ""
+    },
+    "duration": 73.04
+  }
+]

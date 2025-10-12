@@ -1,0 +1,1604 @@
+[
+  {
+    "id": "uncf_desperate_crisis",
+    "file": "desperate_crisis.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Desperate Crisis",
+      "es": "Desperate Crisis",
+      "jp": ""
+    },
+    "duration": 55.032
+  },
+  {
+    "id": "uncf_sortie_of_the_enemy_spacecraft",
+    "file": "sortie_of_the_enemy_spacecraft.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Sortie of The Enemy Spacecraft",
+      "es": "Salida de la Nave Espacial Enemiga",
+      "jp": ""
+    },
+    "duration": 65.6228
+  },
+  {
+    "id": "uncf_the_galactic_pilot_bg",
+    "file": "the_galactic_pilot_bg.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "The Galactic Pilot (BG)",
+      "es": "El Piloto Galáctico (BG)",
+      "jp": ""
+    },
+    "duration": 90.413
+  },
+  {
+    "id": "uncf_the_recon_plane_takes_off",
+    "file": "the_recon_plane_takes_off.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "The Recon Plane Takes Off",
+      "es": "El Avión de Reconocimiento Despega",
+      "jp": ""
+    },
+    "duration": 68.5224
+  },
+  {
+    "id": "uncf_the_yamato_sleeps_under_the_setting_sun",
+    "file": "the_yamato_sleeps_under_the_setting_sun.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "The Yamato Sleeps Under the Setting Sun",
+      "es": "El Yamato Duerme Bajo el Sol Poniente",
+      "jp": ""
+    },
+    "duration": 86.364025
+  },
+  {
+    "id": "uncf_yamato_descends",
+    "file": "yamato_descends.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Yamato Descends",
+      "es": "Yamato Descends",
+      "jp": ""
+    },
+    "duration": 144.32975
+  },
+  {
+    "id": "uncf_decisive_battle_yamato_gamilas_gatlantis",
+    "file": "decisive_battle_yamato_gamilas_gatlantis.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf",
+      "gamilas",
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "Decisive Battle - Yamato Gamilas VS Gatlantis",
+      "es": "Batalla Decisiva - Yamato Gamilas VS Gatlantis",
+      "jp": ""
+    },
+    "duration": 196.70525
+  },
+  {
+    "id": "uncf_endless_battle",
+    "file": "endless_battle.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Endless Battle",
+      "es": "Batalla Sin Fin",
+      "jp": ""
+    },
+    "duration": 158.544
+  },
+  {
+    "id": "uncf_2009",
+    "file": "2009.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf",
+      "guia"
+    ],
+    "titles": {
+      "en": "2220",
+      "es": "2220",
+      "jp": ""
+    },
+    "duration": 225.358367
+  },
+  {
+    "id": "uncf_fight_2",
+    "file": "fight_2.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "FIGHT, Cosmo Tiger 2!",
+      "es": "FIGHT, Cosmo Tiger 2!",
+      "jp": ""
+    },
+    "duration": 223.059592
+  },
+  {
+    "id": "uncf_yamato_op_2205_3199",
+    "file": "2205_3199.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf",
+      "dezariam",
+      "bolar"
+    ],
+    "titles": {
+      "en": "3199",
+      "es": "Apertura Original de Yamato",
+      "jp": ""
+    },
+    "duration": 93.33551
+  },
+  {
+    "id": "uncf_yamato_op_2199",
+    "file": "2199.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf",
+      "gamilas"
+    ],
+    "titles": {
+      "en": "2199",
+      "es": "2199",
+      "jp": ""
+    },
+    "duration": 87.928175
+  },
+  {
+    "id": "uncf_yamato_op_2202",
+    "file": "2202.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf",
+      "gamilas",
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "2202",
+      "es": "2202",
+      "jp": ""
+    },
+    "duration": 89.49551
+  },
+  {
+    "id": "uncf_yamato_op_2202_instrumental",
+    "file": "2202_1.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf",
+      "gamilas",
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "2202 (Instrumental)",
+      "es": "2202 (Instrumental)",
+      "jp": ""
+    },
+    "duration": 96.182857
+  },
+  {
+    "id": "uncf_yamato_original_theme",
+    "file": "original_yamato.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Original Yamato Theme",
+      "es": "Tema Original de Yamato",
+      "jp": ""
+    },
+    "duration": 121.211375
+  },
+  {
+    "id": "uncf_dogfight",
+    "file": "dogfight.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Dogfight",
+      "es": "Batalla espacial",
+      "jp": ""
+    },
+    "duration": 175.536
+  },
+  {
+    "id": "uncf_destined_time",
+    "file": "destined_time.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Time of Fate",
+      "es": "Tiempo del DESTINO",
+      "jp": ""
+    },
+    "duration": 160.704
+  },
+  {
+    "id": "uncf_andromeda",
+    "file": "andromeda.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "New Andromeda Class",
+      "es": "Nueva Clase Andromeda",
+      "jp": ""
+    },
+    "duration": 100.858776
+  },
+  {
+    "id": "uncf_two_in_the_cosmo_zero",
+    "file": "two_in_the_cosmo_zero.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Two in the Cosmo Zero",
+      "es": "Dos en el Cosmo Zero",
+      "jp": ""
+    },
+    "duration": 118.674286
+  },
+  {
+    "id": "uncf_new_cosmo_zero",
+    "file": "new_cosmo_zero.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "New Cosmo Zero",
+      "es": "Nuevo Cosmo Zero",
+      "jp": ""
+    },
+    "duration": 149.394286
+  },
+  {
+    "id": "uncf_sus_fleet_destroyed",
+    "file": "yamato_descends_piano.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "Yamato Descends (Cosmopianist ver.)",
+      "es": "Yamato Desciende (ver. Cosmopianist)"
+    },
+    "duration": 124.224
+  },
+  {
+    "id": "uncf_bluenoah",
+    "file": "blue_noah.mp3",
+    "folder": "uncf",
+    "factions": [
+      "uncf"
+    ],
+    "titles": {
+      "en": "BLUE NOAH (Brothers of the Yamato)",
+      "es": "Blue Noah (Hermanos del Yamato)"
+    },
+    "duration": 199.549375
+  },
+  {
+    "id": "gamilas_desler_attack",
+    "file": "desler_attack.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "DESLER ATTACK",
+      "es": "Ataque de Desler",
+      "jp": ""
+    },
+    "duration": 162.14205
+  },
+  {
+    "id": "gamilas_desler_attack",
+    "file": "desler_attack_1980.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "DESLER ATTACK 1980",
+      "es": "Ataque de Desler 1980",
+      "jp": ""
+    },
+    "duration": 132.696
+  },
+  {
+    "id": "gamilas_desler_attack_1978",
+    "file": "dessler_attack_1978.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "GREAT DESLER ATTACK",
+      "es": "Gran Ataque de Dessler",
+      "jp": ""
+    },
+    "duration": 294.426122
+  },
+  {
+    "id": "gamilas_desler_attack_disco",
+    "file": "desler_attack_disco.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+  ],
+    "titles": {
+      "en": "Desler Attack (Disco)",
+      "es": "Desler Attack (Disco)",
+      "jp": ""
+  },
+    "duration": 188.173333
+  },
+  {
+    "id": "gamilas_desler_attack_piano",
+    "file": "desler_attack_piano.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Desler Attack (Cosmopianist ver.)",
+      "es": "Ataque de Desler (Cosmopianista ver.)",
+      "jp": ""
+    },
+    "duration": 165.024
+  },
+  {
+    "id": "gamilas_fleet_gathering",
+    "file": "fleet_gathering.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Fleet Gathering",
+      "es": "Reunión de la Flota",
+      "jp": ""
+    },
+    "duration": 87.640825
+  },
+  {
+    "id": "gamilas_garmillas_dimensional_submarine",
+    "file": "garmillas_dimensional_submarine.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Garmillas Dimensional Submarine",
+      "es": "Submarino Dimensional de Gamilas",
+      "jp": ""
+    },
+    "duration": 102.7396
+  },
+  {
+    "id": "gamilas_garmillas_dimensional_submarine_tympani",
+    "file": "garmillas_dimensional_submarine_2.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Garmillas Dimensional Submarine (Tympani)",
+      "es": "Submarino Dimensional de Gamilas (Timbal)",
+      "jp": ""
+    },
+    "duration": 99.343675
+  },
+  {
+    "id": "gamilas_new_baleras",
+    "file": "new_baleras.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "New Baleras",
+      "es": "Nueva Baleras",
+      "jp": ""
+    },
+    "duration": 108.303675
+  },
+  {
+    "id": "gamilas_praise_be_our_eternal_glory_gamilas_anthem_without_vocals",
+    "file": "praise_be_our_eternal_glory_gamilas_anthem_without_vocals.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Praise Be Our Eternal Glory (Instrumental)",
+      "es": "Alabado Sea Nuestra Gloria Eterna (Sin Voces)",
+      "jp": ""
+    },
+    "duration": 114.912
+  },
+  {
+    "id": "gamilas_praise_be_our_eternal_glory_gamilas_anthem",
+    "file": "praise_be_our_eternal_glory_gamilas_anthem.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Praise Be Our Eternal Glory",
+      "es": "Alabado Sea Nuestra Gloria Eterna",
+      "jp": ""
+    },
+    "duration": 113.74035
+  },
+  {
+    "id": "gamilas_vs_dezariam",
+    "file": "vs_dezariam.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Battle of the Gamilas Fleet",
+      "es": "Flota de Gamilas VS Flota de Dezariam",
+      "jp": ""
+    },
+    "duration": 125.33551
+  },
+  {
+    "id": "gamilas_battle_of_galman_gamilas",
+    "file": "battle_of_galman_gamilas.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Battle of Galman-Gamilas",
+      "es": "Batalla de Galman-Gamilas",
+      "jp": ""
+    },
+    "duration": 159.216327
+  },
+  {
+    "id": "gamilas_battle_for_iscandar",
+    "file": "battle_for_iscandar.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Battle for the Future of Iscandar",
+      "es": "Batalla por el Futuro de Iscandar",
+      "jp": ""
+    },
+    "duration": 108.773878
+  },
+  {
+    "id": "gamilas_insurrection",
+    "file": "insurrection.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Insurrection",
+      "es": "Insurrección",
+      "jp": ""
+    },
+    "duration": 182.909388
+  },
+  {
+    "id": "gamilas_wandering",
+    "file": "wandering.mp3",
+    "folder": "gamilas",
+    "factions": [
+      "gamilas"
+    ],
+    "titles": {
+      "en": "Wandering",
+      "es": "Errante",
+      "jp": ""
+    },
+    "duration": 199.288163
+  },
+  {
+    "id": "gatlantis_a_pleasant_battle",
+    "file": "terezart.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "Terezart Landing Operation",
+      "es": "Operación de Aterrizaje de Terezart",
+      "jp": ""
+    },
+    "duration": 75.102041
+  },
+  {
+    "id": "gatlantis_barbarian_invasion",
+    "file": "barbarian_invasion.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "Barbarian Invasion",
+      "es": "Invasión Bárbara",
+      "jp": ""
+    },
+    "duration": 123.901975
+  },
+  {
+    "id": "gatlantis_emergence",
+    "file": "emergence.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "EMERGENCE",
+      "es": "Emergencia",
+      "jp": ""
+    },
+    "duration": 115.128
+  },
+  {
+    "id": "gatlantis_advance",
+    "file": "advance.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "ADVANCE",
+      "es": "Avance",
+      "jp": ""
+    },
+    "duration": 241.632
+  },
+  {
+    "id": "gatlantis_flame_strike_cannon",
+    "file": "flame_strike_cannon.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "Flame Strike Cannon",
+      "es": "Cañón Firestorm",
+      "jp": ""
+    },
+    "duration": 29.7828
+  },
+  {
+    "id": "gatlantis_gatlantis_shambleu",
+    "file": "gatlantis_shambleu.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "Megaruda Main Theme (Symphonic Suite ver.)",
+      "es": "Tema Principal de Megaruda (Suite Sinfónica ver.)",
+      "jp": ""
+    },
+    "duration": 140.544
+  },
+  {
+    "id": "gatlantis_city_empire",
+    "file": "city_empire.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "Ark Of Destruction",
+      "es": "Arca de Destrucción",
+      "jp": ""
+    },
+    "duration": 52.845714
+  },
+  {
+    "id": "gatlantis_gatlantis_surprise_attack",
+    "file": "gatlantis_surprise_attack.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "Gatlantis Surprise Attack",
+      "es": "Ataque Sorpresa de Gatlantis",
+      "jp": ""
+    },
+    "duration": 120.6628
+  },
+  {
+    "id": "gatlantis_gatlantis",
+    "file": "gatlantis.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "GATLANTIS",
+      "es": "gatlantis",
+      "jp": ""
+    },
+    "duration": 161.57055
+  },
+  {
+    "id": "gatlantis_gatlantis",
+    "file": "gatlantis_1978.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "GATLANTIS 1978",
+      "es": "gatlantis",
+      "jp": ""
+    },
+    "duration": 159.529796
+  },
+  {
+    "id": "gatlantis_white_comet_disco",
+    "file": "white_comet_disco.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "White Comet Disco",
+      "es": "Cometa Blanco Disco",
+      "jp": ""
+    },
+    "duration": 264.54205
+  },
+  {
+    "id": "gatlantis_white_comet_1980",
+    "file": "white_comet_1980.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "White Comet 1980 x GATLANTIS 1980",
+      "es": "Cometa Blanco 1980 x GATLANTIS 1980",
+      "jp": ""
+    },
+    "duration": 142.176
+  },
+  {
+    "id": "gatlantis_white_comet_2021",
+    "file": "white_comet_2021.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "White Comet (Symphonic Suite ver.)",
+      "es": "Cometa Blanco (ver. Suite Sinfonica)",
+      "jp": ""
+    },
+    "duration": 246.12
+  },
+  {
+    "id": "gatlantis_ex_6",
+    "file": "ex_6.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "M-6",
+      "es": "Track 6",
+      "jp": ""
+    },
+    "duration": 54.125714
+  },
+  {
+    "id": "gatlantis_hijikatas_death_sby2_m20",
+    "file": "hijikatas_death_sby2_m20.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "M-20",
+      "es": "Muerte de Hijikata (SBY2 - M20)",
+      "jp": ""
+    },
+    "duration": 72.594286
+  },
+  {
+    "id": "gatlantis_hijikatas_death_sby2_m23",
+    "file": "hijikatas_death_sby2_m23.mp3",
+    "folder": "gatlantis",
+    "factions": [
+      "gatlantis"
+    ],
+    "titles": {
+      "en": "M-23",
+      "es": "Muerte de Hijikata (SBY2 - M23)",
+      "jp": ""
+    },
+    "duration": 33.227755
+  },
+  {
+    "id": "bolar_bolar_battle",
+    "file": "bolar_battle.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "Bolar Battle",
+      "es": "Batalla Bolar",
+      "jp": ""
+    },
+    "duration": 156.290612
+  },
+  {
+    "id": "bolar_bolar_blitzkrieg",
+    "file": "bolar_blitzkrieg.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "Bolar BLITZKRIEG",
+      "es": "Guerra Bolar",
+      "jp": ""
+    },
+    "duration": 162.298776
+  },
+  {
+    "id": "bolar_seiren_federation_2520",
+    "file": "seiren_federation_2520.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "Seiren Federation (Yamato 2520)",
+      "es": "Federación Seiren (Yamato 2520)",
+      "jp": ""
+    },
+    "duration": 167.810612
+  },
+  {
+    "id": "bolar_bolar_federation_2nd_version",
+    "file": "bolar_federation_2nd_version.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "THE BOLAR FEDERATION",
+      "es": "Federación Bolar",
+      "jp": ""
+    },
+    "duration": 219.663673
+  },
+  {
+    "id": "bolar_the_threat_of_bemlarze",
+    "file": "the_threat_of_bemlarze.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "The Threat of Bemlarze",
+      "es": "La Amenaza de Bemlarze",
+      "jp": ""
+    },
+    "duration": 142.942041
+  },
+  {
+    "id": "bolar_battle_for_shalbart",
+    "file": "battle_for_shalbart.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "Battle for Shalbart",
+      "es": "Batalla por Shalbart",
+      "jp": ""
+    },
+    "duration": 143.56898
+  },
+  {
+    "id": "bolar_death_of_a_hero.mp3",
+    "file": "death_of_a_hero.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "Death of a Hero",
+      "es": "Muerte de un Héroe",
+      "jp": ""
+    },
+    "duration": 190.354286
+  },
+  {
+    "id": "bolar_battle_at_barnard",
+    "file": "battle_at_barnard.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "Battle at Barnard Planet",
+      "es": "Batalla en el Planet Barnard",
+      "jp": ""
+    },
+    "duration": 109.244082
+  },
+  {
+    "id": "bolar_fight_2_bolar",
+    "file": "battle_2_bolar.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "FIGHT 2",
+      "es": "PELEA 2",
+      "jp": ""
+    },
+    "duration": 105.16898
+  },
+  {
+    "id": "bolar_fight_1",
+    "file": "fight_1.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "FIGHT 1",
+      "es": "PELEA 1",
+      "jp": ""
+    },
+    "duration": 159.582041
+  },
+  {
+    "id": "bolar_bolar_bolero",
+    "file": "bolero_of_bolar.mp3",
+    "folder": "bolar",
+    "factions": [
+      "bolar"
+    ],
+    "titles": {
+      "en": "Bolero in Honor of Bolar",
+      "es": "Bolero en Honor a Bolar",
+      "jp": ""
+    },
+    "duration": 182.465306
+  },
+  {
+    "id": "dezariam_dezariam_hammer",
+    "file": "dezariam_hammer.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Dezariam Hammer",
+      "es": "Martillo Dezariam",
+      "jp": ""
+    },
+    "duration": 197.773061
+  },
+  {
+    "id": "dezariam_dezariam_is_comming",
+    "file": "dezariam_is_coming.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Dezariam is comming...",
+      "es": "Dezariam se acerca...",
+      "jp": ""
+    },
+    "duration": 150.360816
+  },
+  {
+    "id": "dezariam_gorba_his_form",
+    "file": "gorba.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "AUTOPLANET GORBA",
+      "es": "Gorba, Su Forma",
+      "jp": ""
+    },
+    "duration": 272.378776
+  },
+  {
+    "id": "dezariam_gorba_80",
+    "file": "autoplanetgorba_83.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "AUTOPLANET GORBA 1980",
+      "es": "AUTOPLANETA GORBA 1980",
+      "jp": ""
+    },
+    "duration": 310.248
+  },
+  {
+    "id": "dezariam_great_gorba",
+    "file": "great_gorba.flac",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "GREAT AUTOPLANET GORBA",
+      "es": "GRAN AUTOPLANETA GORBA",
+      "jp": ""
+    },
+    "duration": 272.52
+  },
+  {
+    "id": "dezariam_pleiades_type_a",
+    "file": "pleiades_type_a.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Pleiades Fierce Attack (Type A)",
+      "es": "Pleiades Fierce Attack (Type A)",
+      "jp": ""
+    },
+    "duration": 262.844082
+  },
+  {
+    "id": "dezariam_pleiades_type_b",
+    "file": "pleiades_type_b.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Pleiades Fierce Attack (Type B)",
+      "es": "Pleiades Fierce Attack (Type B)",
+      "jp": ""
+    },
+    "duration": 263.314286
+  },
+  {
+    "id": "dezariam_earth_under_siege",
+    "file": "earth_under_siege.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Earth Under Siege",
+      "es": "La Tierra Bajo Asedio",
+      "jp": ""
+    },
+    "duration": 157.44
+  },
+  {
+    "id": "dezariam_giant_battleship_grodez",
+    "file": "giant_battleship_grodez.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Great Battleship GRODEZ",
+      "es": "Gran Acorazado Grodez",
+      "jp": ""
+    },
+    "duration": 180.793469
+  },
+  {
+    "id": "dezariam_nucleon_bomb",
+    "file": "nucleon_bomb.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+  ],
+    "titles": {
+      "en": "Massive Heavy Nucleon Bomb",
+      "es": "Massive Heavy Nucleon Bomb",
+      "jp": ""
+  },
+    "duration": 294.613333
+  },
+  {
+    "id": "dezariam_radetzky_march",
+    "file": "radetzky_march.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam",
+      "bolar"
+    ],
+    "titles": {
+      "en": "RADETZKY MARCH",
+      "es": "Marcha Radetzky",
+      "jp": ""
+    },
+    "duration": 161.664
+  },
+  {
+    "id": "dezariam_collapse_of_dezariam_planet",
+    "file": "collapse_of_dezariam_planet.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Collapse of Dezariam Planet",
+      "es": "Colapso del Planeta Dezariam",
+      "jp": ""
+    },
+    "duration": 103.056
+  },
+  {
+    "id": "dezariam_vs_yamato",
+    "file": "vs_yamato.mp3",
+    "folder": "dezariam",
+    "factions": [
+      "dezariam"
+    ],
+    "titles": {
+      "en": "Ultimate Showdown - DEZARIAM VS YAMATO",
+      "es": "Batalla de la Flota Dezariam",
+      "jp": ""
+    },
+    "duration": 148.297143
+  },
+  {
+    "id": "dinguil_hyper_radiation_missile",
+    "file": "hyper_radiation_missile.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Hyper Radiation Missile",
+      "es": "Misil de Radiación Hiper",
+      "jp": ""
+    },
+    "duration": 114.390204
+  },
+  {
+    "id": "dinguil_yamatos_escape",
+    "file": "yamatos_escape.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Yamato's Escape",
+      "es": "Escape de Yamato",
+      "jp": ""
+    },
+    "duration": 162.115918
+  },
+  {
+    "id": "dinguil_bolero_of_tragedy",
+    "file": "bolero_of_tragedy.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Bolero of Tragedy",
+      "es": "Bolero de la Tragedia",
+      "jp": ""
+    },
+    "duration": 212.37551
+  },
+  {
+    "id": "dinguil_battle_at_pluto",
+    "file": "battle_at_pluto.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Battle at Pluto",
+      "es": "Batalla en Plutón",
+      "jp": ""
+    },
+    "duration": 242.677551
+  },
+  {
+    "id": "dinguil_supergiant_battleship_galungborst",
+    "file": "supergiant_battleship_galungborst.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Supergiant Battleship GALUNGBORST",
+      "es": "Acorazado Supergigante Galungborst",
+      "jp": ""
+    },
+    "duration": 144.091429
+  },
+  {
+    "id": "dinguil_aquarius_1",
+    "file": "aquarius_1.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "SYMPHONY OF THE AQUARIUS",
+      "es": "SINFOÍA DEL ACUARIO",
+      "jp": ""
+    },
+    "duration": 56.058776
+  },
+  {
+    "id": "dinguil_aquarius_1",
+    "file": "aquarius_2.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "GREAT SYMPHONY OF THE AQUARIUS",
+      "es": "GRAN SINFOÍA DEL ACUARIO 1",
+      "jp": ""
+    },
+    "duration": 618.44898
+  },
+  {
+    "id": "dinguil_1983",
+    "file": "1983.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "1983",
+      "es": "",
+      "jp": ""
+    },
+    "duration": 158.688
+  },
+  {
+    "id": "dinguil_sinking_uruk_planet",
+    "file": "sinking_uruk_planet.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Sinking Dinguil Planet",
+      "es": "",
+      "jp": ""
+    },
+    "duration": 172.90449
+  },
+  {
+    "id": "dinguil_fated_planet",
+    "file": "fated_planet.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Fated Planet",
+      "es": "",
+      "jp": ""
+    },
+    "duration": 312.084898
+  },
+  {
+    "id": "dinguil_history_of_uruk",
+    "file": "history_of_uruk_1.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "The History of URUK",
+      "es": "La historia de URUK",
+      "jp": ""
+    },
+    "duration": 246.047347
+  },
+  {
+    "id": "dinguil_imperial_dinguil_march",
+    "file": "imperial_dinguil_march.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "IMPERIAL DINGUIL MARCH",
+      "es": "MARCHA IMPERIAL DINGUIL",
+      "jp": ""
+    },
+    "duration": 409.155918
+  },
+  {
+    "id": "dinguil_two_galaxies",
+    "file": "two_galaxies.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Two Galaxies",
+      "es": "Dos Galaxias",
+      "jp": ""
+    },
+    "duration": 82.755918
+  },
+  {
+    "id": "dinguil_two_galaxies_2",
+    "file": "two_galaxies_2.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Two Galaxies and Aquarius",
+      "es": "Dos Galaxias and Aquarius",
+      "jp": ""
+    },
+    "duration": 255.712653
+  },
+  {
+    "id": "dinguil_lugals_war",
+    "file": "lugals_war.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Supreme Leader Lugal's Fleet",
+      "es": "VS la Flota del Líder Supremo Lugal",
+      "jp": ""
+    },
+    "duration": 187.428571
+  },
+  {
+    "id": "dinguil_battle_on_uruk",
+    "file": "battle_on_uruk.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "The Great Battle in the Satellite City URUK",
+      "es": "La Gran Batalla en la Ciudad Satélite URUK",
+      "jp": ""
+    },
+    "duration": 246.726531
+  },
+  {
+    "id": "dinguil_dissapointment_of_emperor_lugal",
+    "file": "dissapointment_of_emperor_lugal.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Emperor Lugal's Disappointment",
+      "es": "Decepción del Emperador Lugal",
+      "jp": ""
+    },
+    "duration": 338.860408
+  },
+  {
+    "id": "dinguil_mobile_fortress",
+    "file": "mobile_fortress.mp3",
+    "folder": "dinguil",
+    "factions": [
+      "dinguil"
+    ],
+    "titles": {
+      "en": "Mobile Fortress",
+      "es": "Fortaleza Móvil",
+      "jp": ""
+    },
+    "duration": 180.767347
+  },
+  {
+  "id": "guia_counterattack",
+  "file": "counterattack.mp3",
+  "folder": "guia",
+  "factions": ["guia"],
+  "titles": {
+    "en": "CounterAttack",
+    "es": "CounterAttack",
+    "jp": ""
+  },
+  "duration": 101.666667
+  },
+  {
+    "id": "guia_mega_fortress_sus",
+    "file": "mega_fortress_sus.mp3",
+    "folder": "guia",
+    "factions": [
+      "guia"
+    ],
+    "titles": {
+      "en": "Mega Fortress SUS",
+      "es": "Mega Fortaleza SUS",
+      "jp": ""
+    },
+    "duration": 346.279184
+  },
+  {
+    "id": "guia_battle_for_the_future",
+    "file": "battle_for_the_future.mp3",
+    "folder": "guia",
+    "factions": [
+      "guia"
+    ],
+    "titles": {
+      "en": "BATTLE FOR THE FUTURE",
+      "es": "Batalla por el Futuro",
+      "jp": ""
+    },
+    "duration": 155.559184
+  },
+  {
+    "id": "guia_metzler",
+    "file": "metzler.mp3",
+    "folder": "guia",
+    "factions": [
+      "guia"
+    ],
+    "titles": {
+      "en": "METZLER",
+      "es": "METZLER",
+      "jp": ""
+    },
+    "duration": 165.485714
+  },
+  {
+    "id": "guia_gorui",
+    "file": "gorui.mp3",
+    "folder": "guia",
+    "factions": [
+      "guia"
+    ],
+    "titles": {
+      "en": "SEGAL vs MAYA",
+      "es": "SEGAL vs MAYA",
+      "jp": ""
+    },
+    "duration": 333.557551
+  },
+  {
+    "id": "guia_cascade_black_hole",
+    "file": "cascade_black_hole.mp3",
+    "folder": "guia",
+    "factions": [
+      "guia"
+    ],
+    "titles": {
+      "en": "Cascade Black Hole",
+      "es": "Agujero Negro Cascada"
+    },
+    "duration": 159.79102
+  },
+  {
+    "id": "arcadia_captainharlock_tvsize",
+    "file": "captainharlock_tvsize.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Captain Harlock (Opening)",
+      "es": "Capitan Harlock (Opening)",
+      "jp": ""
+    },
+    "duration": 74.710204
+  },
+  {
+    "id": "arcadia_captainharlock_instrumental",
+    "file": "captainharlock_karaoke.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Captain Harlock (Instrumental)",
+      "es": "Capitan Harlock (Sin Voces)",
+      "jp": ""
+    },
+    "duration": 74.501224
+  },
+  {
+    "id": "arcadia_illumidas_pursuit",
+    "file": "illumidas_pursuit.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Illumidas Pursuit",
+      "es": "Persecucion Pursuit",
+      "jp": ""
+    },
+    "duration": 155.167347
+  },
+  {
+    "id": "arcadia_arcadia_of_my_youth",
+    "file": "arcadia_of_my_youth.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Arcadia of My Youth",
+      "es": "Arcadia de mi juventud",
+      "jp": ""
+    },
+    "duration": 232.542041
+  },
+  {
+    "id": "arcadia_flag_has_raisen",
+    "file": "flag_has_raisen.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "The Flag Has Risen",
+      "es": "La bandera ha sido izada",
+      "jp": ""
+    },
+    "duration": 173.897143
+  },
+  {
+    "id": "arcadia_i_am_harlock",
+    "file": "i_am_harlock.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "I Am Harlock",
+      "es": "Yo soy Harlock",
+      "jp": ""
+    },
+    "duration": 157.387755
+  },
+  {
+    "id": "arcadia_voyager_of_space",
+    "file": "voyager_of_space.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Voyager of Space",
+      "es": "Viajero del Espacio",
+      "jp": ""
+    },
+    "duration": 166.635102
+  },
+  {
+    "id": "arcadia_alone_in_the_whitenight",
+    "file": "alone_in_the_whitenight.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Alone in the White Night",
+      "es": "Solo en la noche blanca",
+      "jp": ""
+    },
+    "duration": 238.576327
+  },
+  {
+    "id": "arcadia_the_sun_never_dies",
+    "file": "the_sun_never_dies.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "The Sun Never Dies",
+      "es": "El Sol Nunca Muere",
+      "jp": ""
+    },
+    "duration": 256.809796
+  },
+  {
+    "id": "arcadia_harlocks_ballad",
+    "file": "harlocks_ballad.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Harlock's Ballad",
+      "es": "La balada de Harlock",
+      "jp": ""
+    },
+    "duration": 166.217143
+  },
+  {
+    "id": "arcadia_starry_skys_last_song",
+    "file": "starry_skys_last_song.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "The Starry Sky's Last Song",
+      "es": "La Última Canción del Cielo Estrellado",
+      "jp": ""
+    },
+    "duration": 233.952653
+  },
+  {
+    "id": "arcadia_our_departure",
+    "file": "our_departure.mp3",
+    "folder": "arcadia",
+    "factions": [
+      "arcadia"
+    ],
+    "titles": {
+      "en": "Our Departure",
+      "es": "Nuestra Partida",
+      "jp": ""
+    },
+    "duration": 191.477551
+  }
+]
