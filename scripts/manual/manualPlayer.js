@@ -149,7 +149,8 @@ function createListLogoManager() {
       lastTick = ts; tick++;
       if (visibleRotators.size > 0) {
         visibleRotators.forEach(img => {
-          const factions = img.dataset.factions.split(',');
+          const factions = (img.dataset.factions || '').split(',').filter(Boolean);
+          if (factions.length === 0) return;
           const current = factions[tick % factions.length];
           const src = factionLogos[current];
           if (src && img.src !== src) {
@@ -186,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } = ['audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'btnPlayPause', 'imgPlayPause', 'btnLoop', 'imgLoop', 'allTracksList', 'secondList', 'volumeSliderContainer', 'volumeValue', 'volumeBar']
     .reduce((o, id) => (o[id] = document.getElementById(id), o), {});
 
-  // 2. INSTANCIAR GESTORES Y PRECargador
+  // 2. INSTANCIAR GESTORES Y PRECARGADOR
   const playerLogoRotator = createPlayerLogoRotator(document.querySelector('.faction-section img'));
   const listLogoManager = createListLogoManager();
 
@@ -481,26 +482,36 @@ document.addEventListener('DOMContentLoaded', () => {
       group: {
         name: 'shared',
         put: (to, from, dragged) => {
-          const newId = dragged.dataset.catalogIndex;
+          const newId = dragged?.dataset?.catalogIndex;
           const existing = Array.from(to.el.children).map(li => li.dataset.catalogIndex);
-          return !existing.includes(newId);
+          return newId ? !existing.includes(newId) : false;
         }
       },
       animation: 150,
       onAdd: updateQueue,
       onUpdate: updateQueue,
+
+      // ✅ FIX: sin elementFromPoint; usar evt.to para saber si el drop ocurrió en secondList
       onEnd: (evt) => {
-        const dropTarget = document.elementFromPoint(evt.originalEvent.clientX, evt.originalEvent.clientY);
-        if (!secondList.contains(dropTarget)) {
-          const removedItem = evt.item;
-          removedItem.parentNode && removedItem.parentNode.removeChild(removedItem);
+        const toEl = evt.to || evt.target || (evt.originalEvent && evt.originalEvent.target);
+        const droppedInSecond = toEl === secondList || (toEl && secondList.contains(toEl));
+
+        if (droppedInSecond) return;
+
+        // Si terminó fuera de secondList, eliminamos el item “clonado”/movido de la cola
+        const removedItem = evt.item;
+        if (removedItem && removedItem.parentNode) {
           const removedCatalogIndex = Number(removedItem.dataset.catalogIndex);
+          removedItem.parentNode.removeChild(removedItem);
+
           const wasPlaying = (removedCatalogIndex === currentlyPlayingCatalogIndex);
           updateQueue();
+
           if (wasPlaying) {
-            if (playQueue.length === 0) stopPlaybackAndResetUI();
-            else {
-              const newIndexToPlay = evt.oldDraggableIndex % playQueue.length;
+            if (playQueue.length === 0) {
+              stopPlaybackAndResetUI();
+            } else {
+              const newIndexToPlay = (evt.oldDraggableIndex ?? 0) % playQueue.length;
               currentIndexInQueue = newIndexToPlay;
               playSingleTrackByIndex(playQueue[currentIndexInQueue]);
             }
@@ -578,7 +589,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // —— Init —— //
   async function initializeApp() {
-    const root = document.getElementById('appRoot');
     try {
       const fetchUrl = `${dataURL}?_=${Date.now()}`;
       const response = await fetch(fetchUrl, { cache: 'no-cache' });
@@ -604,13 +614,19 @@ document.addEventListener('DOMContentLoaded', () => {
       listLogoManager.start();
 
       imgPlayPause.src = `${baseURL}/buttons/play_button.png`;
-      btnLoop.title = 'Loop Off';
+      imgLoop.src = `${baseURL}/buttons/loop_button.png`;
     } catch (err) {
-      console.error("Failed to initialize application:", err);
-      trackName.textContent = "Error loading catalog.";
-    } finally {
-      root?.setAttribute('aria-busy', 'false');
+      console.error('Initialization error:', err);
+      const root = document.getElementById('appRoot');
+      if (root) {
+        root.innerHTML = `
+          <div class="error-box">
+            <h3>Failed to load catalog</h3>
+            <p>${String(err?.message || err)}</p>
+          </div>`;
+      }
     }
   }
+
   initializeApp();
 });

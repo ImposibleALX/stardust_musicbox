@@ -322,3 +322,182 @@ ul#secondList.manual-track-list {
   border: #23234a;
   border-radius: 1%;
 }
+
+
+
+/* ========================
+   Enhancements (non-breaking)
+   - Subtle "now playing" styling for current track
+   - Accessible focus states
+   - Gentle animations (respect prefers-reduced-motion)
+   - Scrollbar cosmetics
+   - Small control/volume UX touches
+   ======================== */
+
+/* Utility: screen-reader-only */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 1px, 1px);
+  white-space: nowrap; border: 0;
+}
+
+/* Reduce motion for users that prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Scrollbar: minimal and unobtrusive */
+.manual-track-list {
+  scrollbar-color: #1f1f3b transparent;
+}
+.manual-track-list::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.manual-track-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #1f1f3b, #1a1a2e);
+  border-radius: 8px;
+}
+.manual-track-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Track rows: clearer hover & focus */
+.manual-track-list li {
+  position: relative;
+  outline: none;
+}
+.manual-track-list li:focus-visible {
+  box-shadow: 0 0 0 2px rgba(108, 207, 255, 0.35) inset, 0 0 0 2px rgba(108, 207, 255, 0.15);
+  border-radius: 6px;
+}
+
+/* NOW PLAYING state (add .is-playing to the li via JS) */
+.manual-track-list li.is-playing {
+  background: #1a1a33;
+  border-bottom-color: #2a2a4a;
+  color: #fff;
+  box-shadow: inset 0 0 0 2px rgba(108, 207, 255, 0.15), 0 0 10px rgba(108, 207, 255, 0.08);
+}
+.manual-track-list li.is-playing .track-duration { color: #cfefff; }
+.manual-track-list li.is-playing .track-title { font-weight: 600; }
+
+/* Left accent bar for the playing track */
+.manual-track-list li.is-playing::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #6cf, #8fe4ff);
+  box-shadow: 0 0 12px rgba(108, 207, 255, 0.6);
+  opacity: 0.95;
+}
+
+/* Tiny equalizer indicator (CSS-only) */
+@keyframes eqBars {
+  0%   { transform: scaleY(0.45); }
+  25%  { transform: scaleY(0.9);  }
+  50%  { transform: scaleY(0.6);  }
+  75%  { transform: scaleY(0.8);  }
+  100% { transform: scaleY(0.5);  }
+}
+.manual-track-list li.is-playing .track-title::before {
+  content: "";
+  display: inline-block;
+  width: 10px; height: 10px;
+  margin-right: 8px;
+  vertical-align: -1px;
+  background:
+    linear-gradient(#6cf, #6cf) left/2px 100% no-repeat,
+    linear-gradient(#6cf, #6cf) center/2px 100% no-repeat,
+    linear-gradient(#6cf, #6cf) right/2px 100% no-repeat;
+  border-radius: 1px;
+  filter: drop-shadow(0 0 4px rgba(108,207,255,.55));
+  animation: eqBars 800ms ease-in-out infinite alternate;
+}
+
+/* Optional "loading" shimmer while resolving a track (toggle .is-loading on li) */
+@keyframes subtleShimmer {
+  0% { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
+}
+.manual-track-list li.is-loading {
+  color: #b9c8d4;
+  background: linear-gradient(90deg, #161634 0%, #1b1b3a 40%, #22224a 60%, #1b1b3a 100%);
+  background-size: 200% 100%;
+  animation: subtleShimmer 1.25s linear infinite;
+}
+
+/* Disabled/unavailable rows (toggle .is-disabled) */
+.manual-track-list li.is-disabled {
+  opacity: 0.55;
+  filter: grayscale(10%);
+  cursor: not-allowed;
+}
+.manual-track-list li.is-disabled:hover {
+  background: #151527;
+}
+
+/* Compact chip for extra metadata (JS may inject <span class="track-chip">) */
+.manual-track-list .track-chip {
+  justify-self: end;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #0f2030;
+  border: 1px solid #274a5f;
+  color: #bfe9ff;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 6px rgba(108, 207, 255, 0.08) inset;
+}
+
+/* Better cue for active selection when not playing (reuse existing .active) */
+#secondList li.active:not(.is-playing) {
+  background-color: #202044;
+  box-shadow: inset 0 0 0 2px rgba(108, 207, 255, 0.12);
+}
+
+/* Buttons: clearer keyboard focus & pressed states */
+.controls button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(108, 207, 255, 0.35), 0 0 12px rgba(108, 207, 255, 0.35);
+}
+.controls button[aria-pressed="true"],
+#btnLoop.active {
+  border-color: #6cf;
+  box-shadow: 0 0 0 2px rgba(108, 207, 255, 0.25), 0 0 10px rgba(108, 207, 255, 0.3);
+}
+
+/* Timer: use tabular numbers for stable layout */
+.timer-section,
+#timeDisplay {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Volume slider: hover & focus affordances, and muted state */
+#volumeBarBg:hover { border-color: #3e5568; }
+#volumeBarBg:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(108, 207, 255, 0.25);
+}
+.volume-section.muted #volumeBar {
+  background: linear-gradient(to top, #666, #9aa6ad 80%);
+}
+.volume-section.muted #volumeValue {
+  color: #9aa6ad;
+}
+
+/* Player container: subtle separation without changing base aesthetic */
+.player-container {
+  backdrop-filter: saturate(110%) blur(0.6px);
+}
