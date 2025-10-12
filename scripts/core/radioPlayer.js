@@ -28,7 +28,11 @@ function getAdjustedTime(totalDuration) {
     return t < 0 ? 0 : t;
 }
 
-const factionDisplayNames = {
+const DEFAULT_AUDIO_BASE = '../assets/music/';
+const audioBase = window.AUDIO_BASE_PATH || DEFAULT_AUDIO_BASE;
+const audioRoot = audioBase.endsWith('/') ? audioBase : `${audioBase}/`;
+
+const baseFactionDisplayNames = {
     "bolar": "Bolar Federation",
     "dezariam": "Dezariam Nation",
     "gamilas": "Greater Garmillan Empire",
@@ -44,9 +48,17 @@ const factionDisplayNames = {
     "atlantis": "ATLANTIS w/ Humans",
     "neoatlantis": "NEO ATLANTIS",
     "rebel": "Rebel Alliance",
+    "unn": "United Nations Navy",
+    "mcrn": "Martian Congressional Republic Navy",
+    "opa": "Outer Planets Alliance",
+    "fn": "Free Navy",
+    "various": "The Expanse",
+    "uns": "United Nations Spacy",
+    "zentradi": "Zentradi"
 };
 
-const names = factionDisplayNames; // Cache para lookups frecuentes
+const names = { ...baseFactionDisplayNames, ...(window.FACTION_DISPLAY_NAMES || {}) };
+window.FACTION_DISPLAY_NAMES = names;
 
 // Helper hashCode optimizado (sin recalcular bits innecesarios)
 function hashCode(str) {
@@ -80,7 +92,7 @@ function playFaction(faction) {
 // Minimiza las búsquedas de propiedades en playTrack()
 let lastSrc = ''; // Cache para la última ruta cargada
 function playTrack(track, offset = 0, faction, playRequestId, dispName = names[faction] || faction) {
-    const filePath = `../assets/music/${track.folder}/${track.file}`;
+    const filePath = `${audioRoot}${track.folder}/${track.file}`;
     if (lastSrc !== filePath) {
         lastSrc = audioPlayer.src = filePath; 
         audioPlayer.load();

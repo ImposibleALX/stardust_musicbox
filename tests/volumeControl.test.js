@@ -9,8 +9,8 @@ const {
 } = require('./helpers/domStubs');
 
 function loadVolumeControl() {
-  delete require.cache[require.resolve('../js/volumecontrol.js')];
-  require('../js/volumecontrol.js');
+  delete require.cache[require.resolve('../scripts/core/volumeControl.js')];
+  require('../scripts/core/volumeControl.js');
   return global.initVolumeControl;
 }
 
