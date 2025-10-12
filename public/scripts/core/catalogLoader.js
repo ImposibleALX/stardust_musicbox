@@ -4,8 +4,8 @@
   'use strict';
 
   // CONFIG: puedes sobrescribir estos valores antes de incluir el script
-  // e.g. <script>window.CATALOG_BASE_PATH = '/stardust_musicbox/assets/data/'</script>
-  const DEFAULT_BASE_PATH = 'https://imposiblealx.github.io/stardust_musicbox/assets/data/';
+  // e.g. <script>window.CATALOG_BASE_PATH = '/stardust_musicbox/assets/catalogs/'</script>
+  const DEFAULT_BASE_PATH = 'https://imposiblealx.github.io/stardust_musicbox/assets/catalogs/';
   const DEFAULT_FILE = 'music_catalog_all.json';
   const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000; // 24h
   const DEFAULT_FETCH_TIMEOUT_MS = 8000; // 8s

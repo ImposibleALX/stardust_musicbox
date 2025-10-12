@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE EXPANSE</title>
+  <link rel="stylesheet" href="../../../styles/factions.css">
+  <link rel="shortcut icon" href="../../../favicon.ico" type="image/x-icon">
+</head>
+<body data-catalog="music_catalog_expanse.json">
+  <div class="main-container">
+    <header>
+      <h1>THE EXPANSE</h1>
+      <p class="subheading">FACTION MUSIC PLAYER</p>
+      <a href="../../manual/" class="manual-btn-topright">Manual Mode</a>
+    </header>
+    <div class="faction-buttons">
+      <img src="../../../assets/images/logos/nofactions.png" alt="No Factions" onclick="playNoFactions()" title="NO FACTIONS?">
+    </div>
+    <div class="player-container" id="playerContainer">
+      <div class="audio-hidden">
+        <audio id="audioPlayer"></audio>
+      </div>
+      <div class="player-sections">
+        <div class="track-name-section">
+          <span id="trackName">Track Name</span>
+        </div>
+        <div class="faction-section">
+          <span id="factionName"></span>
+        </div>
+        <div class="timer-section">
+          <span id="timeDisplay">00:00</span>
+        </div>
+        <div class="volume-section">
+          <div id="volumeSliderContainer">
+            <div id="volumeBarBg">
+              <div id="volumeBar"></div>
+            </div>
+            <span id="volumeValue">90%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../../scripts/core/config.js"></script>
+  <script src="../../../scripts/factions/expanse.config.js"></script>
+  <script src="../../../scripts/core/catalogLoader.js"></script>
+  <script src="../../../scripts/core/radioPlayer.js"></script>
+  <script src="../../../scripts/core/volumeControl.js"></script>
+</body>
+</html>

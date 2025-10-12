@@ -3,9 +3,10 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // Ruta base de la música y del catálogo
-const musicBasePath = './music';
-const catalogPath = 'C:/Users/CHOCOLATE/Music/stardust musicbox/stardust_musicbox/assets/data/music_catalog.json';
-const outputPath = './music_catalog_with_duration.json';
+const projectRoot = path.resolve(__dirname, '..');
+const musicBasePath = path.join(projectRoot, 'public/assets/music');
+const catalogPath = path.join(projectRoot, 'public/assets/catalogs/music_catalog.json');
+const outputPath = path.join(projectRoot, 'public/assets/catalogs/music_catalog_with_duration.json');
 
 // Leer el catálogo original
 let catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
