@@ -490,8 +490,15 @@ document.addEventListener('DOMContentLoaded', () => {
       onAdd: updateQueue,
       onUpdate: updateQueue,
       onEnd: (evt) => {
-        const dropTarget = document.elementFromPoint(evt.originalEvent.clientX, evt.originalEvent.clientY);
-        if (!secondList.contains(dropTarget)) {
+        const { originalEvent } = evt;
+        let dropTarget = null;
+        if (originalEvent) {
+          const { clientX, clientY } = originalEvent;
+          if (Number.isFinite(clientX) && Number.isFinite(clientY)) {
+            dropTarget = document.elementFromPoint(clientX, clientY);
+          }
+        }
+        if (!dropTarget || !secondList.contains(dropTarget)) {
           const removedItem = evt.item;
           removedItem.parentNode && removedItem.parentNode.removeChild(removedItem);
           const removedCatalogIndex = Number(removedItem.dataset.catalogIndex);
