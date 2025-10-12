@@ -2230,6 +2230,20 @@
     "duration": 169.560816
   },
   {
+    "id": "uns_macross",
+    "file": "macross.mp3",
+    "folder": "uns",
+    "factions": [
+      "uns"
+  ],
+    "titles": {
+      "en": "MACROSS",
+      "es": "MACROSS",
+      "jp": ""
+  },
+    "duration": 193.066667
+  },
+    {
     "id": "uns_dogfighter",
     "file": "dogfighter.mp3",
     "folder": "uns",
@@ -2242,20 +2256,6 @@
       "jp": ""
     },
     "duration": 179.879184
-  },
-  {
-    "id": "uns_macross",
-    "file": "macross.mp3",
-    "folder": "uns",
-    "factions": [
-      "uns"
-  ],
-    "titles": {
-      "en": "S.D.F. MACROSS",
-      "es": "S.D.F. MACROSS",
-      "jp": ""
-  },
-    "duration": 193.066667
   },
   {
     "id": "uns_love",
@@ -2271,6 +2271,20 @@
   },
     "duration": 388.494125
   },
+    {
+    "id": "uns_information_high",
+    "file": "information_high.mp3",
+    "folder": "uns",
+    "factions": [
+      "uns"
+  ],
+    "titles": {
+      "en": "INFORMATION HIGH",
+      "es": "INFORMATION HIGH",
+      "jp": ""
+  },
+    "duration": 483.555542
+  },
   {
     "id": "uns_seventh_moon",
     "file": "seventh_moon.mp3",
@@ -2284,20 +2298,6 @@
       "jp": ""
   },
     "duration": 325.24
-  },
-  {
-    "id": "uns_information_high",
-    "file": "information_high.mp3",
-    "folder": "uns",
-    "factions": [
-      "uns"
-  ],
-    "titles": {
-      "en": "INFORMATION HIGH",
-      "es": "INFORMATION HIGH",
-      "jp": ""
-  },
-    "duration": 483.555542
   },
   {
     "id": "uns_lion",
