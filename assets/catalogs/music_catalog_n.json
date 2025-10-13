@@ -138,19 +138,5 @@
       "jp": ""
     },
     "duration": 115.866667
-  },
-  {
-    "id": "neoatlantis_gargoyle",
-    "file": "gargoyle_1.flac",
-    "folder": "neoatlantis",
-    "factions": [
-      "neoatlantis"
-    ],
-    "titles": {
-      "en": "GARGOYLE",
-      "es": "GARGOYLE",
-      "jp": ""
-    },
-    "duration": 73.04
   }
 ]

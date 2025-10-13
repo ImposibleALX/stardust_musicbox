@@ -35,8 +35,8 @@
       "uncf"
     ],
     "titles": {
-      "en": "The Galactic Pilot (BG)",
-      "es": "El Piloto Galáctico (BG)",
+      "en": "The Galactic Pilot (Farewell Version)",
+      "es": "El Piloto Galáctico (Versión de Despedida)",
       "jp": ""
     },
     "duration": 90.413
@@ -477,8 +477,8 @@
       "gamilas"
     ],
     "titles": {
-      "en": "Battle of the Gamilas Fleet",
-      "es": "Flota de Gamilas VS Flota de Dezariam",
+      "en": "Planetary Hammerfall",
+      "es": "Planetary Hammerfall",
       "jp": ""
     },
     "duration": 125.33551
@@ -1353,16 +1353,18 @@
     "duration": 180.767347
   },
   {
-  "id": "guia_counterattack",
-  "file": "counterattack.mp3",
-  "folder": "guia",
-  "factions": ["guia"],
-  "titles": {
-    "en": "CounterAttack",
-    "es": "CounterAttack",
-    "jp": ""
-  },
-  "duration": 101.666667
+    "id": "guia_counterattack",
+    "file": "counterattack.mp3",
+    "folder": "guia",
+    "factions": [
+      "guia"
+    ],
+    "titles": {
+      "en": "CounterAttack",
+      "es": "CounterAttack",
+      "jp": ""
+    },
+    "duration": 101.694694
   },
   {
     "id": "guia_mega_fortress_sus",
@@ -1605,7 +1607,9 @@
     "id": "expanse_boarded",
     "file": "boarded.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Boarded",
       "es": "Abordado",
@@ -1617,7 +1621,9 @@
     "id": "expanse_handball",
     "file": "handball.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Handball",
       "es": "Balón Mano",
@@ -1629,7 +1635,9 @@
     "id": "expanse_hammerlock",
     "file": "hammerlock.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Hammerlock",
       "es": "Hammerlock",
@@ -1641,7 +1649,9 @@
     "id": "expanse_power_corrupts",
     "file": "power_corrupts.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Power Corrupts",
       "es": "El Poder Corrompe",
@@ -1653,7 +1663,9 @@
     "id": "expanse_signal",
     "file": "signal.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Signal",
       "es": "Señal",
@@ -1665,7 +1677,9 @@
     "id": "expanse_the_launch",
     "file": "the_launch.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "The Launch",
       "es": "El Lanzamiento",
@@ -1677,7 +1691,9 @@
     "id": "expanse_remember_the_cant",
     "file": "remember_the_cant.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Remember the Cant",
       "es": "Recuerda el Cant",
@@ -1689,7 +1705,9 @@
     "id": "expanse_never_see_them_coming",
     "file": "never_see_them_coming.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Never See Them Coming",
       "es": "Nunca los Verás Venir",
@@ -1701,7 +1719,9 @@
     "id": "expanse_going_in",
     "file": "going_in.mp3",
     "folder": "expanse",
-    "factions": ["expanse"],
+    "factions": [
+      "expanse"
+    ],
     "titles": {
       "en": "Going In",
       "es": "Entrando",
@@ -1709,131 +1729,131 @@
     },
     "duration": 171.781224
   },
-{
-  "id": "expanse_what_did_you_do",
-  "file": "what_did_you_do.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "What Did You Do (Julie and Miller Theme)",
-    "es": "What Did You Do",
-    "jp": ""
+  {
+    "id": "expanse_what_did_you_do",
+    "file": "what_did_you_do.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "What Did You Do (Julie and Miller Theme)",
+      "es": "What Did You Do",
+      "jp": ""
+    },
+    "duration": 190.20075
   },
-  "duration": 190.197542
-},
-{
-  "id": "expanse_do_it_together",
-  "file": "do_it_together.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "Do It Together",
-    "es": "Do It Together",
-    "jp": ""
+  {
+    "id": "expanse_do_it_together",
+    "file": "do_it_together.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "Do It Together",
+      "es": "Do It Together",
+      "jp": ""
+    },
+    "duration": 159.115025
   },
-  "duration": 159.111833
-},
-{
-  "id": "expanse_another_way",
-  "file": "another_way.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "Another Way",
-    "es": "Another Way",
-    "jp": ""
+  {
+    "id": "expanse_another_way",
+    "file": "another_way.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "Another Way",
+      "es": "Another Way",
+      "jp": ""
+    },
+    "duration": 131.683265
   },
-  "duration": 131.658208
-},
-{
-  "id": "expanse_we_have_to_kill_it",
-  "file": "we_have_to_kill_it.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "We Have To Kill It",
-    "es": "We Have To Kill It",
-    "jp": ""
+  {
+    "id": "expanse_we_have_to_kill_it",
+    "file": "we_have_to_kill_it.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "We Have To Kill It",
+      "es": "We Have To Kill It",
+      "jp": ""
+    },
+    "duration": 250.987675
   },
-  "duration": 250.984479
-},
-{
-  "id": "expanse_room",
-  "file": "room.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "The Room Eats You",
-    "es": "The Room Eats You",
-    "jp": ""
+  {
+    "id": "expanse_room",
+    "file": "room.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "The Room Eats You",
+      "es": "The Room Eats You",
+      "jp": ""
+    },
+    "duration": 57.182041
   },
-  "duration": 57.156979
-},
-{
-  "id": "expanse_coming_home",
-  "file": "coming_home.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "Coming Home",
-    "es": "Coming Home",
-    "jp": ""
+  {
+    "id": "expanse_coming_home",
+    "file": "coming_home.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "Coming Home",
+      "es": "Coming Home",
+      "jp": ""
+    },
+    "duration": 135.88898
   },
-  "duration": 135.863917
-},
-{
-  "id": "expanse_need_a_ride",
-  "file": "need_a_ride.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "I Need A Ride",
-    "es": "I Need A Ride",
-    "jp": ""
+  {
+    "id": "expanse_need_a_ride",
+    "file": "need_a_ride.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "I Need A Ride",
+      "es": "I Need A Ride",
+      "jp": ""
+    },
+    "duration": 282.279184
   },
-  "duration": 282.254125
-},
-{
-  "id": "expanse_ilus",
-  "file": "ilus.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "To Ilus",
-    "es": "To Ilus",
-    "jp": ""
+  {
+    "id": "expanse_ilus",
+    "file": "ilus.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "To Ilus",
+      "es": "To Ilus",
+      "jp": ""
+    },
+    "duration": 162.011429
   },
-  "duration": 161.96
-},
-{
-  "id": "expanse_highway_star",
-  "file": "highway_star.mp3",
-  "folder": "expanse",
-  "factions": [
-    "expanse"
-  ],
-  "titles": {
-    "en": "Highway Star (Belter Version)",
-    "es": "Highway Star (Belter Version)",
-    "jp": ""
-  },
-  "duration": 371.16
+  {
+    "id": "expanse_highway_star",
+    "file": "highway_star.mp3",
+    "folder": "expanse",
+    "factions": [
+      "expanse"
+    ],
+    "titles": {
+      "en": "Highway Star (Belter Version)",
+      "es": "Highway Star (Belter Version)",
+      "jp": ""
+    },
+    "duration": 371.2
   },
   {
     "id": "atlantis_nautilus_vocal",
@@ -1974,20 +1994,6 @@
       "jp": ""
     },
     "duration": 115.866667
-  },
-  {
-    "id": "neoatlantis_gargoyle",
-    "file": "gargoyle_1.flac",
-    "folder": "neoatlantis",
-    "factions": [
-      "neoatlantis"
-    ],
-    "titles": {
-      "en": "GARGOYLE",
-      "es": "GARGOYLE",
-      "jp": ""
-    },
-    "duration": 73.04
   },
   {
     "id": "cis_grievous",
@@ -2235,15 +2241,15 @@
     "folder": "uns",
     "factions": [
       "uns"
-  ],
+    ],
     "titles": {
       "en": "MACROSS",
       "es": "MACROSS",
       "jp": ""
+    },
+    "duration": 193.123265
   },
-    "duration": 193.066667
-  },
-    {
+  {
     "id": "uns_dogfighter",
     "file": "dogfighter.mp3",
     "folder": "uns",
@@ -2258,32 +2264,88 @@
     "duration": 179.879184
   },
   {
+    "id": "uns_before_the_battle",
+    "file": "before_the_battle.mp3",
+    "folder": "uns",
+    "factions": [
+      "uns"
+    ],
+    "titles": {
+      "en": "Before the Battle",
+      "es": "Antes de la Batalla",
+      "jp": ""
+    },
+    "duration": 196.872
+  },
+  {
+    "id": "uns_action",
+    "file": "action.mp3",
+    "folder": "uns",
+    "factions": [
+      "uns"
+    ],
+    "titles": {
+      "en": "Action",
+      "es": "Acción",
+      "jp": ""
+    },
+    "duration": 68.544
+  },
+  {
+    "id": "uns_arrow_of_fate",
+    "file": "arrow_of_fate.mp3",
+    "folder": "uns",
+    "factions": [
+      "uns"
+    ],
+    "titles": {
+      "en": "Arrow of Fate",
+      "es": "Flecha de la Fortuna",
+      "jp": ""
+    },
+    "duration": 123.672
+  },
+  {
+    "id": "uns_armored_assault",
+    "file": "armored_assault.mp3",
+    "folder": "uns",
+    "factions": [
+      "uns"
+    ],
+    "titles": {
+      "en": "Armored Assault",
+      "es": "Asalto Acorazado",
+      "jp": ""
+    },
+    "duration": 51.672
+  },
+  {
     "id": "uns_love",
     "file": "love.mp3",
     "folder": "uns",
     "factions": [
       "uns"
-  ],
+    ],
     "titles": {
       "en": "Do You Remember Love?",
       "es": "Do You Remember Love?",
       "jp": ""
+    },
+    "duration": 388.545306
   },
-    "duration": 388.494125
-  },
-    {
+  {
     "id": "uns_information_high",
     "file": "information_high.mp3",
     "folder": "uns",
     "factions": [
       "uns"
-  ],
+    ],
     "titles": {
       "en": "INFORMATION HIGH",
       "es": "INFORMATION HIGH",
       "jp": ""
-  },
-    "duration": 483.555542
+    },
+    "duration": 483.604898
   },
   {
     "id": "uns_seventh_moon",
@@ -2291,13 +2353,13 @@
     "folder": "uns",
     "factions": [
       "uns"
-  ],
+    ],
     "titles": {
       "en": "SEVENTH MOON",
       "es": "SEVENTH MOON",
       "jp": ""
-  },
-    "duration": 325.24
+    },
+    "duration": 325.302857
   },
   {
     "id": "uns_lion",
@@ -2305,13 +2367,13 @@
     "folder": "uns",
     "factions": [
       "uns"
-  ],
+    ],
     "titles": {
       "en": "Lion",
       "es": "Lion",
       "jp": ""
-  },
-    "duration": 303.657146
+    },
+    "duration": 303.696
   },
   {
     "id": "uns_borderline",
@@ -2319,13 +2381,13 @@
     "folder": "uns",
     "factions": [
       "uns"
-  ],
+    ],
     "titles": {
       "en": "FORBIDDEN BORDERLINE",
       "es": "FORBIDDEN BORDERLINE",
       "jp": ""
-  },
-    "duration": 279.693333
+    },
+    "duration": 279.72
   },
   {
     "id": "uns_poison",
@@ -2333,13 +2395,13 @@
     "folder": "zentradi",
     "factions": [
       "zentradi"
-  ],
+    ],
     "titles": {
       "en": "Pretty Flowers, Deadly Poison",
       "es": "Pretty Flowers, Deadly Poison",
       "jp": ""
-  },
-    "duration": 254.072729
+    },
+    "duration": 254.119184
   },
   {
     "id": "zentradi_zentradi_theme",
@@ -2370,17 +2432,31 @@
     "duration": 73.639184
   },
   {
+    "id": "zentradi_500000_battle",
+    "file": "500000_men.mp3",
+    "folder": "zentradi",
+    "factions": [
+      "zentradi"
+    ],
+    "titles": {
+      "en": "The Battle of 500,000 Men",
+      "es": "The Battle of 500,000 Men",
+      "jp": ""
+    },
+    "duration": 133.896
+  },
+  {
     "id": "zentradi_alien_attack",
     "file": "alien_attack.mp3",
     "folder": "zentradi",
     "factions": [
       "zentradi"
-  ],
+    ],
     "titles": {
       "en": "Alien Attack!!",
       "es": "Alien Attack!!",
       "jp": ""
-  },
-    "duration": 85.681625
+    },
+    "duration": 85.6112
   }
 ]
