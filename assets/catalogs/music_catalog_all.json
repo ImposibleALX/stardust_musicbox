@@ -2404,20 +2404,6 @@
     "duration": 254.119184
   },
   {
-    "id": "zentradi_zentradi_theme",
-    "file": "zentradi_theme.mp3",
-    "folder": "zentradi",
-    "factions": [
-      "zentradi"
-    ],
-    "titles": {
-      "en": "Zentradi Theme",
-      "es": "Zentradi Theme",
-      "jp": ""
-    },
-    "duration": 97.9565
-  },
-  {
     "id": "zentradi_zentradian_fortress",
     "file": "zentradian_fortress.mp3",
     "folder": "zentradi",
@@ -2458,5 +2444,19 @@
       "jp": ""
     },
     "duration": 85.6112
+  },
+    {
+    "id": "zentradi_zentradi_theme",
+    "file": "zentradi_theme.mp3",
+    "folder": "zentradi",
+    "factions": [
+      "zentradi"
+    ],
+    "titles": {
+      "en": "Zentradi Theme",
+      "es": "Zentradi Theme",
+      "jp": ""
+    },
+    "duration": 97.9565
   }
 ]
