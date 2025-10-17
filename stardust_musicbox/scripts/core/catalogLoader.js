@@ -33,7 +33,7 @@
   function fetchWithTimeout(url, timeoutMs) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
-    return fetch(url, { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' })
+    return fetch(url, { signal: controller.signal, credentials: 'same-origin' })
       .finally(() => clearTimeout(id));
   }
 
@@ -60,11 +60,7 @@
     const url = `${BASE_PATH}${file}`;
     const res = await fetchWithTimeout(url, timeoutMs);
     if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
-    
     const data = await res.json();
-    if (!Array.isArray(data)) {
-      throw new TypeError('Catalog data is not an array.');
-    }
     saveCache(file, data);
     return data;
   }
@@ -147,28 +143,25 @@
 
   // Auto-start: si setCatalog existe ya, carga; si no, espera corto tiempo
   (function autoStart() {
-    const startTime = performance.now();
-    const maxWait = 5000; // 5 segundos
-
-    function pollForSetCatalog() {
+    if (typeof global.setCatalog === 'function') {
+      loadCatalog();
+      flushPendingCache();
+      return;
+    }
+    // poll corto (5s max) para detectar setCatalog si viene después
+    const maxWait = 5000; let waited = 0; const step = 100;
+    const id = setInterval(() => {
+      waited += step;
       if (typeof global.setCatalog === 'function') {
+        clearInterval(id);
         loadCatalog();
         flushPendingCache();
-        return;
-      }
-
-      const elapsed = performance.now() - startTime;
-      if (elapsed < maxWait) {
-        requestAnimationFrame(pollForSetCatalog);
-      } else {
-        console.warn('catalogLoader: autoStart timed out waiting for setCatalog.');
+      } else if (waited >= maxWait) {
+        clearInterval(id);
         // aún sin setCatalog: hacemos la carga para poblar cache (no aplicamos)
         loadCatalog().catch(()=>{});
       }
-    }
-
-    // Iniciar el sondeo en el siguiente frame para dar tiempo a que otros scripts se carguen.
-    requestAnimationFrame(pollForSetCatalog);
+    }, step);
   })();
 
-})(window);[topic]
+})(window);

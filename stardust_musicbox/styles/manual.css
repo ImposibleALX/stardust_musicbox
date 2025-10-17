@@ -1,0 +1,503 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;800&display=swap');
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #080816;
+  font-family: 'Orbitron', sans-serif;
+  color: #ddd;
+  text-align: center;
+  font-weight: normal;
+}
+
+/* Estructura principal con Grid */
+.main-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  padding: 20px;
+  gap: 20px;
+  height: 100%;
+}
+
+header {
+  position: relative;
+}
+
+h1 {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: white;
+}
+
+.subheading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #aaa;
+  margin-top: 5px;
+}
+
+.manual-btn-topright {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #0f0f1a;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 2px #000;
+  text-decoration: none;
+  transition: background 0.2s, box-shadow 0.1s;
+  z-index: 1000;
+}
+.manual-btn-topright:hover {
+  background: #151527;
+  box-shadow: 0 0 20px #6cf;
+}
+
+/* Columnas principales con Grid */
+.manual-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr; /* Una fila que llene el espacio vertical */
+  gap: 40px;
+  width: 100%;
+  height: calc(100vh - 80px); /* Altura relativa al viewport, restando padding y encabezado */
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
+.manual-list {
+  display: flex;
+  flex-direction: column;
+  background: #0f0f1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: left;
+  height: 100%; /* Ocupa toda la altura de la fila del grid */
+  overflow: hidden;
+}
+
+.manual-list h2 {
+  color: #6cf;
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+}
+
+.manual-track-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.manual-track-list::-webkit-scrollbar {
+  width: 0;
+}
+
+/* Skeleton de cada item con Grid */
+.manual-track-list li {
+  display: grid;
+  grid-template-columns: 1fr 60px 40px;
+  align-items: center;
+  padding: 8px 10px;
+  font-size: 1rem;
+  color: #fff;
+  background: #151527;
+  border-bottom: 1px solid #222;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.manual-track-list li:hover {
+  background: #23234a;
+}
+.manual-track-list .track-title {
+  min-width: 0;
+}
+.manual-track-list .track-duration {
+  justify-self: end;
+  text-align: right;
+  color: #6cf;
+  white-space: nowrap;
+}
+.manual-track-list .track-faction {
+  justify-self: end;
+}
+.manual-track-list .track-faction img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 2px #000);
+}
+
+/* Playlist + Player con Grid */
+.playlist-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+}
+
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+.controls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: #11111f;
+  border: 1.5px solid #353535;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #000;
+  transition: box-shadow 0.3s ease, transform 0.2s;
+}
+.controls button:hover {
+  box-shadow: 0 0 10px #6cf;
+}
+.controls button:active:not(#btnLoop) {
+  transform: scale(0.95);
+  box-shadow: 0 0 12px #6cf;
+}
+.controls button img {
+  width: 100%;
+  pointer-events: none;
+}
+#imgLoop {
+  opacity: 0.3;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+#imgLoop.active {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px #6cf);
+}
+#btnLoop.active {
+  border-color: #6cf;
+  box-shadow: 0 0 12px #6cf;
+}
+
+/* Contenedor de audio oculto */
+.audio-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
+}
+
+/* Player con Grid */
+.player-container {
+  background: #151527;
+  width: 100%;
+  padding: 22px;
+  border-radius: 5px;
+  box-shadow: 0 0 25px rgba(108, 255, 255, 0.1);
+  position: relative;
+}
+
+.player-sections {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 40px auto;
+  align-items: center;
+  gap: 16px;
+}
+.track-name-section {
+  grid-column: 1 / span 2;
+  background: #0f0f1a;
+  padding: 15px;
+  border: 1px solid #333;
+  text-align: center;
+}
+.track-name-section #trackName {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #fff;
+}
+.faction-section {
+  grid-column: 1 / 2;
+  background: #0f0f1a;
+  padding: 15px;
+  border: 1px solid #333;
+  text-align: left;
+}
+.faction-section #factionName,
+.timer-section #timeDisplay,
+#volumeValue {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #6cf;
+}
+.timer-section {
+  width: 100px;
+  grid-column: 2 / 3;
+  background: #0f0f1a;
+  padding: 15px;
+  border: 1px solid #333;
+  text-align: center;
+}
+.volume-section {
+  grid-column: 3 / 4;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  margin-left: 10px;
+}
+#volumeSliderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+#volumeBarBg {
+  width: 28px;
+  height: 80px;
+  background: #222;
+  border: 2px solid #333;
+  border-radius: 12px;
+  position: relative;
+  margin-bottom: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+}
+#volumeBar {
+  width: 100%;
+  background: linear-gradient(to top, #6cf, #fff 80%);
+  border-radius: 10px 10px 12px 12px;
+  position: absolute;
+  bottom: 0;
+  height: 80%;
+  transition: height 0.1s;
+}
+#volumeValue {
+  width: 48px;
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* Pista seleccionada */
+#secondList li.active {
+  background-color: #223;
+  color: #fff;
+}
+
+#allTracksList li,
+#secondList li {
+  user-select: none;
+}
+
+ul#secondList.manual-track-list {
+  margin-bottom: 15px;
+  border: #23234a;
+  border-radius: 1%;
+}
+
+
+
+/* ========================
+   Enhancements (non-breaking)
+   - Subtle "now playing" styling for current track
+   - Accessible focus states
+   - Gentle animations (respect prefers-reduced-motion)
+   - Scrollbar cosmetics
+   - Small control/volume UX touches
+   ======================== */
+
+/* Utility: screen-reader-only */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 1px, 1px);
+  white-space: nowrap; border: 0;
+}
+
+/* Reduce motion for users that prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Scrollbar: minimal and unobtrusive */
+.manual-track-list {
+  scrollbar-color: #1f1f3b transparent;
+}
+.manual-track-list::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.manual-track-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #1f1f3b, #1a1a2e);
+  border-radius: 8px;
+}
+.manual-track-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Track rows: clearer hover & focus */
+.manual-track-list li {
+  position: relative;
+  outline: none;
+}
+.manual-track-list li:focus-visible {
+  box-shadow: 0 0 0 2px rgba(108, 207, 255, 0.35) inset, 0 0 0 2px rgba(108, 207, 255, 0.15);
+  border-radius: 6px;
+}
+
+/* NOW PLAYING state (add .is-playing to the li via JS) */
+.manual-track-list li.is-playing {
+  background: #1a1a33;
+  border-bottom-color: #2a2a4a;
+  color: #fff;
+  box-shadow: inset 0 0 0 2px rgba(108, 207, 255, 0.15), 0 0 10px rgba(108, 207, 255, 0.08);
+}
+.manual-track-list li.is-playing .track-duration { color: #cfefff; }
+.manual-track-list li.is-playing .track-title { font-weight: 600; }
+
+/* Left accent bar for the playing track */
+.manual-track-list li.is-playing::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #6cf, #8fe4ff);
+  box-shadow: 0 0 12px rgba(108, 207, 255, 0.6);
+  opacity: 0.95;
+}
+
+/* Tiny equalizer indicator (CSS-only) */
+@keyframes eqBars {
+  0%   { transform: scaleY(0.45); }
+  25%  { transform: scaleY(0.9);  }
+  50%  { transform: scaleY(0.6);  }
+  75%  { transform: scaleY(0.8);  }
+  100% { transform: scaleY(0.5);  }
+}
+.manual-track-list li.is-playing .track-title::before {
+  content: "";
+  display: inline-block;
+  width: 10px; height: 10px;
+  margin-right: 8px;
+  vertical-align: -1px;
+  background:
+    linear-gradient(#6cf, #6cf) left/2px 100% no-repeat,
+    linear-gradient(#6cf, #6cf) center/2px 100% no-repeat,
+    linear-gradient(#6cf, #6cf) right/2px 100% no-repeat;
+  border-radius: 1px;
+  filter: drop-shadow(0 0 4px rgba(108,207,255,.55));
+  animation: eqBars 800ms ease-in-out infinite alternate;
+}
+
+/* Optional "loading" shimmer while resolving a track (toggle .is-loading on li) */
+@keyframes subtleShimmer {
+  0% { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
+}
+.manual-track-list li.is-loading {
+  color: #b9c8d4;
+  background: linear-gradient(90deg, #161634 0%, #1b1b3a 40%, #22224a 60%, #1b1b3a 100%);
+  background-size: 200% 100%;
+  animation: subtleShimmer 1.25s linear infinite;
+}
+
+/* Disabled/unavailable rows (toggle .is-disabled) */
+.manual-track-list li.is-disabled {
+  opacity: 0.55;
+  filter: grayscale(10%);
+  cursor: not-allowed;
+}
+.manual-track-list li.is-disabled:hover {
+  background: #151527;
+}
+
+/* Compact chip for extra metadata (JS may inject <span class="track-chip">) */
+.manual-track-list .track-chip {
+  justify-self: end;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #0f2030;
+  border: 1px solid #274a5f;
+  color: #bfe9ff;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 6px rgba(108, 207, 255, 0.08) inset;
+}
+
+/* Better cue for active selection when not playing (reuse existing .active) */
+#secondList li.active:not(.is-playing) {
+  background-color: #202044;
+  box-shadow: inset 0 0 0 2px rgba(108, 207, 255, 0.12);
+}
+
+/* Buttons: clearer keyboard focus & pressed states */
+.controls button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(108, 207, 255, 0.35), 0 0 12px rgba(108, 207, 255, 0.35);
+}
+.controls button[aria-pressed="true"],
+#btnLoop.active {
+  border-color: #6cf;
+  box-shadow: 0 0 0 2px rgba(108, 207, 255, 0.25), 0 0 10px rgba(108, 207, 255, 0.3);
+}
+
+/* Timer: use tabular numbers for stable layout */
+.timer-section,
+#timeDisplay {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Volume slider: hover & focus affordances, and muted state */
+#volumeBarBg:hover { border-color: #3e5568; }
+#volumeBarBg:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(108, 207, 255, 0.25);
+}
+.volume-section.muted #volumeBar {
+  background: linear-gradient(to top, #666, #9aa6ad 80%);
+}
+.volume-section.muted #volumeValue {
+  color: #9aa6ad;
+}
+
+/* Player container: subtle separation without changing base aesthetic */
+.player-container {
+  backdrop-filter: saturate(110%) blur(0.6px);
+}

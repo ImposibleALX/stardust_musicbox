@@ -9,14 +9,7 @@ const catalogPath = path.join(projectRoot, 'assets/catalogs/music_catalog.json')
 const outputPath = path.join(projectRoot, 'assets/catalogs/music_catalog_with_duration.json');
 
 // Leer el catálogo original
-let catalog;
-try {
-  catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
-} catch (error) {
-  console.error(`❌ Fatal: Could not read or parse catalog file at ${catalogPath}`);
-  console.error(error.message);
-  process.exit(1);
-}
+let catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
 
 // Crear un mapa de duraciones
 let durationMap = {};
@@ -27,7 +20,7 @@ function getDuration(filePath) {
     const output = execSync(`ffprobe -v error -select_streams a:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 "${filePath}"`);
     return parseFloat(output.toString().trim());
   } catch (e) {
-    console.warn(`⚠️  Error getting duration for: ${path.basename(filePath)}`);
+    console.warn(`⚠️ Error obteniendo duración de ${filePath}`);
     return null;
   }
 }
@@ -59,7 +52,7 @@ let emptyDurationEntries = [];
 // Agrega duración al catálogo si hay coincidencia, sobrescribiendo siempre
 catalog = catalog.map(entry => {
   if (!entry.file || entry.file === "") {
-    notFoundFiles.push(`Entry with ID "${entry.id || 'Unknown'}" has no file property.`);
+    notFoundFiles.push(entry);
     return entry;
   }
   if (entry.duration === "" || entry.duration === undefined || entry.duration === null) {
@@ -78,13 +71,13 @@ catalog = catalog.map(entry => {
 
 // Reporte de archivos no detectados
 if (notFoundFiles.length > 0) {
-  console.warn("\n⚠️  Could not find a matching audio file or duration for these catalog entries:");
+  console.warn("⚠️ Archivos no detectados o sin duración:");
   notFoundFiles.forEach(f => console.warn(`  - ${typeof f === "string" ? f : JSON.stringify(f)}`));
 }
 
 // Reporte de entradas con duration vacío
 if (emptyDurationEntries.length > 0) {
-  console.warn("\n⚠️  These entries had an empty 'duration' field in the original catalog:");
+  console.warn("⚠️ Entradas con duration vacío:");
   emptyDurationEntries.forEach(f => console.warn(`  - ${f}`));
 }
 

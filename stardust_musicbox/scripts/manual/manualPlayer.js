@@ -372,16 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // —— Eventos —— //
   function setupEventListeners() {
     secondList.addEventListener('click', e => {
-      // Pre-validación de elementos críticos
-      const elements = [audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause, btnLoop, imgLoop, allTracksList, secondList];
-      if (elements.some(el => !el)) {
-        console.error("Manual Player: One or more critical DOM elements are missing. Aborting setup.");
-        const root = document.getElementById('appRoot');
-        if (root) {
-          root.innerHTML = `<div class="error-box"><h3>Initialization Error</h3><p>A critical UI component failed to load. Please refresh the page.</p></div>`;
-        }
-        return;
-      }
       const li = e.target.closest('li[data-catalog-index]');
       if (!li) return;
       const idx = Number(li.dataset.catalogIndex);
@@ -503,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ✅ FIX: sin elementFromPoint; usar evt.to para saber si el drop ocurrió en secondList
       onEnd: (evt) => {
-        const toEl = evt.to; // evt.to es la lista de destino en Sortable.js
+        const toEl = evt.to || evt.target || (evt.originalEvent && evt.originalEvent.target);
         const droppedInSecond = toEl === secondList || (toEl && secondList.contains(toEl));
 
         if (droppedInSecond) return;
@@ -598,26 +588,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // —— Init —— //
-  async function fetchWithRetry(url, options, retries = 3, backoff = 1000) {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response;
-      } catch (err) {
-        console.warn(`Fetch attempt ${i + 1} failed: ${err.message}. Retrying in ${backoff}ms...`);
-        if (i < retries - 1) await new Promise(res => setTimeout(res, backoff));
-        backoff *= 2; // Exponential backoff
-      }
-    }
-    throw new Error(`Failed to fetch ${url} after ${retries} attempts.`);
-  }
-
   async function initializeApp() {
     try {
       const fetchUrl = `${dataURL}?_=${Date.now()}`;
-      const response = await fetchWithRetry(fetchUrl, { cache: 'no-cache' });
-
+      const response = await fetch(fetchUrl, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       catalog = await response.json();
       window.catalog = catalog;
 
