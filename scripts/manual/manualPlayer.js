@@ -49,6 +49,8 @@ let currentlyPlayingCatalogIndex = -1;
 let isLooping = false;
 let animationFrameId_timer;
 
+const variantManager = typeof createVariantManager === 'function' ? createVariantManager() : null;
+
 function ensureTrailingSlash(path) {
   if (!path) return '';
   return path.endsWith('/') ? path : `${path}/`;
@@ -59,6 +61,7 @@ const musicBaseURL = ensureTrailingSlash(window.AUDIO_BASE_PATH || '../assets/mu
 const catalogBaseURL = ensureTrailingSlash(window.CATALOG_BASE_PATH || '../assets/catalogs/');
 const baseURL = imageBaseURL.replace(/\/$/, '');
 const dataURL = `${catalogBaseURL}music_catalog_all.json`;
+const variantDataURL = `${catalogBaseURL}variant_groups.json`;
 
 // Facciones (sin duplicados)
 const factionDisplayNames = {
@@ -276,35 +279,187 @@ document.addEventListener('DOMContentLoaded', () => {
     updateActiveTrackVisuals();
   }
 
-  function renderTrackList(containerEl, trackIndices) {
-    if (!containerEl) return;
-    const frag = document.createDocumentFragment();
-    trackIndices.forEach(index => {
-      const track = catalog[index];
-      if (!track) return;
-      const li = createElement('li', { 'data-catalog-index': index, draggable: 'true' });
-      const titleSpan = createElement('span', { className: 'track-title', text: track.titles?.en?.trim() || 'Unknown Title' });
-      const durationSpan = createElement('span', { className: 'track-duration', text: formatTime(track.duration || 0) });
-      const factionSpan = createElement('span', { className: 'track-faction' });
-      const factions = track.factions || [];
-      if (factions.length > 0) {
-        const img = createElement('img', {
-          src: factionLogos[factions[0]] || '',
-          alt: factionDisplayNames[factions[0]] || factions[0] || '',
-          title: factionDisplayNames[factions[0]] || factions[0] || '',
-          loading: 'lazy', decoding: 'async'
-        });
-        if (factions.length > 1) {
-          img.dataset.factions = factions.join(',');
-          listLogoManager.observe(img);
-        }
-        factionSpan.appendChild(img);
+  function createBaseListItem(track, {
+    catalogIndex,
+    searchTokens,
+    classNames = [],
+    groupId,
+    draggable = true
+  } = {}) {
+    if (!track || typeof catalogIndex !== 'number') return null;
+    const attrs = { 'data-catalog-index': catalogIndex };
+    if (draggable) attrs.draggable = 'true';
+    const li = createElement('li', attrs);
+    if (Array.isArray(classNames) && classNames.length > 0) {
+      li.classList.add(...classNames);
+    }
+    if (groupId) li.dataset.groupId = groupId;
+    if (searchTokens) li.dataset.searchTokens = searchTokens;
+
+    const titleSpan = createElement('span', { className: 'track-title' });
+    const durationSpan = createElement('span', { className: 'track-duration', text: formatTime(track.duration || 0) });
+    const factionSpan = createElement('span', { className: 'track-faction' });
+    const factions = Array.isArray(track.factions) ? track.factions : [];
+    if (factions.length > 0) {
+      const img = createElement('img', {
+        src: factionLogos[factions[0]] || '',
+        alt: factionDisplayNames[factions[0]] || factions[0] || '',
+        title: factionDisplayNames[factions[0]] || factions[0] || '',
+        loading: 'lazy',
+        decoding: 'async'
+      });
+      if (factions.length > 1) {
+        img.dataset.factions = factions.join(',');
+        listLogoManager.observe(img);
       }
-      li.append(titleSpan, durationSpan, factionSpan);
-      frag.appendChild(li);
+      factionSpan.appendChild(img);
+    }
+
+    li.append(titleSpan, durationSpan, factionSpan);
+    return { li, titleSpan };
+  }
+
+  function createSingleLibraryItem(catalogIndex) {
+    const track = catalog[catalogIndex];
+    if (!track) return null;
+    const searchTokens = track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase();
+    const base = createBaseListItem(track, { catalogIndex, searchTokens });
+    if (!base) return null;
+    base.titleSpan.textContent = track.titles?.en?.trim() || 'Unknown Title';
+    return base.li;
+  }
+
+  function createGroupListItem(group) {
+    if (!group || !Array.isArray(group.variants) || group.variants.length === 0) return null;
+    const activeVariant = group.variants[group.activeIndex || 0];
+    if (!activeVariant) return null;
+    const track = catalog[activeVariant.catalogIndex];
+    if (!track) return null;
+
+    const tokenSet = new Set();
+    if (group.title) tokenSet.add(normalizeString(group.title).toLowerCase());
+    group.variants.forEach(variant => {
+      if (variant.normalizedLabel) tokenSet.add(variant.normalizedLabel);
+      else if (variant.variantLabel) tokenSet.add(normalizeString(variant.variantLabel).toLowerCase());
+      const variantTrack = catalog[variant.catalogIndex];
+      if (variantTrack && typeof variantTrack._normalizedTitle === 'string') {
+        tokenSet.add(variantTrack._normalizedTitle);
+      }
     });
-    containerEl.replaceChildren(frag);
+    const searchTokens = Array.from(tokenSet).filter(Boolean).join(' ');
+
+    const base = createBaseListItem(track, {
+      catalogIndex: activeVariant.catalogIndex,
+      searchTokens,
+      classNames: ['has-variants'],
+      groupId: group.groupId
+    });
+    if (!base) return null;
+
+    const baseTitle = group.title || (track.titles?.en?.trim() || 'Unknown Title');
+    const mainTitle = createElement('span', { className: 'track-main-title', text: baseTitle });
+    const controls = createElement('div', { className: 'variant-controls' });
+
+    const prevBtn = createElement('button', {
+      className: 'variant-btn prev',
+      type: 'button',
+      title: 'Previous version',
+      'aria-label': 'Previous version'
+    });
+    prevBtn.textContent = '◀';
+
+    const label = createElement('span', {
+      className: 'variant-label',
+      text: activeVariant.variantLabel || 'Original'
+    });
+
+    const nextBtn = createElement('button', {
+      className: 'variant-btn next',
+      type: 'button',
+      title: 'Next version',
+      'aria-label': 'Next version'
+    });
+    nextBtn.textContent = '▶';
+
+    controls.append(prevBtn, label, nextBtn);
+    base.titleSpan.append(mainTitle, controls);
+
+    const attachHandler = (delta, focusSide) => (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      handleVariantToggle(group.groupId, delta, focusSide);
+    };
+
+    prevBtn.addEventListener('click', attachHandler(-1, 'prev'));
+    nextBtn.addEventListener('click', attachHandler(1, 'next'));
+
+    return base.li;
+  }
+
+  function createPlaylistItem(catalogIndex) {
+    const track = catalog[catalogIndex];
+    if (!track) return null;
+    const base = createBaseListItem(track, { catalogIndex });
+    if (!base) return null;
+    const variantLabel = variantManager?.getVariantLabelByCatalogIndex(catalogIndex);
+    const titleText = track.titles?.en?.trim() || 'Unknown Title';
+    if (variantLabel && variantLabel.toLowerCase() !== 'original') {
+      base.titleSpan.textContent = `${titleText} — ${variantLabel}`;
+    } else {
+      base.titleSpan.textContent = titleText;
+    }
+    return base.li;
+  }
+
+  function getLibraryEntries() {
+    if (variantManager) {
+      const entries = variantManager.getLibraryEntries();
+      if (entries.length > 0) return entries;
+    }
+    return catalog.map((_, index) => ({ type: 'single', catalogIndex: index }));
+  }
+
+  function renderLibrary() {
+    if (!allTracksList) return;
+    const frag = document.createDocumentFragment();
+    const entries = getLibraryEntries();
+    entries.forEach(entry => {
+      let node = null;
+      if (entry.type === 'group' && variantManager) {
+        const group = variantManager.getGroup(entry.groupId);
+        if (group) node = createGroupListItem(group);
+      } else if (entry.type === 'single') {
+        node = createSingleLibraryItem(entry.catalogIndex);
+      }
+      if (node) frag.appendChild(node);
+    });
+    allTracksList.replaceChildren(frag);
     updateActiveTrackVisuals();
+  }
+
+  function renderPlaylist() {
+    if (!secondList) return;
+    const frag = document.createDocumentFragment();
+    playQueue.forEach(index => {
+      const node = createPlaylistItem(index);
+      if (node) frag.appendChild(node);
+    });
+    secondList.replaceChildren(frag);
+    updateActiveTrackVisuals();
+  }
+
+  function handleVariantToggle(groupId, delta, focusSide = 'next') {
+    if (!variantManager || !allTracksList) return;
+    const group = variantManager.stepActiveVariant(groupId, delta);
+    if (!group) return;
+    const currentNode = allTracksList.querySelector(`li[data-group-id="${groupId}"]`);
+    if (!currentNode) return;
+    const replacement = createGroupListItem(group);
+    if (!replacement) return;
+    allTracksList.replaceChild(replacement, currentNode);
+    const selector = focusSide === 'prev' ? '.variant-btn.prev' : '.variant-btn.next';
+    const focusTarget = replacement.querySelector(selector);
+    if (focusTarget) focusTarget.focus();
   }
 
   function stopPlaybackAndResetUI() {
@@ -343,8 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
       else validateCurrentAudioSource();
     }
     audioPlayer.loop = isLooping && playQueue.length === 1;
+    renderPlaylist();
     updatePlayerControlsState();
-    updateActiveTrackVisuals();
   }
 
   function startTimerUpdates() {
@@ -588,8 +743,13 @@ document.addEventListener('DOMContentLoaded', () => {
           isMatch = track.factions?.some(tf => gfs.includes(tf));
         } else {
           const normalizedQuery = normalizeString(query).toLowerCase();
-          const normalizedTitle = track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase();
-          isMatch = normalizedTitle.includes(normalizedQuery);
+          const tokens = (item.dataset.searchTokens || '').toLowerCase();
+          if (tokens) {
+            isMatch = tokens.includes(normalizedQuery);
+          } else {
+            const normalizedTitle = track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase();
+            isMatch = normalizedTitle.includes(normalizedQuery);
+          }
         }
         item.classList.toggle('hidden', !isMatch);
       }
@@ -613,6 +773,19 @@ document.addEventListener('DOMContentLoaded', () => {
     throw new Error(`Failed to fetch ${url} after ${retries} attempts.`);
   }
 
+  async function fetchVariantGroupsData() {
+    try {
+      const url = `${variantDataURL}?_=${Date.now()}`;
+      const response = await fetch(url, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn('Variant groups unavailable:', err?.message || err);
+      return [];
+    }
+  }
+
   async function initializeApp() {
     try {
       const fetchUrl = `${dataURL}?_=${Date.now()}`;
@@ -627,9 +800,14 @@ document.addEventListener('DOMContentLoaded', () => {
         track._normalizedTitle = normalizeString(title).toLowerCase();
       }
 
+      const variantGroups = await fetchVariantGroupsData();
+      if (variantManager) {
+        variantManager.load({ catalog, variantGroups });
+      }
+
       playQueue = [];
-      renderTrackList(allTracksList, catalog.map((_, i) => i));
-      renderTrackList(secondList, playQueue);
+      renderLibrary();
+      renderPlaylist();
 
       injectSearchBarCSS();
       setupSearchBar();

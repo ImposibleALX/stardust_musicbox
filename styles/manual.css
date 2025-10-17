@@ -129,6 +129,49 @@ h1 {
 .manual-track-list .track-title {
   min-width: 0;
 }
+.manual-track-list li.has-variants .track-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.manual-track-list .track-main-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.variant-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(108, 207, 255, 0.08);
+  border: 1px solid rgba(108, 207, 255, 0.18);
+}
+.variant-btn {
+  border: none;
+  background: transparent;
+  color: #9ad9ff;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0 2px;
+  line-height: 1;
+}
+.variant-btn:hover,
+.variant-btn:focus-visible {
+  color: #cfefff;
+}
+.variant-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(108, 207, 255, 0.35);
+  border-radius: 6px;
+}
+.variant-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #d9f4ff;
+  white-space: nowrap;
+}
 .manual-track-list .track-duration {
   justify-self: end;
   text-align: right;

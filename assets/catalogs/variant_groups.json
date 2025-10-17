@@ -1,0 +1,126 @@
+[
+  {
+    "groupId": "2202",
+    "title": "2202",
+    "defaultVariantId": "uncf_yamato_op_2202",
+    "variants": [
+      {
+        "id": "uncf_yamato_op_2202",
+        "variantLabel": "Original"
+      },
+      {
+        "id": "uncf_yamato_op_2202_instrumental",
+        "variantLabel": "Instrumental"
+      }
+    ]
+  },
+  {
+    "groupId": "captain_harlock",
+    "title": "Captain Harlock",
+    "defaultVariantId": "arcadia_captainharlock_tvsize",
+    "variants": [
+      {
+        "id": "arcadia_captainharlock_tvsize",
+        "variantLabel": "Opening"
+      },
+      {
+        "id": "arcadia_captainharlock_instrumental",
+        "variantLabel": "Instrumental"
+      }
+    ]
+  },
+  {
+    "groupId": "desler_attack",
+    "title": "DESLER ATTACK",
+    "defaultVariantId": "gamilas_desler_attack",
+    "variants": [
+      {
+        "id": "gamilas_desler_attack",
+        "variantLabel": "Original"
+      },
+      {
+        "id": "gamilas_desler_attack_disco",
+        "variantLabel": "Disco"
+      },
+      {
+        "id": "gamilas_desler_attack_piano",
+        "variantLabel": "Cosmopianist ver."
+      }
+    ]
+  },
+  {
+    "groupId": "garmillas_dimensional_submarine",
+    "title": "Garmillas Dimensional Submarine",
+    "defaultVariantId": "gamilas_garmillas_dimensional_submarine",
+    "variants": [
+      {
+        "id": "gamilas_garmillas_dimensional_submarine",
+        "variantLabel": "Original"
+      },
+      {
+        "id": "gamilas_garmillas_dimensional_submarine_tympani",
+        "variantLabel": "Tympani"
+      }
+    ]
+  },
+  {
+    "groupId": "pleiades_fierce_attack",
+    "title": "Pleiades Fierce Attack",
+    "defaultVariantId": "dezariam_pleiades_type_a",
+    "variants": [
+      {
+        "id": "dezariam_pleiades_type_a",
+        "variantLabel": "Type A"
+      },
+      {
+        "id": "dezariam_pleiades_type_b",
+        "variantLabel": "Type B"
+      }
+    ]
+  },
+  {
+    "groupId": "praise_be_our_eternal_glory",
+    "title": "Praise Be Our Eternal Glory",
+    "defaultVariantId": "gamilas_praise_be_our_eternal_glory_gamilas_anthem",
+    "variants": [
+      {
+        "id": "gamilas_praise_be_our_eternal_glory_gamilas_anthem_without_vocals",
+        "variantLabel": "Instrumental"
+      },
+      {
+        "id": "gamilas_praise_be_our_eternal_glory_gamilas_anthem",
+        "variantLabel": "Original"
+      }
+    ]
+  },
+  {
+    "groupId": "separatist_droid_army_march",
+    "title": "Separatist Droid Army March",
+    "defaultVariantId": "cis_droid_army_march_krutikov",
+    "variants": [
+      {
+        "id": "cis_droid_army_march_krutikov",
+        "variantLabel": "Krutikov ver."
+      },
+      {
+        "id": "cis_droid_army_march_samuel",
+        "variantLabel": "Samuel ver."
+      }
+    ]
+  },
+  {
+    "groupId": "yamato_descends",
+    "title": "Yamato Descends",
+    "defaultVariantId": "uncf_yamato_descends",
+    "variants": [
+      {
+        "id": "uncf_yamato_descends",
+        "variantLabel": "Original"
+      },
+      {
+        "id": "uncf_sus_fleet_destroyed",
+        "variantLabel": "Cosmopianist ver."
+      }
+    ]
+  }
+]
