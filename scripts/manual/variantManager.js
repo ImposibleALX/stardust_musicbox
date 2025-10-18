@@ -12,12 +12,14 @@
     const trackIdToIndex = new Map();
     const groupMap = new Map();
     const catalogIndexToVariant = new Map();
+    const variantsInUse = new Map();
     let libraryEntries = [];
 
     function resetState() {
       trackIdToIndex.clear();
       groupMap.clear();
       catalogIndexToVariant.clear();
+      variantsInUse.clear();
       libraryEntries = [];
     }
 
@@ -63,9 +65,16 @@
         if (hydratedVariants.length < 2) continue;
 
         let activeIndex = 0;
+        let defaultIndex = 0;
         if (typeof rawGroup.defaultVariantId === 'string') {
           const foundIndex = hydratedVariants.findIndex(v => v.id === rawGroup.defaultVariantId);
-          if (foundIndex >= 0) activeIndex = foundIndex;
+          if (foundIndex >= 0) {
+            activeIndex = foundIndex;
+            defaultIndex = foundIndex;
+          }
+        }
+        if (defaultIndex !== activeIndex) {
+          defaultIndex = activeIndex;
         }
 
         const title = typeof rawGroup.title === 'string' && rawGroup.title.trim()
@@ -77,7 +86,12 @@
           title,
           variants: hydratedVariants,
           activeIndex,
-          searchTokens: buildGroupSearchTokens(title, hydratedVariants)
+          defaultIndex,
+          searchTokens: buildGroupSearchTokens(title, hydratedVariants),
+          inUse: new Set(),
+          availableCount: hydratedVariants.length,
+          allVariantsInUse: false,
+          activeVariantInUse: false
         };
 
         groupMap.set(groupId, group);
@@ -125,12 +139,71 @@
       });
     }
 
+    function buildInUseMap(catalogIndexes = []) {
+      variantsInUse.clear();
+      if (!Array.isArray(catalogIndexes)) return;
+      catalogIndexes.forEach(index => {
+        if (typeof index !== 'number') return;
+        const variantMeta = catalogIndexToVariant.get(index);
+        if (!variantMeta) return;
+        const { groupId, variantIndex } = variantMeta;
+        if (!groupMap.has(groupId)) return;
+        let bucket = variantsInUse.get(groupId);
+        if (!bucket) {
+          bucket = new Set();
+          variantsInUse.set(groupId, bucket);
+        }
+        bucket.add(variantIndex);
+      });
+    }
+
+    function updateGroupAvailability() {
+      for (const [groupId, group] of groupMap.entries()) {
+        const used = variantsInUse.get(groupId) || new Set();
+        const totalVariants = group.variants.length;
+        const availableIndices = [];
+        for (let i = 0; i < totalVariants; i += 1) {
+          if (!used.has(i)) availableIndices.push(i);
+        }
+
+        group.inUse = new Set(used);
+        group.availableCount = availableIndices.length;
+        group.allVariantsInUse = availableIndices.length === 0;
+
+        if (group.allVariantsInUse) {
+          const fallback = typeof group.defaultIndex === 'number' ? group.defaultIndex : 0;
+          group.activeIndex = fallback;
+          group.activeVariantInUse = true;
+          continue;
+        }
+
+        if (availableIndices.includes(group.activeIndex)) {
+          group.activeVariantInUse = false;
+          continue;
+        }
+
+        const preferred = typeof group.defaultIndex === 'number' ? group.defaultIndex : 0;
+        if (availableIndices.includes(preferred)) {
+          group.activeIndex = preferred;
+          group.activeVariantInUse = false;
+          continue;
+        }
+
+        group.activeIndex = availableIndices[0];
+        group.activeVariantInUse = false;
+      }
+    }
+
     return {
       load({ catalog = [], variantGroups = [] } = {}) {
         resetState();
         buildTrackIndex(catalog);
         loadGroups(variantGroups);
         buildLibraryEntries();
+      },
+      syncVariantsInUse(catalogIndexes = []) {
+        buildInUseMap(catalogIndexes);
+        updateGroupAvailability();
       },
       getLibraryEntries() {
         return libraryEntries.slice();
@@ -141,16 +214,35 @@
       stepActiveVariant(groupId, delta = 1) {
         const group = groupMap.get(groupId);
         if (!group || !group.variants || group.variants.length === 0) return null;
-        const length = group.variants.length;
-        const nextIndex = ((group.activeIndex || 0) + delta) % length;
-        group.activeIndex = nextIndex < 0 ? nextIndex + length : nextIndex;
+        const total = group.variants.length;
+        if (group.allVariantsInUse || group.availableCount <= 0) {
+          group.activeVariantInUse = true;
+          return group;
+        }
+
+        const used = group.inUse || new Set();
+        let nextIndex = group.activeIndex;
+        let attempts = 0;
+        do {
+          nextIndex = (nextIndex + delta + total) % total;
+          attempts += 1;
+        } while (used.has(nextIndex) && attempts <= total);
+
+        if (attempts > total) {
+          return group;
+        }
+
+        group.activeIndex = nextIndex;
+        group.activeVariantInUse = false;
         return group;
       },
       setActiveVariant(groupId, variantIndex) {
         const group = groupMap.get(groupId);
         if (!group || !group.variants || !Number.isInteger(variantIndex)) return null;
         const clamped = ((variantIndex % group.variants.length) + group.variants.length) % group.variants.length;
+        if (group.inUse?.has(clamped) && group.availableCount > 0) return group;
         group.activeIndex = clamped;
+        group.activeVariantInUse = Boolean(group.inUse?.has(clamped));
         return group;
       },
       getActiveVariantCatalogIndex(groupId) {

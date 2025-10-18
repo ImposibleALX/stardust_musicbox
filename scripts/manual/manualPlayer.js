@@ -336,6 +336,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const track = catalog[activeVariant.catalogIndex];
     if (!track) return null;
 
+    const totalVariants = group.variants.length;
+    const availableCount = typeof group.availableCount === 'number' ? group.availableCount : totalVariants;
+    const allVariantsInUse = Boolean(group.allVariantsInUse);
+
     const tokenSet = new Set();
     if (group.title) tokenSet.add(normalizeString(group.title).toLowerCase());
     group.variants.forEach(variant => {
@@ -380,6 +384,41 @@ document.addEventListener('DOMContentLoaded', () => {
       'aria-label': 'Next version'
     });
     nextBtn.textContent = '▶';
+
+    let disableVariantButtons = false;
+    let tooltip = '';
+    if (allVariantsInUse) {
+      disableVariantButtons = true;
+      tooltip = 'Todas las variantes están en la cola.';
+      label.classList.remove('variant-limited');
+      label.classList.add('variant-locked');
+    } else {
+      label.classList.remove('variant-locked');
+      if (availableCount <= 1) {
+        disableVariantButtons = true;
+        tooltip = 'Solo una variante disponible; las demás están en la cola.';
+        label.classList.toggle('variant-limited', availableCount === 1);
+      } else {
+        label.classList.remove('variant-limited');
+      }
+    }
+
+    if (disableVariantButtons) {
+      [prevBtn, nextBtn].forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('disabled');
+        if (tooltip) btn.title = tooltip;
+        btn.setAttribute('aria-disabled', 'true');
+      });
+    } else {
+      [prevBtn, nextBtn].forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('disabled');
+        btn.removeAttribute('aria-disabled');
+      });
+      prevBtn.title = 'Previous version';
+      nextBtn.title = 'Next version';
+    }
 
     controls.append(prevBtn, label, nextBtn);
     base.titleSpan.append(mainTitle, controls);
@@ -500,6 +539,10 @@ document.addEventListener('DOMContentLoaded', () => {
     audioPlayer.loop = isLooping && playQueue.length === 1;
     renderPlaylist();
     updatePlayerControlsState();
+    if (variantManager) {
+      variantManager.syncVariantsInUse(playQueue);
+      renderLibrary();
+    }
   }
 
   function startTimerUpdates() {
@@ -801,11 +844,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const variantGroups = await fetchVariantGroupsData();
+      playQueue = [];
       if (variantManager) {
         variantManager.load({ catalog, variantGroups });
+        variantManager.syncVariantsInUse(playQueue);
       }
 
-      playQueue = [];
       renderLibrary();
       renderPlaylist();
 
