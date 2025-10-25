@@ -1,30 +1,24 @@
 /**
- * volumecontrol.js — Control de volumen optimizado
+ * volumecontrol.min.js — Control de volumen simplificado y optimizado
  *
  * Uso:
  * const vc = initVolumeControl({
- * audioEl: audioPlayer,
- * bgEl: document.getElementById('volumeBarBg'),
- * barEl: document.getElementById('volumeBar'),
- * labelEl: document.getElementById('volumeValue'),
- * handleEl: optionalHandleElement,
- * preserveGrab: false, // true para mantener offset cuando agarras el handle
- * initial: 0.9,
- * step: 0.05,
- * curve: (x) => x ** 4
+ *   audioEl,
+ *   bgEl,
+ *   barEl,
+ *   labelEl,
+ *   handleEl,            // opcional
+ *   preserveGrab: false, // true = respeta el offset del cursor al agarrar el handle
+ *   initial: 0.9,
+ *   step: 0.05,
+ *   curve: (x) => x ** 4  // curva perceptual
  * });
- *
- * Notas:
- * - Internamente usa requestAnimationFrame para las actualizaciones visuales (sin bloqueos).
- * - Reduce llamadas a getBoundingClientRect al mínimo (cache durante drag).
  */
-
 (function (global) {
   'use strict';
 
-  function clamp(v, a = 0, b = 1) { return Math.min(Math.max(v, a), b); }
-
-  function defaultCurve(x) { return x ** 4; }
+  const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
+  const defaultCurve = (x) => x ** 4;
 
   function initVolumeControl({
     audioEl,
@@ -41,100 +35,124 @@
       throw new Error('initVolumeControl: faltan elementos requeridos (audioEl, bgEl, barEl, labelEl).');
     }
 
-    // Estado interno
+    // Estado mínimo
     let linear = clamp(Number(initial) || 0.9);
-    let cachedRect = null;           // bounding rect cache usado durante drag
     let isDragging = false;
-    let pendingY = null;             // Y más reciente (viewport) recibido por pointermove
-    let rafId = null;                // requestAnimationFrame id para UI
-    let lastRendered = -1;           // evita renders redundantes
-    let grabOffsetPx = 0;            // offset en px entre cursor y centro del handle
+    let pendingY = null;       // último Y recibido (viewport)
+    let rafId = null;          // único RAF para drag + render
+    let cachedRect = null;     // rect del BG cacheado durante drag
+    let grabOffsetPx = 0;      // offset cursor/handle cuando preserveGrab = true
+    let lastPercent = -1;      // evita renders idénticos
     let prevVolumeBeforeMute = null;
     let disabled = false;
+    const unsubs = [];
 
-    // Optimización: asegurar contenedor posicionable para handle absoluto
-    const computed = window.getComputedStyle(bgEl);
-    if (computed.position === 'static') bgEl.style.position = bgEl.style.position || 'relative';
-    bgEl.style.touchAction = bgEl.style.touchAction || 'none'; // evita scroll táctil en bg
+    // Helpers de eventos (para destroy limpio)
+    const on = (el, type, fn, opts) => {
+      el.addEventListener(type, fn, opts);
+      unsubs.push(() => el.removeEventListener(type, fn, opts));
+    };
 
-    // Prepara handle si existe (centro con transform)
+    // Preparar estilos mínimos (sin forzar layout)
+    const st = window.getComputedStyle(bgEl);
+    if (st.position === 'static') bgEl.style.position = bgEl.style.position || 'relative';
+    bgEl.style.touchAction = bgEl.style.touchAction || 'none';
+    if (!bgEl.hasAttribute('tabindex')) bgEl.setAttribute('tabindex', '0');
+
     if (handleEl) {
       handleEl.style.position = handleEl.style.position || 'absolute';
       handleEl.style.left = '50%';
       handleEl.style.transform = 'translate(-50%, -50%)';
       handleEl.style.touchAction = handleEl.style.touchAction || 'none';
-      // pointer cursor
       handleEl.style.cursor = handleEl.style.cursor || 'grab';
     }
 
-    // Aplica volumen al audio con curva y actualiza UI (usando RAF)
-    function applyVolumeToAudio() {
-      audioEl.volume = clamp(curve(linear), 0, 1);
-    }
-
-    function scheduleRender() {
-      if (rafId) return;
-      rafId = requestAnimationFrame(renderUI);
-    }
-
-    function renderUI() {
+    // —— Núcleo: único bucle RAF para procesar drag y render —— //
+    const tick = () => {
       rafId = null;
-      // redondeo a 2 decimales para evitar repaints innecesarios
-      const percent = Math.round(linear * 100);
-      if (lastRendered === percent) return;
-      lastRendered = percent;
 
-      // barra (height en porcentaje)
-      barEl.style.height = `${percent}%`;
-      // etiqueta porcentaje
-      labelEl.textContent = `${percent}%`;
-
-      // handle (posicion relativa por porcentaje para evitar layout thrash)
-      if (handleEl) {
-        // top en porcentaje relativo al contenedor (0% top, 100% bottom)
-        const topPercent = (1 - linear) * 100;
-        handleEl.style.top = `${topPercent}%`;
+      if (isDragging && pendingY != null) {
+        // Solo leemos el rect al iniciar el drag (o si no existe)
+        if (!cachedRect) cachedRect = bgEl.getBoundingClientRect();
+        const correctedY = pendingY - grabOffsetPx;
+        const relY = clamp(correctedY - cachedRect.top, 0, cachedRect.height || 1);
+        const newLinear = clamp(1 - (relY / (cachedRect.height || 1)));
+        if (newLinear !== linear) setLinear(newLinear, /*skipSchedule*/ true, /*skipAudio*/ false);
       }
-    }
 
-    function setLinearValue(v, { skipAudio = false } = {}) {
-      linear = clamp(Number(v) || 0);
-      if (!skipAudio) applyVolumeToAudio();
-      scheduleRender();
+      // Render UI solo si cambia el % visible
+      const percent = Math.round(linear * 100);
+      if (percent !== lastPercent) {
+        lastPercent = percent;
+        barEl.style.height = percent + '%';
+        labelEl.textContent = percent + '%';
+        if (handleEl) handleEl.style.top = (100 - percent) + '%';
+      }
+    };
+
+    const schedule = () => { if (!rafId) rafId = requestAnimationFrame(tick); };
+
+    // Aplicar volumen real (curva perceptual -> volumen 0..1)
+    const applyAudio = () => { audioEl.volume = clamp(curve(linear), 0, 1); };
+
+    // Setter único (con opciones internas para evitar RAF redundantes)
+    function setLinear(v, skipSchedule = false, skipAudio = false) {
+      const nv = clamp(Number(v) || 0);
+      if (nv === linear && !isDragging) return linear;
+      linear = nv;
+      if (!skipAudio) applyAudio();
+      if (!skipSchedule) schedule();
       return linear;
     }
 
-    function setVolume(linearValue) {
-      return setLinearValue(linearValue, { skipAudio: false });
+    // API pública (compatible)
+    const setVolume = (v) => setLinear(v);
+    const getVolume = () => linear;
+
+    function mute() {
+      if (audioEl.volume > 0.001) {
+        prevVolumeBeforeMute = linear;
+        setLinear(0);
+      }
     }
 
-    function getVolume() { return linear; }
-
-    // Convertir clientY -> linear usando rect (top..height)
-    function clientYToLinear(clientY) {
-      if (!cachedRect) cachedRect = bgEl.getBoundingClientRect();
-      const relY = clamp(clientY - cachedRect.top, 0, cachedRect.height);
-      const newLinear = 1 - (relY / (cachedRect.height || 1));
-      return clamp(newLinear);
+    function unmute() {
+      if (prevVolumeBeforeMute != null) {
+        setLinear(prevVolumeBeforeMute);
+        prevVolumeBeforeMute = null;
+      } else {
+        setLinear(Math.max(linear, 0.5));
+      }
     }
 
-    // Establecer desde Y, respectando grabOffsetPx si aplica
-    function setVolumeFromClientY(clientY) {
-      const correctedY = clientY - grabOffsetPx;
-      const newLinear = clientYToLinear(correctedY);
-      setVolume(newLinear);
+    function setCurve(fn) {
+      if (typeof fn === 'function') {
+        curve = fn;
+        applyAudio();
+        schedule();
+      }
     }
 
-    // MOUSE / TOUCH / POINTER unified handlers
+    function enable() { disabled = false; bgEl.classList.remove('vc-disabled'); }
+    function disable() { disabled = true;  bgEl.classList.add('vc-disabled'); }
+
+    function destroy() {
+      if (rafId) cancelAnimationFrame(rafId);
+      pendingY = null;
+      cachedRect = null;
+      isDragging = false;
+      while (unsubs.length) { try { unsubs.pop()(); } catch (_) {} }
+      try { delete bgEl.__volumeControl; } catch (_) {}
+    }
+
+    // —— Eventos —— //
     function onPointerDown(e) {
       if (disabled) return;
-      // sólo botón primario o touch
       if (e.button && e.button !== 0) return;
       e.preventDefault();
       isDragging = true;
       cachedRect = bgEl.getBoundingClientRect();
 
-      // calcular grabOffset en px si preserveGrab: diferencia entre cursor y centro del handle
       if (preserveGrab && handleEl) {
         const handleCenterY = cachedRect.top + cachedRect.height * (1 - linear);
         grabOffsetPx = e.clientY - handleCenterY;
@@ -142,164 +160,67 @@
         grabOffsetPx = 0;
       }
 
-      // intentar capturar pointer para seguir el movimiento fuera del bg
-      try { e.target.setPointerCapture?.(e.pointerId); } catch (err) {}
-      // primera posición
-      setVolumeFromClientY(e.clientY);
-      // registrar listeners a nivel documento (para capturar fuera del elemento)
-      document.addEventListener('pointermove', onPointerMove, { passive: false });
-      document.addEventListener('pointerup', onPointerUp, { passive: false });
-      // cambiar cursor del handle si existe
-      if (handleEl) handleEl.style.cursor = 'grabbing';
-    }
-
-    function onPointerMove(e) {
-      if (!isDragging) return;
-      if (e.cancelable) e.preventDefault();
-      // throttle: guardar último Y y procesarlo en RAF
       pendingY = e.clientY;
-      scheduleDragProcess();
+      e.target.setPointerCapture?.(e.pointerId);
+
+      // Listeners a nivel documento para seguir el drag fuera del BG
+      const move = (ev) => { if (ev.cancelable) ev.preventDefault(); pendingY = ev.clientY; schedule(); };
+      const up = (ev) => {
+        isDragging = false;
+        pendingY = null;
+        cachedRect = null;
+        grabOffsetPx = 0;
+        ev.target.releasePointerCapture?.(ev.pointerId);
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        if (handleEl) handleEl.style.cursor = 'grab';
+      };
+      document.addEventListener('pointermove', move, { passive: false });
+      document.addEventListener('pointerup', up, { passive: false });
+      if (handleEl) handleEl.style.cursor = 'grabbing';
+      schedule();
     }
 
-    function onPointerUp(e) {
-      if (!isDragging) return;
-      isDragging = false;
-      pendingY = null;
-      cachedRect = null;
-      grabOffsetPx = 0;
-
-      // release pointer capture
-      try { e.target.releasePointerCapture?.(e.pointerId); } catch (err) {}
-      document.removeEventListener('pointermove', onPointerMove);
-      document.removeEventListener('pointerup', onPointerUp);
-      if (handleEl) handleEl.style.cursor = 'grab';
-    }
-
-    // Procesa drag en RAF (evita flood de events)
-    let dragRaf = null;
-    function scheduleDragProcess() {
-      if (dragRaf) return;
-      dragRaf = requestAnimationFrame(() => {
-        dragRaf = null;
-        if (pendingY == null) return;
-        setVolumeFromClientY(pendingY);
-      });
-    }
-
-    // Rueda del ratón para ajustar en pasos
     function onWheel(e) {
       if (disabled) return;
       e.preventDefault();
-      cachedRect = bgEl.getBoundingClientRect(); // rect necesario si queremos posicion relativa en futuro
-      const delta = e.deltaY > 0 ? -step : step;
-      setVolume(linear + delta);
+      const delta = e.deltaY > 0 ? -step : step; // rueda abajo => baja volumen
+      setLinear(linear + delta);
     }
 
-    // Doble click para MUTE / UNMUTE
-    function onDblClick(e) {
+    function onDblClick() {
       if (disabled) return;
-      if (audioEl.volume > 0.001) {
-        prevVolumeBeforeMute = linear;
-        setVolume(0);
-      } else if (prevVolumeBeforeMute != null) {
-        setVolume(prevVolumeBeforeMute);
-        prevVolumeBeforeMute = null;
-      } else {
-        setVolume(0.9);
-      }
+      if (audioEl.volume > 0.001) mute();
+      else unmute();
     }
 
-    // Keybindings para accesibilidad cuando bg tiene tabindex
     function onKeyDown(e) {
       if (disabled) return;
-      const code = e.code;
-      if (!['ArrowUp','ArrowDown','PageUp','PageDown','Home','End'].includes(code)) return;
+      const { code } = e;
+      if (!['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(code)) return;
       e.preventDefault();
-      if (code === 'ArrowUp') setVolume(linear + step);
-      if (code === 'ArrowDown') setVolume(linear - step);
-      if (code === 'PageUp') setVolume(linear + (step * 5));
-      if (code === 'PageDown') setVolume(linear - (step * 5));
-      if (code === 'Home') setVolume(0);
-      if (code === 'End') setVolume(1);
+      if (code === 'ArrowUp')   setLinear(linear + step);
+      if (code === 'ArrowDown') setLinear(linear - step);
+      if (code === 'PageUp')    setLinear(linear + step * 5);
+      if (code === 'PageDown')  setLinear(linear - step * 5);
+      if (code === 'Home')      setLinear(0);
+      if (code === 'End')       setLinear(1);
     }
 
-    // API pública adicional
-    function mute() {
-      if (audioEl.volume > 0.001) {
-        prevVolumeBeforeMute = linear;
-        setVolume(0);
-      }
-    }
-    function unmute() {
-      if (prevVolumeBeforeMute != null) {
-        setVolume(prevVolumeBeforeMute);
-        prevVolumeBeforeMute = null;
-      } else {
-        setVolume(Math.max(linear, 0.5));
-      }
-    }
+    on(bgEl, 'pointerdown', onPointerDown, { passive: false });
+    on(bgEl, 'wheel',       onWheel,       { passive: false });
+    on(bgEl, 'dblclick',    onDblClick,    { passive: true  });
+    on(bgEl, 'keydown',     onKeyDown,     { passive: false });
 
-    function setCurve(fn) {
-      if (typeof fn === 'function') {
-        curve = fn;
-        applyVolumeToAudio();
-        scheduleRender();
-      }
-    }
+    if (handleEl) on(handleEl, 'pointerdown', onPointerDown, { passive: false });
 
-    function enable() { disabled = false; bgEl.classList.remove('vc-disabled'); }
-    function disable() { disabled = true; bgEl.classList.add('vc-disabled'); }
+    // Init
+    setLinear(linear); // aplica audio + agenda render
+    bgEl.__volumeControl = { setVolume, getVolume, mute, unmute, setCurve, enable, disable, destroy };
 
-    function destroy() {
-      cancelAnimationFrame(rafId); rafId = null;
-      cancelAnimationFrame(dragRaf); dragRaf = null;
-      document.removeEventListener('pointermove', onPointerMove);
-      document.removeEventListener('pointerup', onPointerUp);
-      bgEl.removeEventListener('pointerdown', onPointerDown);
-      bgEl.removeEventListener('wheel', onWheel);
-      bgEl.removeEventListener('dblclick', onDblClick);
-      bgEl.removeEventListener('keydown', onKeyDown);
-      if (handleEl) {
-        handleEl.removeEventListener('pointerdown', onPointerDown);
-      }
-      // no tocamos el audioEl event listeners externos
-    }
-
-    // Init: attach listeners
-    bgEl.addEventListener('pointerdown', onPointerDown, { passive: false });
-    bgEl.addEventListener('wheel', onWheel, { passive: false });
-    bgEl.addEventListener('dblclick', onDblClick, { passive: true });
-    bgEl.addEventListener('keydown', onKeyDown, { passive: false });
-
-    // Si hay handle, permitir arrastrarlo (delegar down en handle también)
-    if (handleEl) handleEl.addEventListener('pointerdown', onPointerDown, { passive: false });
-
-    // Hacer bg focusable para recibir key events si no lo es
-    if (!bgEl.hasAttribute('tabindex')) bgEl.setAttribute('tabindex', '0');
-
-    // Inicializar UI y audio
-    setLinearValue(linear);
-    applyVolumeToAudio();
-
-    // Exponer instancia
-    const instance = {
-      setVolume,
-      getVolume,
-      mute,
-      unmute,
-      setCurve,
-      enable,
-      disable,
-      destroy
-    };
-
-    // también guardarla en el elemento DOM para debugging (opcional)
-    try { bgEl.__volumeControl = instance; } catch (e) {}
-
-    return instance;
+    // Retornar instancia pública
+    return bgEl.__volumeControl;
   }
 
-  // Exportar a window
   if (!global.initVolumeControl) global.initVolumeControl = initVolumeControl;
-
 })(window);
