@@ -171,4 +171,4 @@
     requestAnimationFrame(pollForSetCatalog);
   })();
 
-})(window);[topic]
+})(window);

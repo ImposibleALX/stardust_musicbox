@@ -2,17 +2,17 @@
  * volumecontrol.js — Control de volumen optimizado
  *
  * Uso:
- *   const vc = initVolumeControl({
- *     audioEl: audioPlayer,
- *     bgEl: document.getElementById('volumeBarBg'),
- *     barEl: document.getElementById('volumeBar'),
- *     labelEl: document.getElementById('volumeValue'),
- *     handleEl: optionalHandleElement,
- *     preserveGrab: false, // true para mantener offset cuando agarras el handle
- *     initial: 0.9,
- *     step: 0.05,
- *     curve: (x) => x ** 4
- *   });
+ * const vc = initVolumeControl({
+ * audioEl: audioPlayer,
+ * bgEl: document.getElementById('volumeBarBg'),
+ * barEl: document.getElementById('volumeBar'),
+ * labelEl: document.getElementById('volumeValue'),
+ * handleEl: optionalHandleElement,
+ * preserveGrab: false, // true para mantener offset cuando agarras el handle
+ * initial: 0.9,
+ * step: 0.05,
+ * curve: (x) => x ** 4
+ * });
  *
  * Notas:
  * - Internamente usa requestAnimationFrame para las actualizaciones visuales (sin bloqueos).

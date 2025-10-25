@@ -49,6 +49,19 @@ let currentlyPlayingCatalogIndex = -1;
 let isLooping = false;
 let animationFrameId_timer;
 
+// *** OPTIMIZACIÓN ***
+// Este Set mantiene un caché de los índices en la playlist.
+// Se actualiza solo en updateQueue() y removeFromQueueByCatalogIndex().
+let reservedIndexSet = new Set();
+// La función original (abajo) leía el DOM CIENTOS de veces.
+// function getReservedCatalogIndexSet_OLD() {
+//   return new Set(Array.from(secondList?.children || []).map(li => Number(li.dataset.catalogIndex)).filter(Number.isFinite));
+// }
+function getReservedCatalogIndexSet() {
+  return reservedIndexSet;
+}
+
+
 const variantManager = typeof createVariantManager === 'function' ? createVariantManager() : null;
 
 function ensureTrailingSlash(path) {
@@ -286,7 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
     groupId,
     draggable = true
   } = {}) {
-    if (!track || typeof catalogIndex !== 'number') return null;
+    if (typeof catalogIndex !== 'number') return null;
+    const safeTrack = track || {}; // Safety for allReserved case
     const attrs = { 'data-catalog-index': catalogIndex };
     if (draggable) attrs.draggable = 'true';
     const li = createElement('li', attrs);
@@ -297,9 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchTokens) li.dataset.searchTokens = searchTokens;
 
     const titleSpan = createElement('span', { className: 'track-title' });
-    const durationSpan = createElement('span', { className: 'track-duration', text: formatTime(track.duration || 0) });
+    const durationSpan = createElement('span', { className: 'track-duration', text: formatTime(safeTrack.duration || 0) });
     const factionSpan = createElement('span', { className: 'track-faction' });
-    const factions = Array.isArray(track.factions) ? track.factions : [];
+    const factions = Array.isArray(safeTrack.factions) ? safeTrack.factions : [];
     if (factions.length > 0) {
       const img = createElement('img', {
         src: factionLogos[factions[0]] || '',
@@ -330,11 +344,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function createGroupListItem(group) {
+    const reserved = getReservedCatalogIndexSet(); // Ahora usa el Set cacheado
     if (!group || !Array.isArray(group.variants) || group.variants.length === 0) return null;
-    const activeVariant = group.variants[group.activeIndex || 0];
+    let activeVariant = group.variants[group.activeIndex || 0];
     if (!activeVariant) return null;
-    const track = catalog[activeVariant.catalogIndex];
-    if (!track) return null;
+
+    // If activeVariant is already queued, advance to the next available (wrap), skipping reserved ones
+    if (activeVariant && reserved.has(activeVariant.catalogIndex)) {
+      const total = group.variants.length;
+      let hops = 0;
+      while (hops < total && (reserved.has(activeVariant.catalogIndex))) {
+        // try to use variantManager step to keep state consistent, else manual rotate
+        if (typeof variantManager?.stepActiveVariant === 'function') {
+          variantManager.stepActiveVariant(group.groupId, +1);
+          const updatedGroup = variantManager.getGroup(group.groupId); // Re-fetch group state
+          activeVariant = updatedGroup.variants[updatedGroup.activeIndex];
+        } else {
+          const nextIdx = ((group.activeIndex || 0) + 1) % total;
+          group.activeIndex = nextIdx;
+          activeVariant = group.variants[nextIdx];
+        }
+        hops++;
+      }
+    }
+
+    // If still reserved (i.e., all variants are reserved), mark as unavailable
+    const allReserved = group.variants.every(v => reserved.has(v.catalogIndex));
+    const activeCatalogIndex = activeVariant.catalogIndex;
+    const track = !allReserved ? catalog[activeCatalogIndex] : null;
+    
+    // Use the *first* variant's track for metadata if the active one isn't valid
+    const displayTrack = track || catalog[group.variants[0].catalogIndex];
 
     const tokenSet = new Set();
     if (group.title) tokenSet.add(normalizeString(group.title).toLowerCase());
@@ -348,15 +388,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const searchTokens = Array.from(tokenSet).filter(Boolean).join(' ');
 
-    const base = createBaseListItem(track, {
-      catalogIndex: activeVariant.catalogIndex,
+    const base = createBaseListItem(displayTrack, { // Usa displayTrack
+      catalogIndex: activeCatalogIndex,
       searchTokens,
-      classNames: ['has-variants'],
-      groupId: group.groupId
+      classNames: ['has-variants' + (allReserved ? ' variants-depleted' : '')],
+      groupId: group.groupId,
+      draggable: !allReserved
     });
     if (!base) return null;
 
-    const baseTitle = group.title || (track.titles?.en?.trim() || 'Unknown Title');
+    const baseTitle = group.title || (displayTrack?.titles?.en?.trim() || 'Unknown Title');
     const mainTitle = createElement('span', { className: 'track-main-title', text: baseTitle });
     const controls = createElement('div', { className: 'variant-controls' });
 
@@ -370,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const label = createElement('span', {
       className: 'variant-label',
-      text: activeVariant.variantLabel || 'Original'
+      text: allReserved ? 'All queued' : (activeVariant.variantLabel || 'Original')
     });
 
     const nextBtn = createElement('button', {
@@ -382,12 +423,14 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtn.textContent = '▶';
 
     controls.append(prevBtn, label, nextBtn);
+    if (allReserved) { prevBtn.disabled = true; nextBtn.disabled = true; }
     base.titleSpan.append(mainTitle, controls);
 
+    // Pass the element itself (base.li) to the handler
     const attachHandler = (delta, focusSide) => (event) => {
       event.preventDefault();
       event.stopPropagation();
-      handleVariantToggle(group.groupId, delta, focusSide);
+      handleVariantToggle(group.groupId, delta, focusSide, base.li);
     };
 
     prevBtn.addEventListener('click', attachHandler(-1, 'prev'));
@@ -399,18 +442,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function createPlaylistItem(catalogIndex) {
     const track = catalog[catalogIndex];
     if (!track) return null;
-    const base = createBaseListItem(track, { catalogIndex });
+    const base = createBaseListItem(track, { catalogIndex, draggable: false }); // Draggable false en playlist
     if (!base) return null;
-    const variantLabel = variantManager?.getVariantLabelByCatalogIndex(catalogIndex);
+        // Variant label intentionally NOT appended to playlist title
     const titleText = track.titles?.en?.trim() || 'Unknown Title';
-    if (variantLabel && variantLabel.toLowerCase() !== 'original') {
-      base.titleSpan.textContent = `${titleText} — ${variantLabel}`;
-    } else {
-      base.titleSpan.textContent = titleText;
-    }
+
+        base.titleSpan.textContent = titleText;
     return base.li;
   }
-
   function getLibraryEntries() {
     if (variantManager) {
       const entries = variantManager.getLibraryEntries();
@@ -448,15 +487,34 @@ document.addEventListener('DOMContentLoaded', () => {
     updateActiveTrackVisuals();
   }
 
-  function handleVariantToggle(groupId, delta, focusSide = 'next') {
-    if (!variantManager || !allTracksList) return;
-    const group = variantManager.stepActiveVariant(groupId, delta);
+  // Accept 'currentNode' as the element to be replaced
+  function handleVariantToggle(groupId, delta, focusSide = 'next', currentNode) {
+    if (!variantManager || !allTracksList || !currentNode) return; // Check for currentNode
+
+    let group = variantManager.stepActiveVariant(groupId, delta);
     if (!group) return;
-    const currentNode = allTracksList.querySelector(`li[data-group-id="${groupId}"]`);
-    if (!currentNode) return;
+
+    // Ensure new active variant is not already queued; if it is, keep stepping until free or full loop
+    const reserved = getReservedCatalogIndexSet(); // Ahora usa el Set cacheado
+    if (Array.isArray(group.variants)) {
+      const total = group.variants.length;
+      let hops = 0;
+      let activeIdx = group.activeIndex || 0;
+      
+      while (hops < total && reserved.has(group.variants[activeIdx].catalogIndex)) {
+        group = variantManager.stepActiveVariant(groupId, delta);
+        if (!group) return; // Should not happen, but safety
+        activeIdx = group.activeIndex || 0;
+        hops++;
+      }
+    }
+
     const replacement = createGroupListItem(group);
     if (!replacement) return;
-    allTracksList.replaceChild(replacement, currentNode);
+    
+    // Use 'currentNode' from the argument
+    allTracksList.replaceChild(replacement, currentNode); 
+    
     const selector = focusSide === 'prev' ? '.variant-btn.prev' : '.variant-btn.next';
     const focusTarget = replacement.querySelector(selector);
     if (focusTarget) focusTarget.focus();
@@ -492,15 +550,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateQueue() {
     playQueue = Array.from(secondList.children).map(li => Number(li.dataset.catalogIndex));
+    reservedIndexSet = new Set(playQueue); // *** OPTIMIZACIÓN: Actualiza el caché ***
+
     if (currentlyPlayingCatalogIndex !== -1) {
       const newIdx = playQueue.indexOf(currentlyPlayingCatalogIndex);
       if (newIdx !== -1) currentIndexInQueue = newIdx;
       else validateCurrentAudioSource();
     }
     audioPlayer.loop = isLooping && playQueue.length === 1;
-    renderPlaylist();
+    
+    renderPlaylist(); // Re-dibuja la playlist (simple)
     updatePlayerControlsState();
-  }
+    renderLibrary(); // Re-dibuja la biblioteca (para marcar 'agotados')
+}
 
   function startTimerUpdates() {
     if (animationFrameId_timer) cancelAnimationFrame(animationFrameId_timer);
@@ -608,12 +670,16 @@ document.addEventListener('DOMContentLoaded', () => {
         labelEl: volumeValue
       });
       // Sincroniza aria-valuenow
-      const sync = () => document.getElementById('volumeBarBg').setAttribute('aria-valuenow', String(Math.round(inst.getVolume() * 100)));
+      const sync = () => {
+        const bg = document.getElementById('volumeBarBg');
+        if (bg) bg.setAttribute('aria-valuenow', String(Math.round(inst.getVolume() * 100)));
+      }
       audioPlayer.addEventListener('volumechange', sync);
       sync();
     }
 
     [allTracksList, secondList].forEach(el => {
+      if (!el) return;
       el.addEventListener('wheel', e => {
         e.preventDefault();
         e.currentTarget.scrollTop += e.deltaY;
@@ -636,55 +702,129 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', unlock, { passive: true });
   }
 
-  // —— Sortable —— //
-  function setupSortable() {
-    if (!allTracksList || !secondList) {
-      console.error('Lists not found');
-      return;
+  // Quita un track de la cola y mantiene reproducción/punteros/loop coherentes.
+  function removeFromQueueByCatalogIndex(removedCatalogIndex) {
+    const pos = playQueue.indexOf(removedCatalogIndex);
+    if (pos === -1) return;
+
+    const wasPlaying = (removedCatalogIndex === currentlyPlayingCatalogIndex);
+
+    // quita del array fuente de verdad
+    playQueue.splice(pos, 1);
+    reservedIndexSet = new Set(playQueue); // *** OPTIMIZACIÓN: Actualiza el caché ***
+
+    // si quitaste algo antes del puntero actual y NO era el que sonaba, corre el puntero una a la izq.
+    if (!wasPlaying && pos < currentIndexInQueue) {
+      currentIndexInQueue = Math.max(0, currentIndexInQueue - 1);
     }
-    Sortable.create(allTracksList, { group: { name: 'shared', pull: 'clone', put: false }, animation: 150, sort: false });
-    Sortable.create(secondList, {
-      group: {
-        name: 'shared',
-        put: (to, from, dragged) => {
-          const newId = dragged?.dataset?.catalogIndex;
-          const existing = Array.from(to.el.children).map(li => li.dataset.catalogIndex);
-          return newId ? !existing.includes(newId) : false;
-        }
-      },
-      animation: 150,
-      onAdd: updateQueue,
-      onUpdate: updateQueue,
 
-      // ✅ FIX: sin elementFromPoint; usar evt.to para saber si el drop ocurrió en secondList
-      onEnd: (evt) => {
-        const toEl = evt.to; // evt.to es la lista de destino en Sortable.js
-        const droppedInSecond = toEl === secondList || (toEl && secondList.contains(toEl));
+    // loop solo si queda 1
+    audioPlayer.loop = isLooping && playQueue.length === 1;
 
-        if (droppedInSecond) return;
+    // re-render UI
+    renderPlaylist();
+    updatePlayerControlsState();
+    updateActiveTrackVisuals();
+    renderLibrary(); // Re-render library to update depleted status
 
-        // Si terminó fuera de secondList, eliminamos el item “clonado”/movido de la cola
-        const removedItem = evt.item;
-        if (removedItem && removedItem.parentNode) {
-          const removedCatalogIndex = Number(removedItem.dataset.catalogIndex);
-          removedItem.parentNode.removeChild(removedItem);
-
-          const wasPlaying = (removedCatalogIndex === currentlyPlayingCatalogIndex);
-          updateQueue();
-
-          if (wasPlaying) {
-            if (playQueue.length === 0) {
-              stopPlaybackAndResetUI();
-            } else {
-              const newIndexToPlay = (evt.oldDraggableIndex ?? 0) % playQueue.length;
-              currentIndexInQueue = newIndexToPlay;
-              playSingleTrackByIndex(playQueue[currentIndexInQueue]);
-            }
-          }
-        }
+    // si quitaste el que sonaba → avanza al siguiente en la misma posición
+    if (wasPlaying) {
+      if (playQueue.length === 0) {
+        stopPlaybackAndResetUI();
+      } else {
+        // mismo hueco 'pos' (o 0 si el hueco quedó fuera)
+        currentIndexInQueue = (pos >= playQueue.length) ? 0 : pos;
+        playSingleTrackByIndex(playQueue[currentIndexInQueue]);
       }
-    });
+    }
   }
+
+  // —— Sortable —— //
+function setupSortable() {
+  if (!allTracksList || !secondList) {
+    console.error('Lists not found');
+    return;
+  }
+  if (typeof Sortable === 'undefined') {
+    console.error('Sortable.js library not loaded.');
+    return;
+  }
+
+  // Biblioteca: arrastras clon; no acepta drops; revierte en spill visual
+  Sortable.create(allTracksList, {
+    group: { name: 'shared', pull: 'clone', put: false },
+    animation: 150,
+    sort: false,
+    revertOnSpill: true
+  });
+
+  // Utilidad: borra por id + asegura DOM fuera
+  const safeRemoveByNode = (itemNode) => {
+    const id = Number(itemNode?.dataset?.catalogIndex);
+    if (!Number.isFinite(id)) return;
+    if (!playQueue.includes(id)) return; // ya fue borrado
+    removeFromQueueByCatalogIndex(id);   // avanza si era el que sonaba
+    itemNode?.remove?.();                // garantía si el plugin no quitó el nodo
+  };
+
+  // ¿El puntero terminó fuera de la playlist?
+  const isPointerOutsideSecondList = (evt) => {
+    const e = evt.originalEvent || evt;
+    const t = (e && e.changedTouches && e.changedTouches[0]) || null;
+    const x = typeof e?.clientX === 'number' ? e.clientX : (t ? t.clientX : undefined);
+    const y = typeof e?.clientY === 'number' ? e.clientY : (t ? t.clientY : undefined);
+    if (typeof x === 'number' && typeof y === 'number') {
+      const under = document.elementFromPoint(x, y);
+      return !secondList.contains(under); // fuera = true
+    }
+    // Fallback
+    return evt.to !== secondList;
+  };
+
+  // Playlist
+  Sortable.create(secondList, {
+    group: {
+      name: 'shared',
+      put: (to, from, dragged) => {
+        const id = dragged?.dataset?.catalogIndex;
+        if (!id) return false;
+        // ❌ no duplicar EXACTO el mismo catalogIndex
+        for (const li of to.el.children) {
+          if (li.dataset.catalogIndex === id) return false;
+        }
+        return true; // ✅ permitir si es variante distinta (otro catalogIndex)
+      }
+    },
+    animation: 150,
+
+    // Si el build tiene el plugin, úsalo; si no, el onEnd de abajo cubre todo.
+    removeOnSpill: true,
+
+    // Camino plugin: derrame => borrar
+    onSpill: (evt) => {
+      safeRemoveByNode(evt.item);
+    },
+
+    // Futuro: si alguna vez otra lista acepta el ítem, también borramos del estado
+    onRemove: (evt) => {
+      safeRemoveByNode(evt.item);
+    },
+
+    // Plan B robusto (independiente del plugin):
+    // Si el drag vino de la playlist y terminó fuera de la playlist -> BORRAR.
+    // Esto incluye: soltar sobre la biblioteca o en cualquier zona fuera de la UL.
+    onEnd: (evt) => {
+      if (evt.from === secondList && isPointerOutsideSecondList(evt)) {
+        safeRemoveByNode(evt.item);
+      }
+    },
+
+    // Altas / reorden dentro de la playlist
+    onAdd: updateQueue,
+    onUpdate: updateQueue
+  });
+}
+
 
   // —— Búsqueda —— //
   function injectSearchBarCSS() {
@@ -723,24 +863,26 @@ document.addEventListener('DOMContentLoaded', () => {
     searchContainer.appendChild(searchInput);
     heading.after(searchContainer);
 
-    const SANITIZE = /^[A-Za-z0-9 _\-\/#]{0,50}$/;
+    // *** SIMPLIFICACIÓN: Se elimina SANITIZE regex restrictivo ***
+    // const SANITIZE = /^[A-Za-z0-9 _\-\/#]{0,50}$/; 
     const handleSearch = (event) => {
       const raw = event.target.value;
-      if (!SANITIZE.test(raw)) { event.target.value = raw.slice(0, -1); return; }
+      // if (!SANITIZE.test(raw)) { event.target.value = raw.slice(0, -1); return; } // Eliminado
       const query = raw.toLowerCase().trim();
       const items = allTracksList.children;
       for (const item of items) {
         const idx = parseInt(item.dataset.catalogIndex, 10);
+        if (isNaN(idx)) continue;
         const track = catalog[idx]; if (!track) continue;
         let isMatch = false;
         if (!query) isMatch = true;
         else if (query.startsWith('/')) {
           const fq = query.substring(1);
-          isMatch = track.factions?.includes(fq);
+          isMatch = (track.factions || []).includes(fq);
         } else if (query.startsWith('#')) {
           const gq = query.substring(1);
           const gfs = factionGroups[gq] || [];
-          isMatch = track.factions?.some(tf => gfs.includes(tf));
+          isMatch = (track.factions || []).some(tf => gfs.includes(tf));
         } else {
           const normalizedQuery = normalizeString(query).toLowerCase();
           const tokens = (item.dataset.searchTokens || '').toLowerCase();
@@ -788,14 +930,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function initializeApp() {
     try {
+      // Validar elementos críticos del DOM antes de fetchear
+      const criticalElements = [audioPlayer, allTracksList, secondList, btnPlayPause, imgPlayPause, btnLoop, imgLoop, trackName, factionName, timeDisplay, volumeSliderContainer, volumeBar, volumeValue];
+      if (criticalElements.some(el => !el)) {
+        console.error('Initialization failed: Critical DOM elements are missing.');
+        const root = document.getElementById('appRoot') || document.body;
+        root.innerHTML = `<div class="error-box"><h3>Initialization Error</h3><p>A critical UI component failed to load. Please check element IDs.</p></div>`;
+        return;
+      }
+
       const fetchUrl = `${dataURL}?_=${Date.now()}`;
       const response = await fetchWithRetry(fetchUrl, { cache: 'no-cache' });
 
       catalog = await response.json();
+      if (!Array.isArray(catalog)) throw new Error("Catalog data is not an array.");
+      
       window.catalog = catalog;
 
       // Precompute normalized titles for faster search matching
       for (const track of catalog) {
+        if (!track) continue;
         const title = track?.titles?.en || '';
         track._normalizedTitle = normalizeString(title).toLowerCase();
       }
@@ -806,6 +960,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       playQueue = [];
+      reservedIndexSet = new Set(); // Inicializa el caché
       renderLibrary();
       renderPlaylist();
 
@@ -820,7 +975,7 @@ document.addEventListener('DOMContentLoaded', () => {
       imgLoop.src = `${baseURL}/buttons/loop_button.png`;
     } catch (err) {
       console.error('Initialization error:', err);
-      const root = document.getElementById('appRoot');
+      const root = document.getElementById('appRoot') || document.body;
       if (root) {
         root.innerHTML = `
           <div class="error-box">

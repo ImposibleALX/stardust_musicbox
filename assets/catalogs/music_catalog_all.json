@@ -330,7 +330,7 @@
     "duration": 162.14205
   },
   {
-    "id": "gamilas_desler_attack",
+    "id": "gamilas_desler_attack_1980",
     "file": "desler_attack_1980.mp3",
     "folder": "gamilas",
     "factions": [
@@ -666,7 +666,7 @@
     "duration": 161.57055
   },
   {
-    "id": "gatlantis_gatlantis",
+    "id": "gatlantis_gatlantis_1978",
     "file": "gatlantis_1978.mp3",
     "folder": "gatlantis",
     "factions": [
@@ -1185,7 +1185,7 @@
     "duration": 56.058776
   },
   {
-    "id": "dinguil_aquarius_1",
+    "id": "dinguil_aquarius_1_2",
     "file": "aquarius_2.mp3",
     "folder": "dinguil",
     "factions": [
@@ -2445,7 +2445,7 @@
     },
     "duration": 85.6112
   },
-    {
+  {
     "id": "zentradi_zentradi_theme",
     "file": "zentradi_theme.mp3",
     "folder": "zentradi",
