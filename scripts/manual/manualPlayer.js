@@ -53,14 +53,9 @@ let animationFrameId_timer;
 // Este Set mantiene un caché de los índices en la playlist.
 // Se actualiza solo en updateQueue() y removeFromQueueByCatalogIndex().
 let reservedIndexSet = new Set();
-// La función original (abajo) leía el DOM CIENTOS de veces.
-// function getReservedCatalogIndexSet_OLD() {
-//   return new Set(Array.from(secondList?.children || []).map(li => Number(li.dataset.catalogIndex)).filter(Number.isFinite));
-// }
 function getReservedCatalogIndexSet() {
   return reservedIndexSet;
 }
-
 
 const variantManager = typeof createVariantManager === 'function' ? createVariantManager() : null;
 
@@ -304,9 +299,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const attrs = { 'data-catalog-index': catalogIndex };
     if (draggable) attrs.draggable = 'true';
     const li = createElement('li', attrs);
+
+    // 🔧 PARCHE: Normaliza classNames -> tokens válidos (sin espacios)
     if (Array.isArray(classNames) && classNames.length > 0) {
-      li.classList.add(...classNames);
+      const tokens = classNames.flatMap((c) => {
+        if (typeof c === 'string') return c.split(/\s+/);
+        if (Array.isArray(c)) return c;
+        return String(c).split(/\s+/);
+      }).filter(Boolean);
+      if (tokens.length) li.classList.add(...tokens);
     }
+
     if (groupId) li.dataset.groupId = groupId;
     if (searchTokens) li.dataset.searchTokens = searchTokens;
 
@@ -388,10 +391,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const searchTokens = Array.from(tokenSet).filter(Boolean).join(' ');
 
-    const base = createBaseListItem(displayTrack, { // Usa displayTrack
+    // 🔧 PARCHE: pasa clases separadas, no concatenadas con espacios
+    const classNames = ['has-variants'];
+    if (allReserved) classNames.push('variants-depleted');
+
+    const base = createBaseListItem(displayTrack, {
       catalogIndex: activeCatalogIndex,
       searchTokens,
-      classNames: ['has-variants' + (allReserved ? ' variants-depleted' : '')],
+      classNames,
       groupId: group.groupId,
       draggable: !allReserved
     });
@@ -444,10 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!track) return null;
     const base = createBaseListItem(track, { catalogIndex, draggable: false }); // Draggable false en playlist
     if (!base) return null;
-        // Variant label intentionally NOT appended to playlist title
+    // Variant label intentionally NOT appended to playlist title
     const titleText = track.titles?.en?.trim() || 'Unknown Title';
-
-        base.titleSpan.textContent = titleText;
+    base.titleSpan.textContent = titleText;
     return base.li;
   }
   function getLibraryEntries() {
@@ -863,11 +869,8 @@ function setupSortable() {
     searchContainer.appendChild(searchInput);
     heading.after(searchContainer);
 
-    // *** SIMPLIFICACIÓN: Se elimina SANITIZE regex restrictivo ***
-    // const SANITIZE = /^[A-Za-z0-9 _\-\/#]{0,50}$/; 
     const handleSearch = (event) => {
       const raw = event.target.value;
-      // if (!SANITIZE.test(raw)) { event.target.value = raw.slice(0, -1); return; } // Eliminado
       const query = raw.toLowerCase().trim();
       const items = allTracksList.children;
       for (const item of items) {
