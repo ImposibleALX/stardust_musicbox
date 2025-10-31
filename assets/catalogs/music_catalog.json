@@ -945,7 +945,7 @@
     },
     "duration": 150.360816
   },
-  {
+    {
     "id": "dezariam_gorba_original",
     "file": "autoplanetgorba_original2.mp3",
     "folder": "dezariam",
@@ -957,7 +957,7 @@
       "es": "AUTOPLANETA GORBA (Original)",
       "jp": ""
     },
-    "duration": 266.112
+    "duration": ""
   },
   {
     "id": "dezariam_gorba_his_form",

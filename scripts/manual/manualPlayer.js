@@ -1,10 +1,10 @@
-// —— Helpers —— //
+// Helpers
 function createElement(tag, { className, text, html, ...attrs } = {}) {
   const el = document.createElement(tag);
   if (className) el.className = className;
   if (text) el.textContent = text;
   if (html) el.innerHTML = html;
-  Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   return el;
 }
 function formatTime(seconds = 0) {
@@ -16,62 +16,43 @@ function formatTime(seconds = 0) {
 function waitForCanPlay(audio) {
   return new Promise(resolve => {
     if (audio.readyState >= 3) return resolve();
-    const handler = () => { audio.removeEventListener('canplaythrough', handler); resolve(); };
-    audio.addEventListener('canplaythrough', handler, { once: true });
+    const h = () => (audio.removeEventListener('canplaythrough', h), resolve());
+    audio.addEventListener('canplaythrough', h, { once: true });
   });
 }
 function debounce(fn, delay = 300) {
-  let timeoutId;
-  return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn(...args), delay);
-  };
+  let t; return (...a) => (clearTimeout(t), t = setTimeout(() => fn(...a), delay));
 }
 function normalizeString(str = '') {
   return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
-
-// Infer basic image mime type from file extension (used for Media Session artwork)
 function getImageMimeType(url = '') {
   const ext = url.split('?')[0].split('#')[0].split('.').pop()?.toLowerCase();
   if (ext === 'png') return 'image/png';
   if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
   if (ext === 'webp') return 'image/webp';
   if (ext === 'gif') return 'image/gif';
-  return undefined;
 }
 
-// —— Estado —— //
+// Estado global mínimo
 let catalog = [];
-let playQueue = []; // fuente única de verdad para la playlist
+let playQueue = [];
 let currentIndexInQueue = 0;
 let currentlyPlayingCatalogIndex = -1;
 let isLooping = false;
 let animationFrameId_timer;
-
-// *** OPTIMIZACIÓN ***
-// Este Set mantiene un caché de los índices en la playlist.
-// Se actualiza solo en updateQueue() y removeFromQueueByCatalogIndex().
-let reservedIndexSet = new Set();
-function getReservedCatalogIndexSet() {
-  return reservedIndexSet;
-}
-
+let reservedIndexSet = new Set(); // cache de la playlist (para “agotados”)
 const variantManager = typeof createVariantManager === 'function' ? createVariantManager() : null;
 
-function ensureTrailingSlash(path) {
-  if (!path) return '';
-  return path.endsWith('/') ? path : `${path}/`;
-}
+function ensureTrailingSlash(path) { return !path ? '' : (path.endsWith('/') ? path : `${path}/`); }
 
-const imageBaseURL = (window.IMAGE_BASE_PATH || '../assets/images');
+const imageBaseURL = (window.IMAGE_BASE_PATH || '../assets/images').replace(/\/$/, '');
 const musicBaseURL = ensureTrailingSlash(window.AUDIO_BASE_PATH || '../assets/music/');
 const catalogBaseURL = ensureTrailingSlash(window.CATALOG_BASE_PATH || '../assets/catalogs/');
-const baseURL = imageBaseURL.replace(/\/$/, '');
 const dataURL = `${catalogBaseURL}music_catalog_all.json`;
 const variantDataURL = `${catalogBaseURL}variant_groups.json`;
 
-// Facciones (sin duplicados)
+// Facciones
 const factionDisplayNames = {
   bolar: "Bolar Federation", dezariam: "Dezariam Nation", gamilas: "Greater Garmillan Empire",
   gatlantis: "White Comet / Gatlantis Empire", uncf: "United Nations Cosmo Force",
@@ -83,26 +64,26 @@ const factionDisplayNames = {
   fn: "Free Navy", zentradi: "Zentradi", uns: "United Nations Spacy"
 };
 const factionLogos = {
-  bolar: `${baseURL}/mini_logos/bolar_logo.png`,
-  dezariam: `${baseURL}/mini_logos/dezariam_logo.png`,
-  gamilas: `${baseURL}/logos/gamilas_logo.webp`,
-  gatlantis: `${baseURL}/mini_logos/gatlantis_logo.webp`,
-  uncf: `${baseURL}/mini_logos/uncf_logo.png`,
-  arcadia: `${baseURL}/logos/arcadia_logo.png`,
-  dinguil: `${baseURL}/logos/dinguil_logo.png`,
-  guia: `${baseURL}/mini_logos/guia_logo.webp`,
-  cis: `${baseURL}/mini_logos/cis_logo.png`,
-  empire: `${baseURL}/mini_logos/galactic_empire_logo.png`,
-  republic: `${baseURL}/mini_logos/galactic_republic_logo.png`,
-  atlantis: `${baseURL}/mini_logos/atlantis_logo.png`,
-  neoatlantis: `${baseURL}/mini_logos/neoatlantis_logo.png`,
-  rebel: `${baseURL}/logos/rebel_logo.png`,
-  unn: `${baseURL}/mini_logos/unn_logo.png`,
-  mcrn: `${baseURL}/mini_logos/mcrn_logo.png`,
-  opa: `${baseURL}/mini_logos/opa_logo.png`,
-  fn: `${baseURL}/mini_logos/fn_logo.png`,
-  zentradi: `${baseURL}/mini_logos/zentradi_logo.png`,
-  uns: `${baseURL}/mini_logos/uns_logo.png`
+  bolar: `${imageBaseURL}/mini_logos/bolar_logo.png`,
+  dezariam: `${imageBaseURL}/mini_logos/dezariam_logo.png`,
+  gamilas: `${imageBaseURL}/logos/gamilas_logo.webp`,
+  gatlantis: `${imageBaseURL}/mini_logos/gatlantis_logo.webp`,
+  uncf: `${imageBaseURL}/mini_logos/uncf_logo.png`,
+  arcadia: `${imageBaseURL}/logos/arcadia_logo.png`,
+  dinguil: `${imageBaseURL}/logos/dinguil_logo.png`,
+  guia: `${imageBaseURL}/mini_logos/guia_logo.webp`,
+  cis: `${imageBaseURL}/mini_logos/cis_logo.png`,
+  empire: `${imageBaseURL}/mini_logos/galactic_empire_logo.png`,
+  republic: `${imageBaseURL}/mini_logos/galactic_republic_logo.png`,
+  atlantis: `${imageBaseURL}/mini_logos/atlantis_logo.png`,
+  neoatlantis: `${imageBaseURL}/mini_logos/neoatlantis_logo.png`,
+  rebel: `${imageBaseURL}/logos/rebel_logo.png`,
+  unn: `${imageBaseURL}/mini_logos/unn_logo.png`,
+  mcrn: `${imageBaseURL}/mini_logos/mcrn_logo.png`,
+  opa: `${imageBaseURL}/mini_logos/opa_logo.png`,
+  fn: `${imageBaseURL}/mini_logos/fn_logo.png`,
+  zentradi: `${imageBaseURL}/mini_logos/zentradi_logo.png`,
+  uns: `${imageBaseURL}/mini_logos/uns_logo.png`
 };
 const factionGroups = {
   sby: ['uncf','bolar','gamilas','gatlantis','dinguil','dezariam','guia'],
@@ -112,7 +93,7 @@ const factionGroups = {
   macross: ['uns','zentradi']
 };
 
-// —— Rotadores de logos —— //
+// Rotadores de logos
 function createPlayerLogoRotator(imageElement) {
   let timerId = null;
   const stop = () => { if (timerId) clearInterval(timerId); if (imageElement) imageElement.src = ''; timerId = null; };
@@ -121,7 +102,7 @@ function createPlayerLogoRotator(imageElement) {
     if (!imageElement) return;
     const factions = track?.factions || [];
     if (factions.length < 2) {
-      const k = factions.length === 1 ? factions[0] : null;
+      const k = factions[0] || null;
       imageElement.src = k ? (factionLogos[k] || '') : '';
       imageElement.alt = k ? (factionDisplayNames[k] || k) : '';
       return;
@@ -144,114 +125,83 @@ function createListLogoManager() {
   let animationFrameId = null, lastTick = 0, interval = 3000, tick = 0;
   const visibleRotators = new Set();
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        visibleRotators.add(e.target);
-      } else {
-        visibleRotators.delete(e.target);
-      }
-    });
+    entries.forEach(e => (e.isIntersecting ? visibleRotators.add(e.target) : visibleRotators.delete(e.target)));
   }, { root: null, threshold: 0.1 });
 
   function rotateLoop(ts) {
     if (!lastTick) lastTick = ts;
-    const elapsed = ts - lastTick;
-    if (elapsed >= interval) {
+    if (ts - lastTick >= interval) {
       lastTick = ts; tick++;
-      if (visibleRotators.size > 0) {
-        visibleRotators.forEach(img => {
-          const factions = (img.dataset.factions || '').split(',').filter(Boolean);
-          if (factions.length === 0) return;
-          const current = factions[tick % factions.length];
-          const src = factionLogos[current];
-          if (src && img.src !== src) {
-            img.src = src;
-            img.alt = factionDisplayNames[current] || current;
-          }
-        });
-      }
+      visibleRotators.forEach(img => {
+        const factions = (img.dataset.factions || '').split(',').filter(Boolean);
+        if (!factions.length) return;
+        const src = factionLogos[factions[tick % factions.length]];
+        if (src && img.src !== src) {
+          img.src = src;
+          img.alt = factionDisplayNames[factions[tick % factions.length]] || '';
+        }
+      });
     }
-    if (visibleRotators.size > 0) {
-      animationFrameId = requestAnimationFrame(rotateLoop);
-    } else {
-      animationFrameId = null;
-    }
+    if (visibleRotators.size) animationFrameId = requestAnimationFrame(rotateLoop);
+    else animationFrameId = null;
   }
   return {
-    observe: (img) => {
-      observer.observe(img);
-      if (!animationFrameId && visibleRotators.size > 0) {
-        requestAnimationFrame(rotateLoop);
-      }
-    },
-    start: () => { if (!animationFrameId && visibleRotators.size > 0) requestAnimationFrame(rotateLoop); }
+    observe: (img) => { observer.observe(img); if (!animationFrameId && visibleRotators.size) requestAnimationFrame(rotateLoop); },
+    start: () => { if (!animationFrameId && visibleRotators.size) requestAnimationFrame(rotateLoop); }
   };
 }
 
-// —— App —— //
+// App
 document.addEventListener('DOMContentLoaded', () => {
+  const ids = ['audioPlayer','trackName','factionName','timeDisplay','btnPlayPause','imgPlayPause','btnLoop','imgLoop','allTracksList','secondList','volumeSliderContainer','volumeValue','volumeBar','volumeBarBg'];
+  const ctx = ids.reduce((o, id) => (o[id] = document.getElementById(id), o), {});
+  const { audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause, btnLoop, imgLoop, allTracksList, secondList, volumeSliderContainer, volumeValue, volumeBar } = ctx;
 
-  // 1. OBTENER ELEMENTOS DEL DOM
-  const {
-    audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause,
-    btnLoop, imgLoop, allTracksList, secondList, volumeSliderContainer, volumeValue, volumeBar
-  } = ['audioPlayer', 'trackName', 'factionName', 'timeDisplay', 'btnPlayPause', 'imgPlayPause', 'btnLoop', 'imgLoop', 'allTracksList', 'secondList', 'volumeSliderContainer', 'volumeValue', 'volumeBar']
-    .reduce((o, id) => (o[id] = document.getElementById(id), o), {});
-
-  // 2. INSTANCIAR GESTORES Y PRECARGADOR
   const playerLogoRotator = createPlayerLogoRotator(document.querySelector('.faction-section img'));
   const listLogoManager = createListLogoManager();
 
-  // Preloader muy ligero
   const preloader = {
     element: document.createElement('audio'),
     init() { this.element.preload = 'metadata'; },
     preload(track) {
       if (!track) return;
       const filePath = `${musicBaseURL}${track.folder}/${track.file}`;
-      if (this.element.src !== filePath) {
-        this.element.src = filePath;
-        this.element.load();
-      }
+      if (this.element.src !== filePath) { this.element.src = filePath; this.element.load(); }
     }
   };
   preloader.init();
 
-  // —— Media Session (móvil pro) —— //
   function updateMediaSession(track) {
     if (!('mediaSession' in navigator) || !track) return;
     const factions = track.factions || [];
     const artKey = factions[0];
     const artSrc = artKey && factionLogos[artKey] ? factionLogos[artKey] : undefined;
     const mime = artSrc ? getImageMimeType(artSrc) : undefined;
-    const artwork = artSrc ? [{ src: artSrc, sizes: '96x96', type: mime }].filter(Boolean) : [];
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.titles?.en || 'Unknown Title',
       artist: (factions.map(f => factionDisplayNames[f] || f)).join(', ') || 'Unknown',
       album: 'Stardust Music Box',
-      artwork
+      artwork: artSrc ? [{ src: artSrc, sizes: '96x96', type: mime }].filter(Boolean) : []
     });
   }
   if ('mediaSession' in navigator) {
     navigator.mediaSession.setActionHandler('play', () => { audioPlayer.play(); });
     navigator.mediaSession.setActionHandler('pause', () => { audioPlayer.pause(); });
     navigator.mediaSession.setActionHandler('previoustrack', () => {
-      if (playQueue.length === 0) return;
+      if (!playQueue.length) return;
       currentIndexInQueue = (currentIndexInQueue - 1 + playQueue.length) % playQueue.length;
       playSingleTrackByIndex(playQueue[currentIndexInQueue]);
     });
     navigator.mediaSession.setActionHandler('nexttrack', () => {
-      if (playQueue.length === 0) return;
+      if (!playQueue.length) return;
       currentIndexInQueue = (currentIndexInQueue + 1) % playQueue.length;
       playSingleTrackByIndex(playQueue[currentIndexInQueue]);
     });
   }
 
-  // —— Funciones principales —— //
   async function playSingleTrackByIndex(catalogIndex, offset = 0) {
     const track = catalog[catalogIndex];
     if (!track || !track.file || !track.folder || typeof track.duration !== 'number') {
-      console.error(`Skipping malformed track at index ${catalogIndex}:`, track);
       if (playQueue.length > 1) {
         currentIndexInQueue = (currentIndexInQueue + 1) % playQueue.length;
         playSingleTrackByIndex(playQueue[currentIndexInQueue]);
@@ -265,10 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentIndexInQueue = playQueue.indexOf(catalogIndex);
 
     const filePath = `${musicBaseURL}${track.folder}/${track.file}`;
-    if (audioPlayer.src !== filePath) {
-      audioPlayer.src = filePath;
-      audioPlayer.load();
-    }
+    if (audioPlayer.src !== filePath) { audioPlayer.src = filePath; audioPlayer.load(); }
 
     try {
       await waitForCanPlay(audioPlayer);
@@ -287,43 +234,30 @@ document.addEventListener('DOMContentLoaded', () => {
     updateActiveTrackVisuals();
   }
 
-  function createBaseListItem(track, {
-    catalogIndex,
-    searchTokens,
-    classNames = [],
-    groupId,
-    draggable = true
-  } = {}) {
+  function createBaseListItem(track, { catalogIndex, searchTokens, classNames = [], groupId, draggable = true } = {}) {
     if (typeof catalogIndex !== 'number') return null;
-    const safeTrack = track || {}; // Safety for allReserved case
     const attrs = { 'data-catalog-index': catalogIndex };
     if (draggable) attrs.draggable = 'true';
     const li = createElement('li', attrs);
 
-    // 🔧 PARCHE: Normaliza classNames -> tokens válidos (sin espacios)
-    if (Array.isArray(classNames) && classNames.length > 0) {
-      const tokens = classNames.flatMap((c) => {
-        if (typeof c === 'string') return c.split(/\s+/);
-        if (Array.isArray(c)) return c;
-        return String(c).split(/\s+/);
-      }).filter(Boolean);
+    if (classNames?.length) {
+      const tokens = classNames.flatMap(c => typeof c === 'string' ? c.split(/\s+/) : Array.isArray(c) ? c : String(c).split(/\s+/)).filter(Boolean);
       if (tokens.length) li.classList.add(...tokens);
     }
-
     if (groupId) li.dataset.groupId = groupId;
     if (searchTokens) li.dataset.searchTokens = searchTokens;
 
     const titleSpan = createElement('span', { className: 'track-title' });
-    const durationSpan = createElement('span', { className: 'track-duration', text: formatTime(safeTrack.duration || 0) });
+    const durationSpan = createElement('span', { className: 'track-duration', text: formatTime(track?.duration || 0) });
     const factionSpan = createElement('span', { className: 'track-faction' });
-    const factions = Array.isArray(safeTrack.factions) ? safeTrack.factions : [];
-    if (factions.length > 0) {
+
+    const factions = Array.isArray(track?.factions) ? track.factions : [];
+    if (factions.length) {
       const img = createElement('img', {
         src: factionLogos[factions[0]] || '',
         alt: factionDisplayNames[factions[0]] || factions[0] || '',
         title: factionDisplayNames[factions[0]] || factions[0] || '',
-        loading: 'lazy',
-        decoding: 'async'
+        loading: 'lazy', decoding: 'async'
       });
       if (factions.length > 1) {
         img.dataset.factions = factions.join(',');
@@ -331,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       factionSpan.appendChild(img);
     }
-
     li.append(titleSpan, durationSpan, factionSpan);
     return { li, titleSpan };
   }
@@ -347,20 +280,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function createGroupListItem(group) {
-    const reserved = getReservedCatalogIndexSet(); // Ahora usa el Set cacheado
-    if (!group || !Array.isArray(group.variants) || group.variants.length === 0) return null;
+    if (!group?.variants?.length) return null;
     let activeVariant = group.variants[group.activeIndex || 0];
     if (!activeVariant) return null;
 
-    // If activeVariant is already queued, advance to the next available (wrap), skipping reserved ones
-    if (activeVariant && reserved.has(activeVariant.catalogIndex)) {
+    if (activeVariant && reservedIndexSet.has(activeVariant.catalogIndex)) {
       const total = group.variants.length;
       let hops = 0;
-      while (hops < total && (reserved.has(activeVariant.catalogIndex))) {
-        // try to use variantManager step to keep state consistent, else manual rotate
+      while (hops < total && reservedIndexSet.has(activeVariant.catalogIndex)) {
         if (typeof variantManager?.stepActiveVariant === 'function') {
           variantManager.stepActiveVariant(group.groupId, +1);
-          const updatedGroup = variantManager.getGroup(group.groupId); // Re-fetch group state
+          const updatedGroup = variantManager.getGroup(group.groupId);
           activeVariant = updatedGroup.variants[updatedGroup.activeIndex];
         } else {
           const nextIdx = ((group.activeIndex || 0) + 1) % total;
@@ -371,12 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // If still reserved (i.e., all variants are reserved), mark as unavailable
-    const allReserved = group.variants.every(v => reserved.has(v.catalogIndex));
+    const allReserved = group.variants.every(v => reservedIndexSet.has(v.catalogIndex));
     const activeCatalogIndex = activeVariant.catalogIndex;
     const track = !allReserved ? catalog[activeCatalogIndex] : null;
-    
-    // Use the *first* variant's track for metadata if the active one isn't valid
     const displayTrack = track || catalog[group.variants[0].catalogIndex];
 
     const tokenSet = new Set();
@@ -384,14 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
     group.variants.forEach(variant => {
       if (variant.normalizedLabel) tokenSet.add(variant.normalizedLabel);
       else if (variant.variantLabel) tokenSet.add(normalizeString(variant.variantLabel).toLowerCase());
-      const variantTrack = catalog[variant.catalogIndex];
-      if (variantTrack && typeof variantTrack._normalizedTitle === 'string') {
-        tokenSet.add(variantTrack._normalizedTitle);
-      }
+      const vt = catalog[variant.catalogIndex];
+      if (vt?.['\u005fnormalizedTitle']) tokenSet.add(vt._normalizedTitle);
     });
     const searchTokens = Array.from(tokenSet).filter(Boolean).join(' ');
 
-    // 🔧 PARCHE: pasa clases separadas, no concatenadas con espacios
     const classNames = ['has-variants'];
     if (allReserved) classNames.push('variants-depleted');
 
@@ -408,38 +332,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainTitle = createElement('span', { className: 'track-main-title', text: baseTitle });
     const controls = createElement('div', { className: 'variant-controls' });
 
-    const prevBtn = createElement('button', {
-      className: 'variant-btn prev',
-      type: 'button',
-      title: 'Previous version',
-      'aria-label': 'Previous version'
-    });
+    const prevBtn = createElement('button', { className: 'variant-btn prev', type: 'button', title: 'Previous version', 'aria-label': 'Previous version' });
     prevBtn.textContent = '◀';
-
-    const label = createElement('span', {
-      className: 'variant-label',
-      text: allReserved ? 'All queued' : (activeVariant.variantLabel || 'Original')
-    });
-
-    const nextBtn = createElement('button', {
-      className: 'variant-btn next',
-      type: 'button',
-      title: 'Next version',
-      'aria-label': 'Next version'
-    });
+    const label = createElement('span', { className: 'variant-label', text: allReserved ? 'All queued' : (activeVariant.variantLabel || 'Original') });
+    const nextBtn = createElement('button', { className: 'variant-btn next', type: 'button', title: 'Next version', 'aria-label': 'Next version' });
     nextBtn.textContent = '▶';
 
     controls.append(prevBtn, label, nextBtn);
     if (allReserved) { prevBtn.disabled = true; nextBtn.disabled = true; }
     base.titleSpan.append(mainTitle, controls);
 
-    // Pass the element itself (base.li) to the handler
     const attachHandler = (delta, focusSide) => (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+      event.preventDefault(); event.stopPropagation();
       handleVariantToggle(group.groupId, delta, focusSide, base.li);
     };
-
     prevBtn.addEventListener('click', attachHandler(-1, 'prev'));
     nextBtn.addEventListener('click', attachHandler(1, 'next'));
 
@@ -449,17 +355,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function createPlaylistItem(catalogIndex) {
     const track = catalog[catalogIndex];
     if (!track) return null;
-    const base = createBaseListItem(track, { catalogIndex, draggable: false }); // Draggable false en playlist
+    const base = createBaseListItem(track, { catalogIndex, draggable: false });
     if (!base) return null;
-    // Variant label intentionally NOT appended to playlist title
-    const titleText = track.titles?.en?.trim() || 'Unknown Title';
-    base.titleSpan.textContent = titleText;
+    base.titleSpan.textContent = track.titles?.en?.trim() || 'Unknown Title';
     return base.li;
   }
+
   function getLibraryEntries() {
     if (variantManager) {
       const entries = variantManager.getLibraryEntries();
-      if (entries.length > 0) return entries;
+      if (entries.length) return entries;
     }
     return catalog.map((_, index) => ({ type: 'single', catalogIndex: index }));
   }
@@ -468,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!allTracksList) return;
     const frag = document.createDocumentFragment();
     const entries = getLibraryEntries();
-    entries.forEach(entry => {
+    for (const entry of entries) {
       let node = null;
       if (entry.type === 'group' && variantManager) {
         const group = variantManager.getGroup(entry.groupId);
@@ -477,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
         node = createSingleLibraryItem(entry.catalogIndex);
       }
       if (node) frag.appendChild(node);
-    });
+    }
     allTracksList.replaceChildren(frag);
     updateActiveTrackVisuals();
   }
@@ -485,45 +390,35 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderPlaylist() {
     if (!secondList) return;
     const frag = document.createDocumentFragment();
-    playQueue.forEach(index => {
+    for (const index of playQueue) {
       const node = createPlaylistItem(index);
       if (node) frag.appendChild(node);
-    });
+    }
     secondList.replaceChildren(frag);
     updateActiveTrackVisuals();
   }
 
-  // Accept 'currentNode' as the element to be replaced
   function handleVariantToggle(groupId, delta, focusSide = 'next', currentNode) {
-    if (!variantManager || !allTracksList || !currentNode) return; // Check for currentNode
-
+    if (!variantManager || !allTracksList || !currentNode) return;
     let group = variantManager.stepActiveVariant(groupId, delta);
     if (!group) return;
 
-    // Ensure new active variant is not already queued; if it is, keep stepping until free or full loop
-    const reserved = getReservedCatalogIndexSet(); // Ahora usa el Set cacheado
     if (Array.isArray(group.variants)) {
       const total = group.variants.length;
       let hops = 0;
       let activeIdx = group.activeIndex || 0;
-      
-      while (hops < total && reserved.has(group.variants[activeIdx].catalogIndex)) {
+      while (hops < total && reservedIndexSet.has(group.variants[activeIdx].catalogIndex)) {
         group = variantManager.stepActiveVariant(groupId, delta);
-        if (!group) return; // Should not happen, but safety
+        if (!group) return;
         activeIdx = group.activeIndex || 0;
         hops++;
       }
     }
-
     const replacement = createGroupListItem(group);
     if (!replacement) return;
-    
-    // Use 'currentNode' from the argument
-    allTracksList.replaceChild(replacement, currentNode); 
-    
+    allTracksList.replaceChild(replacement, currentNode);
     const selector = focusSide === 'prev' ? '.variant-btn.prev' : '.variant-btn.next';
-    const focusTarget = replacement.querySelector(selector);
-    if (focusTarget) focusTarget.focus();
+    replacement.querySelector(selector)?.focus();
   }
 
   function stopPlaybackAndResetUI() {
@@ -540,9 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function validateCurrentAudioSource() {
     if (!audioPlayer.src) return;
-    if (!playQueue.includes(currentlyPlayingCatalogIndex)) {
-      stopPlaybackAndResetUI();
-    }
+    if (!playQueue.includes(currentlyPlayingCatalogIndex)) stopPlaybackAndResetUI();
   }
 
   function updatePlayerControlsState() {
@@ -556,19 +449,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateQueue() {
     playQueue = Array.from(secondList.children).map(li => Number(li.dataset.catalogIndex));
-    reservedIndexSet = new Set(playQueue); // *** OPTIMIZACIÓN: Actualiza el caché ***
-
+    reservedIndexSet = new Set(playQueue);
     if (currentlyPlayingCatalogIndex !== -1) {
       const newIdx = playQueue.indexOf(currentlyPlayingCatalogIndex);
       if (newIdx !== -1) currentIndexInQueue = newIdx;
       else validateCurrentAudioSource();
     }
     audioPlayer.loop = isLooping && playQueue.length === 1;
-    
-    renderPlaylist(); // Re-dibuja la playlist (simple)
+    renderPlaylist();
     updatePlayerControlsState();
-    renderLibrary(); // Re-dibuja la biblioteca (para marcar 'agotados')
-}
+    renderLibrary();
+  }
 
   function startTimerUpdates() {
     if (animationFrameId_timer) cancelAnimationFrame(animationFrameId_timer);
@@ -592,41 +483,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // —— Eventos —— //
   function setupEventListeners() {
     secondList.addEventListener('click', e => {
-      // Pre-validación de elementos críticos
-      const elements = [audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause, btnLoop, imgLoop, allTracksList, secondList];
-      if (elements.some(el => !el)) {
-        console.error("Manual Player: One or more critical DOM elements are missing. Aborting setup.");
-        const root = document.getElementById('appRoot');
-        if (root) {
-          root.innerHTML = `<div class="error-box"><h3>Initialization Error</h3><p>A critical UI component failed to load. Please refresh the page.</p></div>`;
-        }
-        return;
-      }
       const li = e.target.closest('li[data-catalog-index]');
       if (!li) return;
       const idx = Number(li.dataset.catalogIndex);
-      if (idx !== currentlyPlayingCatalogIndex || audioPlayer.paused) {
-        playSingleTrackByIndex(idx);
-      }
+      if (idx !== currentlyPlayingCatalogIndex || audioPlayer.paused) playSingleTrackByIndex(idx);
     });
 
     allTracksList.addEventListener('pointerenter', e => {
       const li = e.target.closest('li[data-catalog-index]');
       if (!li) return;
-      const idx = Number(li.dataset.catalogIndex);
-      preloader.preload(catalog[idx]);
+      preloader.preload(catalog[Number(li.dataset.catalogIndex)]);
     }, true);
 
     btnPlayPause.addEventListener('click', () => {
       if (audioPlayer.paused) {
         if (audioPlayer.src) audioPlayer.play();
-        else if (playQueue.length > 0) playSingleTrackByIndex(playQueue[0]);
-      } else {
-        audioPlayer.pause();
-      }
+        else if (playQueue.length) playSingleTrackByIndex(playQueue[0]);
+      } else audioPlayer.pause();
     });
 
     btnLoop.addEventListener('click', () => {
@@ -639,221 +514,225 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     audioPlayer.addEventListener('play', () => {
-      imgPlayPause.src = `${baseURL}/buttons/pause_button.png`;
+      imgPlayPause.src = `${imageBaseURL}/buttons/pause_button.png`;
       startTimerUpdates();
       updateActiveTrackVisuals();
-      if (navigator.mediaSession) {
-        navigator.mediaSession.playbackState = 'playing';
-      }
+      if (navigator.mediaSession) navigator.mediaSession.playbackState = 'playing';
     });
     audioPlayer.addEventListener('pause', () => {
-      imgPlayPause.src = `${baseURL}/buttons/play_button.png`;
+      imgPlayPause.src = `${imageBaseURL}/buttons/play_button.png`;
       stopTimerUpdates();
-      if (navigator.mediaSession) {
-        navigator.mediaSession.playbackState = 'paused';
-      }
+      if (navigator.mediaSession) navigator.mediaSession.playbackState = 'paused';
     });
-
     audioPlayer.addEventListener('ended', () => {
       stopTimerUpdates();
       timeDisplay.textContent = formatTime(0);
-      if (playQueue.length === 0) { stopPlaybackAndResetUI(); return; }
+      if (!playQueue.length) { stopPlaybackAndResetUI(); return; }
       if (audioPlayer.loop) return;
-      if (isLooping) {
-        playSingleTrackByIndex(playQueue[currentIndexInQueue]); // mismo track
-      } else {
+      if (isLooping) playSingleTrackByIndex(playQueue[currentIndexInQueue]);
+      else {
         currentIndexInQueue = (currentIndexInQueue + 1) % playQueue.length;
         playSingleTrackByIndex(playQueue[currentIndexInQueue]);
       }
     });
 
-    // Volumen
-    if (typeof initVolumeControl === 'function') {
-      const inst = initVolumeControl({
+    if (typeof initVolumeControl === 'function' && volumeSliderContainer) {
+      const vc = initVolumeControl({
         audioEl: audioPlayer,
         bgEl: volumeSliderContainer,
-        barEl: volumeBar,
-        labelEl: volumeValue
+        barEl: volumeBar || null,
+        labelEl: volumeValue || null
       });
-      // Sincroniza aria-valuenow
-      const sync = () => {
-        const bg = document.getElementById('volumeBarBg');
-        if (bg) bg.setAttribute('aria-valuenow', String(Math.round(inst.getVolume() * 100)));
-      }
-      audioPlayer.addEventListener('volumechange', sync);
-      sync();
+      const updateAria = () => {
+        const percent = Math.round((vc.getVolume?.() || 0) * 100);
+        volumeSliderContainer.setAttribute('aria-valuenow', String(percent));
+        volumeSliderContainer.setAttribute('aria-valuemin', '0');
+        volumeSliderContainer.setAttribute('aria-valuemax', '100');
+      };
+      volumeSliderContainer.addEventListener('vc:change', updateAria);
+      audioPlayer.addEventListener('volumechange', updateAria);
+      updateAria();
+      window.volumeController = vc;
+    } else if (volumeSliderContainer) {
+      const clamp01 = (v) => Math.min(Math.max(v, 0), 1);
+      const render = () => {
+        const p = Math.round(audioPlayer.volume * 100);
+        if (volumeBar) volumeBar.style.height = p + '%';
+        if (volumeValue) volumeValue.textContent = p + '%';
+        volumeSliderContainer.setAttribute('aria-valuenow', String(p));
+      };
+      volumeSliderContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        audioPlayer.volume = clamp01(audioPlayer.volume + (e.deltaY > 0 ? -0.05 : 0.05));
+        render();
+      }, { passive: false });
+      volumeSliderContainer.addEventListener('keydown', (e) => {
+        const map = { ArrowUp: +0.05, ArrowDown: -0.05, PageUp: +0.25, PageDown: -0.25, Home: -1, End: +1 };
+        if (!(e.code in map)) return;
+        e.preventDefault();
+        if (e.code === 'Home') audioPlayer.volume = 0;
+        else if (e.code === 'End') audioPlayer.volume = 1;
+        else audioPlayer.volume = clamp01(audioPlayer.volume + map[e.code]);
+        render();
+      }, { passive: false });
+      audioPlayer.addEventListener('volumechange', render);
+      render();
+    }
+    // Volumen — estado visual de mute por clases (CSS)
+    const volumeSection = document.querySelector('.volume-section');
+    if (volumeSection) {
+      volumeSliderContainer.addEventListener('vc:mute', () => {
+        volumeSection.classList.add('muted');
+      });
+      volumeSliderContainer.addEventListener('vc:unmute', () => {
+        volumeSection.classList.remove('muted');
+      });
     }
 
     [allTracksList, secondList].forEach(el => {
       if (!el) return;
-      el.addEventListener('wheel', e => {
-        e.preventDefault();
-        e.currentTarget.scrollTop += e.deltaY;
-      }, { passive: false });
+      el.addEventListener('wheel', e => { e.preventDefault(); e.currentTarget.scrollTop += e.deltaY; }, { passive: false });
     });
 
-    // iOS/Android: unlock de audio con primer gesto del usuario
+    // Unlock móvil
     let unlocked = false;
     const unlock = async () => {
       if (unlocked) return;
-      try {
-        await audioPlayer.play();
-        audioPlayer.pause();
-        unlocked = true;
-        document.removeEventListener('touchend', unlock);
-        document.removeEventListener('click', unlock);
-      } catch (_) {}
+      try { await audioPlayer.play(); audioPlayer.pause(); unlocked = true; } catch (_) {}
+      document.removeEventListener('touchend', unlock);
+      document.removeEventListener('click', unlock);
     };
     document.addEventListener('touchend', unlock, { passive: true });
     document.addEventListener('click', unlock, { passive: true });
   }
 
-  // Quita un track de la cola y mantiene reproducción/punteros/loop coherentes.
   function removeFromQueueByCatalogIndex(removedCatalogIndex) {
     const pos = playQueue.indexOf(removedCatalogIndex);
     if (pos === -1) return;
-
     const wasPlaying = (removedCatalogIndex === currentlyPlayingCatalogIndex);
-
-    // quita del array fuente de verdad
     playQueue.splice(pos, 1);
-    reservedIndexSet = new Set(playQueue); // *** OPTIMIZACIÓN: Actualiza el caché ***
-
-    // si quitaste algo antes del puntero actual y NO era el que sonaba, corre el puntero una a la izq.
-    if (!wasPlaying && pos < currentIndexInQueue) {
-      currentIndexInQueue = Math.max(0, currentIndexInQueue - 1);
-    }
-
-    // loop solo si queda 1
+    reservedIndexSet = new Set(playQueue);
+    if (!wasPlaying && pos < currentIndexInQueue) currentIndexInQueue = Math.max(0, currentIndexInQueue - 1);
     audioPlayer.loop = isLooping && playQueue.length === 1;
-
-    // re-render UI
     renderPlaylist();
     updatePlayerControlsState();
     updateActiveTrackVisuals();
-    renderLibrary(); // Re-render library to update depleted status
-
-    // si quitaste el que sonaba → avanza al siguiente en la misma posición
+    renderLibrary();
     if (wasPlaying) {
-      if (playQueue.length === 0) {
-        stopPlaybackAndResetUI();
-      } else {
-        // mismo hueco 'pos' (o 0 si el hueco quedó fuera)
+      if (!playQueue.length) stopPlaybackAndResetUI();
+      else {
         currentIndexInQueue = (pos >= playQueue.length) ? 0 : pos;
         playSingleTrackByIndex(playQueue[currentIndexInQueue]);
       }
     }
   }
 
-  // —— Sortable —— //
-function setupSortable() {
-  if (!allTracksList || !secondList) {
-    console.error('Lists not found');
-    return;
-  }
-  if (typeof Sortable === 'undefined') {
-    console.error('Sortable.js library not loaded.');
-    return;
+  function setupSortable() {
+  if (!allTracksList || !secondList) return console.error('Lists not found');
+  if (typeof Sortable === 'undefined') return console.error('Sortable.js library not loaded.');
+
+  // 1) Detección muy fiable de entorno táctil
+  const isCoarse = window.matchMedia?.('(pointer: coarse)')?.matches || ('ontouchstart' in window);
+
+  // 2) Montar plugins de spill si están disponibles en tu bundle
+  // (usa los módulos OnSpill de tu repo)
+  try {
+    if (Sortable.mount && window.RemoveOnSpill && window.RevertOnSpill) {
+      Sortable.mount(window.RemoveOnSpill, window.RevertOnSpill);
+    }
+  } catch (e) {
+    // Silencioso si no están expuestos en global; tu OnSpill ya maneja spill por drop()
   }
 
-  // Biblioteca: arrastras clon; no acepta drops; revierte en spill visual
-  Sortable.create(allTracksList, {
-    group: { name: 'shared', pull: 'clone', put: false },
+  // 3) Opciones base para ambas listas
+  const filterNotDraggable = '.variant-btn, .track-faction, .track-duration';
+  const sharedGroup = { name: 'shared' }; // pull/put se define por lista
+  const common = {
     animation: 150,
-    sort: false,
-    revertOnSpill: true
-  });
-
-  // Utilidad: borra por id + asegura DOM fuera
-  const safeRemoveByNode = (itemNode) => {
-    const id = Number(itemNode?.dataset?.catalogIndex);
-    if (!Number.isFinite(id)) return;
-    if (!playQueue.includes(id)) return; // ya fue borrado
-    removeFromQueueByCatalogIndex(id);   // avanza si era el que sonaba
-    itemNode?.remove?.();                // garantía si el plugin no quitó el nodo
+    direction: 'vertical',
+    filter: filterNotDraggable,
+    preventOnFilter: true,
+    // Auto scroll mientras arrastras hacia los bordes
+    scroll: true,
+    bubbleScroll: true,
+    scrollSensitivity: isCoarse ? 90 : 60,
+    scrollSpeed: isCoarse ? 16 : 12,
+    // Clases visuales (opcional, ya tienes estilos propios)
+    dragClass: 'is-dragging',
+    ghostClass: 'is-ghost',
+    chosenClass: 'is-chosen',
+    // iOS/Android: ghost sobre body para evitar clipping
+    fallbackOnBody: isCoarse,
+    // Hooks para bloquear gestos de la página en táctil
+    onChoose: () => { if (isCoarse) document.body.classList.add('drag-touching'); },
+    onUnchoose: () => { if (isCoarse) document.body.classList.remove('drag-touching'); },
+    onEnd:   () => { if (isCoarse) document.body.classList.remove('drag-touching'); }
   };
 
-  // ¿El puntero terminó fuera de la playlist?
+  // 4) Ajustes específicos para táctil
+  const touchTweaks = isCoarse ? {
+    forceFallback: true,           // Usa fallback para un drag más estable en móviles
+    delayOnTouchOnly: true,        // Espera un corto delay antes de iniciar drag (evita roces)
+    delay: 70,                     // 60–100 ms recomendado
+    touchStartThreshold: 8,        // px para distinguir scroll vs drag
+    fallbackTolerance: 14          // cuánto debes mover el dedo para "confirmar" el drag
+  } : {
+    // Desktop: sin fallback, drag nativo
+    forceFallback: false
+  };
+
+  // 5) Lista de biblioteca (solo clona hacia la playlist)
+  Sortable.create(allTracksList, {
+    ...common,
+    ...touchTweaks,
+    group: { ...sharedGroup, pull: 'clone', put: false },
+    sort: false,
+    revertOnSpill: true // si sueltas fuera, vuelve al origen (según plugin)
+  });
+
+  const safeRemoveByNode = (itemNode) => {
+    const id = Number(itemNode?.dataset?.catalogIndex);
+    if (!Number.isFinite(id) || !playQueue.includes(id)) return;
+    removeFromQueueByCatalogIndex(id);
+    itemNode?.remove?.();
+  };
+
   const isPointerOutsideSecondList = (evt) => {
     const e = evt.originalEvent || evt;
-    const t = (e && e.changedTouches && e.changedTouches[0]) || null;
-    const x = typeof e?.clientX === 'number' ? e.clientX : (t ? t.clientX : undefined);
-    const y = typeof e?.clientY === 'number' ? e.clientY : (t ? t.clientY : undefined);
+    const t = e?.changedTouches?.[0] || null;
+    const x = typeof e?.clientX === 'number' ? e.clientX : t?.clientX;
+    const y = typeof e?.clientY === 'number' ? e.clientY : t?.clientY;
     if (typeof x === 'number' && typeof y === 'number') {
       const under = document.elementFromPoint(x, y);
-      return !secondList.contains(under); // fuera = true
+      return !secondList.contains(under);
     }
-    // Fallback
     return evt.to !== secondList;
   };
 
-  // Playlist
+  // 6) Playlist (acepta únicos, no duplica, permite reordenar)
   Sortable.create(secondList, {
+    ...common,
+    ...touchTweaks,
     group: {
-      name: 'shared',
-      put: (to, from, dragged) => {
+      ...sharedGroup,
+      put: (to, _from, dragged) => {
         const id = dragged?.dataset?.catalogIndex;
         if (!id) return false;
-        // ❌ no duplicar EXACTO el mismo catalogIndex
-        for (const li of to.el.children) {
-          if (li.dataset.catalogIndex === id) return false;
-        }
-        return true; // ✅ permitir si es variante distinta (otro catalogIndex)
-      }
+        for (const li of to.el.children) if (li.dataset.catalogIndex === id) return false;
+        return true;
+      },
+      pull: true
     },
-    animation: 150,
-
-    // Si el build tiene el plugin, úsalo; si no, el onEnd de abajo cubre todo.
-    removeOnSpill: true,
-
-    // Camino plugin: derrame => borrar
-    onSpill: (evt) => {
-      safeRemoveByNode(evt.item);
-    },
-
-    // Futuro: si alguna vez otra lista acepta el ítem, también borramos del estado
-    onRemove: (evt) => {
-      safeRemoveByNode(evt.item);
-    },
-
-    // Plan B robusto (independiente del plugin):
-    // Si el drag vino de la playlist y terminó fuera de la playlist -> BORRAR.
-    // Esto incluye: soltar sobre la biblioteca o en cualquier zona fuera de la UL.
+    removeOnSpill: true, // si se derrama, elimina (OnSpill)
+    onSpill: (evt) => safeRemoveByNode(evt.item),
+    onRemove: (evt) => safeRemoveByNode(evt.item),
     onEnd: (evt) => {
-      if (evt.from === secondList && isPointerOutsideSecondList(evt)) {
-        safeRemoveByNode(evt.item);
-      }
+      if (evt.from === secondList && isPointerOutsideSecondList(evt)) safeRemoveByNode(evt.item);
     },
-
-    // Altas / reorden dentro de la playlist
     onAdd: updateQueue,
     onUpdate: updateQueue
   });
 }
-
-
-  // —— Búsqueda —— //
-  function injectSearchBarCSS() {
-    const style = createElement('style', { html: `
-      .search-container { margin-bottom: 12px; position: relative; }
-      #trackSearchInput {
-        width: 100%; padding: 10px 12px;
-        font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 500;
-        background-color: #080816; color: #ddd;
-        border: 1px solid #333; border-radius: 8px; outline: none;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
-      #trackSearchInput:focus { border-color: #6cf; box-shadow: 0 0 8px rgba(108, 207, 255, 0.5), inset 0 1px 3px rgba(0,0,0,0.4); }
-      #trackSearchInput::placeholder { color: #777; }
-      #trackSearchInput::-webkit-search-cancel-button {
-        -webkit-appearance: none; height: 16px; width: 16px; cursor: pointer;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'><path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>");
-      }
-      #allTracksList li.hidden { display: none; }
-    `});
-    document.head.appendChild(style);
-  }
 
   function setupSearchBar() {
     const listContainer = allTracksList?.closest('.manual-list');
@@ -870,8 +749,7 @@ function setupSortable() {
     heading.after(searchContainer);
 
     const handleSearch = (event) => {
-      const raw = event.target.value;
-      const query = raw.toLowerCase().trim();
+      const query = event.target.value.toLowerCase().trim();
       const items = allTracksList.children;
       for (const item of items) {
         const idx = parseInt(item.dataset.catalogIndex, 10);
@@ -880,21 +758,15 @@ function setupSortable() {
         let isMatch = false;
         if (!query) isMatch = true;
         else if (query.startsWith('/')) {
-          const fq = query.substring(1);
-          isMatch = (track.factions || []).includes(fq);
+          isMatch = (track.factions || []).includes(query.substring(1));
         } else if (query.startsWith('#')) {
-          const gq = query.substring(1);
-          const gfs = factionGroups[gq] || [];
+          const gfs = factionGroups[query.substring(1)] || [];
           isMatch = (track.factions || []).some(tf => gfs.includes(tf));
         } else {
           const normalizedQuery = normalizeString(query).toLowerCase();
           const tokens = (item.dataset.searchTokens || '').toLowerCase();
-          if (tokens) {
-            isMatch = tokens.includes(normalizedQuery);
-          } else {
-            const normalizedTitle = track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase();
-            isMatch = normalizedTitle.includes(normalizedQuery);
-          }
+          isMatch = tokens ? tokens.includes(normalizedQuery)
+                           : (track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase()).includes(normalizedQuery);
         }
         item.classList.toggle('hidden', !isMatch);
       }
@@ -902,7 +774,6 @@ function setupSortable() {
     searchInput.addEventListener('input', debounce(handleSearch, 250));
   }
 
-  // —— Init —— //
   async function fetchWithRetry(url, options, retries = 3, backoff = 1000) {
     for (let i = 0; i < retries; i++) {
       try {
@@ -910,84 +781,62 @@ function setupSortable() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response;
       } catch (err) {
-        console.warn(`Fetch attempt ${i + 1} failed: ${err.message}. Retrying in ${backoff}ms...`);
         if (i < retries - 1) await new Promise(res => setTimeout(res, backoff));
-        backoff *= 2; // Exponential backoff
+        backoff *= 2;
       }
     }
     throw new Error(`Failed to fetch ${url} after ${retries} attempts.`);
   }
-
   async function fetchVariantGroupsData() {
     try {
-      const url = `${variantDataURL}?_=${Date.now()}`;
-      const response = await fetch(url, { cache: 'no-cache' });
+      const response = await fetch(`${variantDataURL}?_=${Date.now()}`, { cache: 'no-cache' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       return Array.isArray(data) ? data : [];
-    } catch (err) {
-      console.warn('Variant groups unavailable:', err?.message || err);
-      return [];
-    }
+    } catch { return []; }
   }
 
   async function initializeApp() {
     try {
-      // Validar elementos críticos del DOM antes de fetchear
-      const criticalElements = [audioPlayer, allTracksList, secondList, btnPlayPause, imgPlayPause, btnLoop, imgLoop, trackName, factionName, timeDisplay, volumeSliderContainer, volumeBar, volumeValue];
-      if (criticalElements.some(el => !el)) {
-        console.error('Initialization failed: Critical DOM elements are missing.');
-        const root = document.getElementById('appRoot') || document.body;
-        root.innerHTML = `<div class="error-box"><h3>Initialization Error</h3><p>A critical UI component failed to load. Please check element IDs.</p></div>`;
+      const critical = [audioPlayer, allTracksList, secondList, btnPlayPause, imgPlayPause, btnLoop, imgLoop, trackName, factionName, timeDisplay, volumeSliderContainer];
+      if (critical.some(el => !el)) {
+        (document.getElementById('appRoot') || document.body).innerHTML =
+          `<div class="error-box"><h3>Initialization Error</h3><p>A critical UI component failed to load. Please check element IDs.</p></div>`;
         return;
       }
 
-      const fetchUrl = `${dataURL}?_=${Date.now()}`;
-      const response = await fetchWithRetry(fetchUrl, { cache: 'no-cache' });
-
+      const response = await fetchWithRetry(`${dataURL}?_=${Date.now()}`, { cache: 'no-cache' });
       catalog = await response.json();
       if (!Array.isArray(catalog)) throw new Error("Catalog data is not an array.");
-      
       window.catalog = catalog;
 
-      // Precompute normalized titles for faster search matching
       for (const track of catalog) {
-        if (!track) continue;
         const title = track?.titles?.en || '';
         track._normalizedTitle = normalizeString(title).toLowerCase();
       }
 
       const variantGroups = await fetchVariantGroupsData();
-      if (variantManager) {
-        variantManager.load({ catalog, variantGroups });
-      }
+      if (variantManager) variantManager.load({ catalog, variantGroups });
 
       playQueue = [];
-      reservedIndexSet = new Set(); // Inicializa el caché
+      reservedIndexSet = new Set();
       renderLibrary();
       renderPlaylist();
 
-      injectSearchBarCSS();
       setupSearchBar();
       setupEventListeners();
       setupSortable();
       updatePlayerControlsState();
       listLogoManager.start();
 
-      imgPlayPause.src = `${baseURL}/buttons/play_button.png`;
-      imgLoop.src = `${baseURL}/buttons/loop_button.png`;
+      imgPlayPause.src = `${imageBaseURL}/buttons/play_button.png`;
+      imgLoop.src = `${imageBaseURL}/buttons/loop_button.png`;
     } catch (err) {
-      console.error('Initialization error:', err);
       const root = document.getElementById('appRoot') || document.body;
-      if (root) {
-        root.innerHTML = `
-          <div class="error-box">
-            <h3>Failed to load catalog</h3>
-            <p>${String(err?.message || err)}</p>
-          </div>`;
-      }
+      root.innerHTML = `<div class="error-box"><h3>Failed to load catalog</h3><p>${String(err?.message || err)}</p></div>`;
     }
   }
 
+  setupEventListeners();
   initializeApp();
 });

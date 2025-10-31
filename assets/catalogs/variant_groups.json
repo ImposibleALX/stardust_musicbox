@@ -79,6 +79,25 @@
     ]
   },
   {
+    "groupId": "autoplanet_gorba",
+    "title": "AUTOPLANET GORBA",
+    "defaultVariantId": "dezariam_gorba_original",
+    "variants": [
+      {
+        "id": "dezariam_gorba_original",
+        "variantLabel": "Original"
+      },
+      {
+        "id": "dezariam_gorba_his_form",
+        "variantLabel": "2205"
+      },
+      {
+        "id": "dezariam_gorba_80",
+        "variantLabel": "1980"
+      }
+    ]
+  },
+  {
     "groupId": "praise_be_our_eternal_glory",
     "title": "Praise Be Our Eternal Glory",
     "defaultVariantId": "gamilas_praise_be_our_eternal_glory_gamilas_anthem",

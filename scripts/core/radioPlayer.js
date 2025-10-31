@@ -503,19 +503,58 @@ const bannedNoFactions = new Set([
   "arcadia_deathshadow"
 ]);
 
+// ---------- Volumen: integración con volumecontrol.js ----------
+function initVolumeControllerOnce() {
+  if (typeof initVolumeControl !== 'function') return;       // módulo aún no cargado
+  if (window.volumeController) return;                       // ya inicializado
+
+  // Usa el bg preferente; si no existe, cae al contenedor principal
+  const bgEl = volumeBarBg || volumeSliderContainer || null;
+  if (!audioPlayer || !bgEl) return;
+
+  // Asegura atributos de accesibilidad
+  try {
+    bgEl.setAttribute('role', 'slider');
+    bgEl.setAttribute('aria-valuemin', '0');
+    bgEl.setAttribute('aria-valuemax', '100');
+    bgEl.setAttribute('tabindex', '0');
+  } catch (_) {}
+
+  const vc = initVolumeControl({
+    audioEl: audioPlayer,
+    bgEl,
+    barEl: volumeBar || null,
+    labelEl: volumeValue || null
+  });
+
+  // Sync ARIA en cada cambio del control
+  const updateAria = () => {
+    const v = vc.getVolume ? vc.getVolume() : audioPlayer.volume || 0;
+    const p = Math.round(v * 100);
+    bgEl.setAttribute('aria-valuenow', String(p));
+  };
+
+  // Eventos del propio control y del audio (por si alguien cambia volume por código)
+  bgEl.addEventListener('vc:change', updateAria);
+  audioPlayer.addEventListener('volumechange', updateAria);
+  updateAria();
+
+  // Exponer para debug
+  window.volumeController = vc;
+}
+
+// Intenta inicializar al cargar el archivo (si el DOM ya tiene los nodos)
+initVolumeControllerOnce();
+
 // ---------- setCatalog ----------
 window.setCatalog = function (data) {
   catalog = data;
   trackName.textContent   = "Choose your faction to start";
   factionName.textContent = "Choose your faction to start";
 
+  // Inicialización segura del control de volumen (fallback si aún no estaba listo)
   if (typeof initVolumeControl === 'function' && window.volumeController == null) {
-    window.volumeController = initVolumeControl({
-      audioEl: audioPlayer,
-      bgEl: volumeBarBg,
-      barEl: volumeBar,
-      labelEl: volumeValue
-    });
+    initVolumeControllerOnce();
   }
 
   purgeOldFactionCache();
