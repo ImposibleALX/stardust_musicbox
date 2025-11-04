@@ -1,29 +1,11 @@
 (function (global) {
   'use strict';
 
-  /** ─────────────────────────────────────────────────────────────────────
-   *  CONFIG FORTIFICADO: normalize + validar + SSR-safe + hardening
-   *  API: configureFactionPage(options)
-   *  options = {
-   *    catalogBasePath?: string,
-   *    audioBasePath?: string,
-   *    imageBasePath?: string,
-   *    displayNames?: Record<string,string>,
-   *    replaceDisplayNames?: boolean,      // default: false (merge)
-   *    manualHref?: string,
-   *    manualSelector?: string,            // default: '.manual-btn-topright'
-   *    pageTitle?: string,
-   *    makeAbsolute?: boolean              // default: true
-   *  }
-   *  Devuelve: objeto de config aplicado (congelado).
-   *  ───────────────────────────────────────────────────────────────────── */
-
-  // ───── Utilidades básicas
+  /** CONFIG FORTIFICADO: configureFactionPage(options) */
   var hasDocument = !!(global && global.document);
   function isStr(x){ return typeof x === 'string'; }
   function isObj(x){ return x && typeof x === 'object' && !Array.isArray(x); }
 
-  // Evita contaminación de prototipo al copiar claves
   function safeAssign(dst, src) {
     if (!isObj(dst) || !isObj(src)) return dst;
     for (var k in src) {
@@ -34,7 +16,6 @@
     return dst;
   }
 
-  // Sanitiza un mapa de display names (claves y valores a string simple)
   function sanitizeDisplayNames(map) {
     if (!isObj(map)) return {};
     var out = {};
@@ -49,50 +30,33 @@
     return out;
   }
 
-  // URL absolutas seguras (sin tocar data:, blob:, mailto:, tel:, hash/query puros)
   function toAbsoluteUrlMaybe(href) {
     if (!hasDocument || !isStr(href)) return href;
     try {
-      if (/^(data:|blob:|mailto:|tel:)/i.test(href) || href.startsWith('#') || href.startsWith('?')) {
-        return href;
-      }
+      if (/^(data:|blob:|mailto:|tel:)/i.test(href) || href.startsWith('#') || href.startsWith('?')) return href;
       return new URL(href, (global.location && global.location.href) || undefined).toString();
     } catch (_e) {
       return href;
     }
   }
 
-  // Normaliza paths de “carpeta” → final slash (salvo si parece archivo con extensión)
   function normalizePath(value) {
     if (!isStr(value)) return value;
     var v = value.trim();
     if (!v) return v;
     if (/^(data:|blob:|mailto:|tel:)/i.test(v) || v.startsWith('#') || v.startsWith('?')) return v;
-
-    // Normaliza separadores
     v = v.replace(/\\/g, '/');
-
-    // Separa protocolo (http://, https://, file://, etc.)
     var m = v.match(/^([a-z]+:\/\/)(.*)$/i);
     var proto = '';
     if (m) { proto = m[1]; v = m[2]; }
-
-    // Compacta “//” múltiples en el resto del path
     v = v.replace(/\/{2,}/g, '/');
-
-    // Reensambla
     v = proto + v;
-
-    // Mantén si finaliza en ? o #
     if (/[?#]$/.test(v)) return v;
-
-    // Si no parece archivo (.*ext), asegura slash final
     var hasExt = /\.[a-z0-9]{1,8}(?:[?#]|$)/i.test(v);
     if (!hasExt && !v.endsWith('/')) v += '/';
     return v;
   }
 
-  // Merge seguro de display names
   function mergeDisplayNames(next, replace) {
     var current = isObj(global.FACTION_DISPLAY_NAMES) ? global.FACTION_DISPLAY_NAMES : {};
     var out = replace ? {} : {};
@@ -102,7 +66,6 @@
     return out;
   }
 
-  // DOM util: aplica enlace del manual (espera DOM si hace falta)
   function updateManualLink(href, selector) {
     if (!hasDocument || !isStr(selector) || !href) return;
     var apply = function () {
@@ -124,7 +87,6 @@
     }
   }
 
-  // Título de página (seguro con DOMContentLoaded)
   function setPageTitle(title) {
     if (!hasDocument || !isStr(title)) return;
     var fn = function () { global.document.title = title; };
@@ -135,7 +97,6 @@
     }
   }
 
-  // Lock helpers: define propiedades no configurables para evitar cambios accidentales
   function defineGlobalConst(key, value) {
     try {
       Object.defineProperty(global, key, {
@@ -145,19 +106,12 @@
         configurable: false
       });
     } catch (_e) {
-      // fallback si ya existía: asigna directo
       global[key] = value;
     }
   }
 
-  // Marca de configuración aplicada (evita doble init si quieres)
   var FLAG = '__FACTION_CONFIG_LOCK__';
 
-  /**
-   * Configura rutas base, display names y metadatos de página.
-   * @param {Object} options
-   * @returns {Readonly<Object>} objeto de config aplicada
-   */
   function configureFactionPage(options) {
     if (!isObj(options)) options = {};
     var catalogBasePath   = isStr(options.catalogBasePath) ? options.catalogBasePath : null;
@@ -170,7 +124,6 @@
     var pageTitle         = isStr(options.pageTitle)       ? options.pageTitle       : null;
     var makeAbsolute      = (options.makeAbsolute !== false); // default true
 
-    // Aplica rutas base (opcionalmente absolutas)
     if (catalogBasePath) {
       var rawC = makeAbsolute ? toAbsoluteUrlMaybe(catalogBasePath) : catalogBasePath;
       var normC = normalizePath(rawC);
@@ -179,7 +132,6 @@
     if (audioBasePath) {
       var rawA = makeAbsolute ? toAbsoluteUrlMaybe(audioBasePath) : audioBasePath;
       var normA = normalizePath(rawA);
-      // No forzamos const aquí por si cambia de entorno en caliente:
       global.AUDIO_BASE_PATH = normA;
     }
     if (imageBasePath) {
@@ -188,17 +140,14 @@
       global.IMAGE_BASE_PATH = normI;
     }
 
-    // Nombres de facciones
     var merged = null;
     if (displayNames) {
       merged = mergeDisplayNames(displayNames, replaceDisplay);
     }
 
-    // Link del manual y título
     if (manualHref) updateManualLink(manualHref, manualSelector);
     if (pageTitle)  setPageTitle(pageTitle);
 
-    // Marca opcional antirreinit (si ya existe no bloquea, solo informa)
     try {
       if (!global[FLAG]) {
         Object.defineProperty(global, FLAG, {
@@ -207,7 +156,6 @@
       }
     } catch (_e) {}
 
-    // Devuelve config aplicada (congelada)
     var applied = {
       CATALOG_BASE_PATH: global.CATALOG_BASE_PATH || null,
       AUDIO_BASE_PATH:   global.AUDIO_BASE_PATH   || null,
@@ -221,7 +169,6 @@
     return applied;
   }
 
-  // Exponer API (idempotente)
   try {
     Object.defineProperty(global, 'configureFactionPage', {
       value: configureFactionPage,
@@ -232,5 +179,4 @@
   } catch (_e) {
     global.configureFactionPage = configureFactionPage;
   }
-
 })(window);

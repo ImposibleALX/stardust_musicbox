@@ -1,27 +1,38 @@
-// Helpers
+'use strict';
+// manualPlayer.js
+
+// ---------- Helpers ----------
 function createElement(tag, { className, text, html, ...attrs } = {}) {
   const el = document.createElement(tag);
   if (className) el.className = className;
-  if (text) el.textContent = text;
-  if (html) el.innerHTML = html;
+  if (text != null) el.textContent = text;
+  if (html != null) el.innerHTML = html;
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   return el;
 }
 function formatTime(seconds = 0) {
-  seconds = Math.round(seconds);
-  const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const s = String(seconds % 60).padStart(2, '0');
-  return `${m}:${s}`;
+  const s = Math.max(0, Math.round(seconds));
+  const m = String(Math.floor(s / 60)).padStart(2, '0');
+  const r = String(s % 60).padStart(2, '0');
+  return `${m}:${r}`;
 }
 function waitForCanPlay(audio) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
+    if (!audio) return resolve();
     if (audio.readyState >= 3) return resolve();
-    const h = () => (audio.removeEventListener('canplaythrough', h), resolve());
+    const h = () => {
+      audio.removeEventListener('canplaythrough', h);
+      resolve();
+    };
     audio.addEventListener('canplaythrough', h, { once: true });
   });
 }
 function debounce(fn, delay = 300) {
-  let t; return (...a) => (clearTimeout(t), t = setTimeout(() => fn(...a), delay));
+  let t;
+  return (...a) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...a), delay);
+  };
 }
 function normalizeString(str = '') {
   return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -32,36 +43,53 @@ function getImageMimeType(url = '') {
   if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
   if (ext === 'webp') return 'image/webp';
   if (ext === 'gif') return 'image/gif';
+  return undefined;
+}
+function ensureTrailingSlash(path) {
+  return !path ? '' : path.endsWith('/') ? path : `${path}/`;
 }
 
-// Estado global mínimo
-let catalog = [];
-let playQueue = [];
-let currentIndexInQueue = 0;
-let currentlyPlayingCatalogIndex = -1;
-let isLooping = false;
-let animationFrameId_timer;
-let reservedIndexSet = new Set(); // cache de la playlist (para “agotados”)
-const variantManager = typeof createVariantManager === 'function' ? createVariantManager() : null;
-
-function ensureTrailingSlash(path) { return !path ? '' : (path.endsWith('/') ? path : `${path}/`); }
-
-const imageBaseURL = (window.IMAGE_BASE_PATH || '../assets/images').replace(/\/$/, '');
+// ---------- Rutas base ----------
+const imageBaseURL = String(window.IMAGE_BASE_PATH || '../assets/images').replace(/\/$/, '');
 const musicBaseURL = ensureTrailingSlash(window.AUDIO_BASE_PATH || '../assets/music/');
 const catalogBaseURL = ensureTrailingSlash(window.CATALOG_BASE_PATH || '../assets/catalogs/');
 const dataURL = `${catalogBaseURL}music_catalog_all.json`;
 const variantDataURL = `${catalogBaseURL}variant_groups.json`;
 
-// Facciones
+// ---------- Estado global mínimo ----------
+let catalog = [];
+let playQueue = [];
+let currentIndexInQueue = 0;
+let currentlyPlayingCatalogIndex = -1;
+let isLooping = false;
+let animationFrameId_timer = null;
+let reservedIndexSet = new Set(); // cache de la playlist (para “agotados”)
+const variantManager = typeof createVariantManager === 'function' ? createVariantManager() : null;
+
+// ---------- Facciones ----------
 const factionDisplayNames = {
-  bolar: "Bolar Federation", dezariam: "Dezariam Nation", gamilas: "Greater Garmillan Empire",
-  gatlantis: "White Comet / Gatlantis Empire", uncf: "United Nations Cosmo Force",
-  arcadia: "Captain Harlock's Arcadia", dinguil: "Dinguil Empire", various: "THE EXPANSE",
-  guia: "Great Urup Interstellar Alliance", cis: "Confederacy of Independent Systems",
-  empire: "Galactic Empire", republic: "Galactic Republic", jedi: "Jedi Order",
-  atlantis: "ATLANTIS w/ Humans", neoatlantis: "NEO ATLANTIS", rebel: "Rebel Alliance",
-  unn: "United Nations Navy", mcrn: "Martian Republic Navy", opa: "Outer Planets Alliance",
-  fn: "Free Navy", zentradi: "Zentradi", uns: "United Nations Spacy"
+  bolar: 'Bolar Federation',
+  dezariam: 'Dezariam Nation',
+  gamilas: 'Greater Garmillan Empire',
+  gatlantis: 'White Comet / Gatlantis Empire',
+  uncf: 'United Nations Cosmo Force',
+  arcadia: "Captain Harlock's Arcadia",
+  dinguil: 'Dinguil Empire',
+  various: 'THE EXPANSE',
+  guia: 'Great Urup Interstellar Alliance',
+  cis: 'Confederacy of Independent Systems',
+  empire: 'Galactic Empire',
+  republic: 'Galactic Republic',
+  jedi: 'Jedi Order',
+  atlantis: 'ATLANTIS w/ Humans',
+  neoatlantis: 'NEO ATLANTIS',
+  rebel: 'Rebel Alliance',
+  unn: 'United Nations Navy',
+  mcrn: 'Martian Republic Navy',
+  opa: 'Outer Planets Alliance',
+  fn: 'Free Navy',
+  zentradi: 'Zentradi',
+  uns: 'United Nations Spacy'
 };
 const factionLogos = {
   bolar: `${imageBaseURL}/mini_logos/bolar_logo.png`,
@@ -86,25 +114,29 @@ const factionLogos = {
   uns: `${imageBaseURL}/mini_logos/uns_logo.png`
 };
 const factionGroups = {
-  sby: ['uncf','bolar','gamilas','gatlantis','dinguil','dezariam','guia'],
-  expanse: ['mcrn','opa','fn','unn'],
-  nadia: ['neoatlantis','atlantis'],
-  starwars: ['republic','empire','rebel','cis'],
-  macross: ['uns','zentradi']
+  sby: ['uncf', 'bolar', 'gamilas', 'gatlantis', 'dinguil', 'dezariam', 'guia'],
+  expanse: ['mcrn', 'opa', 'fn', 'unn'],
+  nadia: ['neoatlantis', 'atlantis'],
+  starwars: ['republic', 'empire', 'rebel', 'cis'],
+  macross: ['uns', 'zentradi']
 };
 
-// Rotadores de logos
+// ---------- Rotadores de logos ----------
 function createPlayerLogoRotator(imageElement) {
   let timerId = null;
-  const stop = () => { if (timerId) clearInterval(timerId); if (imageElement) imageElement.src = ''; timerId = null; };
+  const stop = () => {
+    if (timerId) clearInterval(timerId);
+    if (imageElement) imageElement.src = '';
+    timerId = null;
+  };
   const start = (track) => {
     stop();
     if (!imageElement) return;
     const factions = track?.factions || [];
     if (factions.length < 2) {
       const k = factions[0] || null;
-      imageElement.src = k ? (factionLogos[k] || '') : '';
-      imageElement.alt = k ? (factionDisplayNames[k] || k) : '';
+      imageElement.src = k ? factionLogos[k] || '' : '';
+      imageElement.alt = k ? factionDisplayNames[k] || k : '';
       return;
     }
     let i = 0;
@@ -125,20 +157,22 @@ function createListLogoManager() {
   let animationFrameId = null, lastTick = 0, interval = 3000, tick = 0;
   const visibleRotators = new Set();
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => (e.isIntersecting ? visibleRotators.add(e.target) : visibleRotators.delete(e.target)));
+    entries.forEach((e) => (e.isIntersecting ? visibleRotators.add(e.target) : visibleRotators.delete(e.target)));
+    if (!animationFrameId && visibleRotators.size) requestAnimationFrame(rotateLoop);
   }, { root: null, threshold: 0.1 });
 
   function rotateLoop(ts) {
     if (!lastTick) lastTick = ts;
     if (ts - lastTick >= interval) {
       lastTick = ts; tick++;
-      visibleRotators.forEach(img => {
+      visibleRotators.forEach((img) => {
         const factions = (img.dataset.factions || '').split(',').filter(Boolean);
         if (!factions.length) return;
-        const src = factionLogos[factions[tick % factions.length]];
+        const key = factions[tick % factions.length];
+        const src = factionLogos[key];
         if (src && img.src !== src) {
           img.src = src;
-          img.alt = factionDisplayNames[factions[tick % factions.length]] || '';
+          img.alt = factionDisplayNames[key] || '';
         }
       });
     }
@@ -146,16 +180,26 @@ function createListLogoManager() {
     else animationFrameId = null;
   }
   return {
-    observe: (img) => { observer.observe(img); if (!animationFrameId && visibleRotators.size) requestAnimationFrame(rotateLoop); },
-    start: () => { if (!animationFrameId && visibleRotators.size) requestAnimationFrame(rotateLoop); }
+    observe: (img) => observer.observe(img),
+    start: () => { if (!animationFrameId) requestAnimationFrame(rotateLoop); }
   };
 }
 
-// App
+// ---------- App ----------
 document.addEventListener('DOMContentLoaded', () => {
-  const ids = ['audioPlayer','trackName','factionName','timeDisplay','btnPlayPause','imgPlayPause','btnLoop','imgLoop','allTracksList','secondList','volumeSliderContainer','volumeValue','volumeBar','volumeBarBg'];
-  const ctx = ids.reduce((o, id) => (o[id] = document.getElementById(id), o), {});
-  const { audioPlayer, trackName, factionName, timeDisplay, btnPlayPause, imgPlayPause, btnLoop, imgLoop, allTracksList, secondList, volumeSliderContainer, volumeValue, volumeBar } = ctx;
+  const ids = [
+    'audioPlayer','trackName','factionName','timeDisplay',
+    'btnPlayPause','imgPlayPause','btnLoop','imgLoop',
+    'allTracksList','secondList','volumeSliderContainer',
+    'volumeValue','volumeBar','volumeBarBg'
+  ];
+  const ctx = ids.reduce((o, id) => ((o[id] = document.getElementById(id)), o), {});
+  const {
+    audioPlayer, trackName, factionName, timeDisplay,
+    btnPlayPause, imgPlayPause, btnLoop, imgLoop,
+    allTracksList, secondList, volumeSliderContainer,
+    volumeValue, volumeBar, volumeBarBg
+  } = ctx;
 
   const playerLogoRotator = createPlayerLogoRotator(document.querySelector('.faction-section img'));
   const listLogoManager = createListLogoManager();
@@ -179,14 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const mime = artSrc ? getImageMimeType(artSrc) : undefined;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.titles?.en || 'Unknown Title',
-      artist: (factions.map(f => factionDisplayNames[f] || f)).join(', ') || 'Unknown',
+      artist: factions.map((f) => factionDisplayNames[f] || f).join(', ') || 'Unknown',
       album: 'Stardust Music Box',
       artwork: artSrc ? [{ src: artSrc, sizes: '96x96', type: mime }].filter(Boolean) : []
     });
   }
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.setActionHandler('play', () => { audioPlayer.play(); });
-    navigator.mediaSession.setActionHandler('pause', () => { audioPlayer.pause(); });
+    navigator.mediaSession.setActionHandler('play', () => audioPlayer.play());
+    navigator.mediaSession.setActionHandler('pause', () => audioPlayer.pause());
     navigator.mediaSession.setActionHandler('previoustrack', () => {
       if (!playQueue.length) return;
       currentIndexInQueue = (currentIndexInQueue - 1 + playQueue.length) % playQueue.length;
@@ -226,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     trackName.textContent = track.titles?.en?.trim() || 'Unknown Title';
-    const factionsText = (track.factions || []).map(f => factionDisplayNames[f] || f).join(', ');
+    const factionsText = (track.factions || []).map((f) => factionDisplayNames[f] || f).join(', ');
     factionName.textContent = `Factions: ${factionsText || 'Unknown'}`;
 
     playerLogoRotator.start(track);
@@ -236,12 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function createBaseListItem(track, { catalogIndex, searchTokens, classNames = [], groupId, draggable = true } = {}) {
     if (typeof catalogIndex !== 'number') return null;
-    const attrs = { 'data-catalog-index': catalogIndex };
+    const attrs = { 'data-catalog-index': catalogIndex, tabindex: '0' };
     if (draggable) attrs.draggable = 'true';
     const li = createElement('li', attrs);
 
     if (classNames?.length) {
-      const tokens = classNames.flatMap(c => typeof c === 'string' ? c.split(/\s+/) : Array.isArray(c) ? c : String(c).split(/\s+/)).filter(Boolean);
+      const tokens = classNames.flatMap((c) => (typeof c === 'string' ? c.split(/\s+/) : Array.isArray(c) ? c : String(c).split(/\s+/))).filter(Boolean);
       if (tokens.length) li.classList.add(...tokens);
     }
     if (groupId) li.dataset.groupId = groupId;
@@ -257,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         src: factionLogos[factions[0]] || '',
         alt: factionDisplayNames[factions[0]] || factions[0] || '',
         title: factionDisplayNames[factions[0]] || factions[0] || '',
-        loading: 'lazy', decoding: 'async'
+        loading: 'lazy', decoding: 'async', width: '28', height: '28'
       });
       if (factions.length > 1) {
         img.dataset.factions = factions.join(',');
@@ -266,6 +310,19 @@ document.addEventListener('DOMContentLoaded', () => {
       factionSpan.appendChild(img);
     }
     li.append(titleSpan, durationSpan, factionSpan);
+
+    // Accesible: Enter/Space reproducen si está en playlist
+    li.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const idx = Number(li.dataset.catalogIndex);
+        if (!Number.isFinite(idx)) return;
+        if (li.closest('#secondList')) {
+          if (idx !== currentlyPlayingCatalogIndex || audioPlayer.paused) playSingleTrackByIndex(idx);
+        }
+        e.preventDefault();
+      }
+    });
+
     return { li, titleSpan };
   }
 
@@ -284,6 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeVariant = group.variants[group.activeIndex || 0];
     if (!activeVariant) return null;
 
+    // Evita variantes "agotadas" en playlist
     if (activeVariant && reservedIndexSet.has(activeVariant.catalogIndex)) {
       const total = group.variants.length;
       let hops = 0;
@@ -301,18 +359,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    const allReserved = group.variants.every(v => reservedIndexSet.has(v.catalogIndex));
+    const allReserved = group.variants.every((v) => reservedIndexSet.has(v.catalogIndex));
     const activeCatalogIndex = activeVariant.catalogIndex;
     const track = !allReserved ? catalog[activeCatalogIndex] : null;
     const displayTrack = track || catalog[group.variants[0].catalogIndex];
 
     const tokenSet = new Set();
     if (group.title) tokenSet.add(normalizeString(group.title).toLowerCase());
-    group.variants.forEach(variant => {
+    group.variants.forEach((variant) => {
       if (variant.normalizedLabel) tokenSet.add(variant.normalizedLabel);
       else if (variant.variantLabel) tokenSet.add(normalizeString(variant.variantLabel).toLowerCase());
       const vt = catalog[variant.catalogIndex];
-      if (vt?.['\u005fnormalizedTitle']) tokenSet.add(vt._normalizedTitle);
+      if (vt?.['_normalizedTitle']) tokenSet.add(vt._normalizedTitle);
     });
     const searchTokens = Array.from(tokenSet).filter(Boolean).join(' ');
 
@@ -328,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (!base) return null;
 
-    const baseTitle = group.title || (displayTrack?.titles?.en?.trim() || 'Unknown Title');
+    const baseTitle = group.title || displayTrack?.titles?.en?.trim() || 'Unknown Title';
     const mainTitle = createElement('span', { className: 'track-main-title', text: baseTitle });
     const controls = createElement('div', { className: 'variant-controls' });
 
@@ -425,8 +483,8 @@ document.addEventListener('DOMContentLoaded', () => {
     audioPlayer.pause();
     audioPlayer.src = '';
     currentlyPlayingCatalogIndex = -1;
-    trackName.textContent = "Drag & drop your favourite tracks";
-    factionName.textContent = "No faction selected";
+    trackName.textContent = 'Drag & drop your favourite tracks';
+    factionName.textContent = 'No faction selected';
     timeDisplay.textContent = formatTime(0);
     playerLogoRotator.stop();
     updatePlayerControlsState();
@@ -445,10 +503,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPlayPause.classList.toggle('disabled', isEmpty);
     btnLoop.classList.toggle('disabled', isEmpty);
     btnLoop.setAttribute('aria-pressed', String(isLooping && !isEmpty));
+    audioPlayer.loop = isLooping && playQueue.length === 1;
   }
 
   function updateQueue() {
-    playQueue = Array.from(secondList.children).map(li => Number(li.dataset.catalogIndex));
+    playQueue = Array.from(secondList.children).map((li) => Number(li.dataset.catalogIndex));
     reservedIndexSet = new Set(playQueue);
     if (currentlyPlayingCatalogIndex !== -1) {
       const newIdx = playQueue.indexOf(currentlyPlayingCatalogIndex);
@@ -477,33 +536,42 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateActiveTrackVisuals() {
+    // Marca activo en playlist
     for (const item of secondList.children) {
       const itemIndex = Number(item.dataset.catalogIndex);
-      item.classList.toggle('active', itemIndex === currentlyPlayingCatalogIndex);
+      const playing = itemIndex === currentlyPlayingCatalogIndex;
+      item.classList.toggle('active', playing);
+      item.classList.toggle('is-playing', playing);
+      if (playing) item.setAttribute('aria-current', 'true');
+      else item.removeAttribute('aria-current');
     }
   }
 
   function setupEventListeners() {
-    secondList.addEventListener('click', e => {
+    // Click al item en playlist reproduce
+    secondList.addEventListener('click', (e) => {
       const li = e.target.closest('li[data-catalog-index]');
       if (!li) return;
       const idx = Number(li.dataset.catalogIndex);
       if (idx !== currentlyPlayingCatalogIndex || audioPlayer.paused) playSingleTrackByIndex(idx);
     });
 
-    allTracksList.addEventListener('pointerenter', e => {
+    // Preload en hover en la biblioteca
+    allTracksList.addEventListener('pointerenter', (e) => {
       const li = e.target.closest('li[data-catalog-index]');
       if (!li) return;
       preloader.preload(catalog[Number(li.dataset.catalogIndex)]);
     }, true);
 
+    // Play/Pause
     btnPlayPause.addEventListener('click', () => {
       if (audioPlayer.paused) {
-        if (audioPlayer.src) audioPlayer.play();
+        if (audioPlayer.src) audioPlayer.play().catch(()=>{});
         else if (playQueue.length) playSingleTrackByIndex(playQueue[0]);
       } else audioPlayer.pause();
     });
 
+    // Loop
     btnLoop.addEventListener('click', () => {
       isLooping = !isLooping;
       audioPlayer.loop = isLooping && playQueue.length === 1;
@@ -513,6 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnLoop.setAttribute('aria-pressed', String(isLooping));
     });
 
+    // Reacciones del audio
     audioPlayer.addEventListener('play', () => {
       imgPlayPause.src = `${imageBaseURL}/buttons/pause_button.png`;
       startTimerUpdates();
@@ -536,37 +605,40 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Volumen: usa módulo si existe, si no fallback accesible
     if (typeof initVolumeControl === 'function' && volumeSliderContainer) {
       const vc = initVolumeControl({
         audioEl: audioPlayer,
-        bgEl: volumeSliderContainer,
+        bgEl: volumeBarBg || volumeSliderContainer,
         barEl: volumeBar || null,
         labelEl: volumeValue || null
       });
       const updateAria = () => {
         const percent = Math.round((vc.getVolume?.() || 0) * 100);
-        volumeSliderContainer.setAttribute('aria-valuenow', String(percent));
-        volumeSliderContainer.setAttribute('aria-valuemin', '0');
-        volumeSliderContainer.setAttribute('aria-valuemax', '100');
+        (volumeBarBg || volumeSliderContainer).setAttribute('aria-valuenow', String(percent));
+        (volumeBarBg || volumeSliderContainer).setAttribute('aria-valuemin', '0');
+        (volumeBarBg || volumeSliderContainer).setAttribute('aria-valuemax', '100');
       };
-      volumeSliderContainer.addEventListener('vc:change', updateAria);
+      (volumeBarBg || volumeSliderContainer).addEventListener('vc:change', updateAria);
       audioPlayer.addEventListener('volumechange', updateAria);
       updateAria();
       window.volumeController = vc;
     } else if (volumeSliderContainer) {
+      // Fallback simple (rueda + teclado) con ARIA
       const clamp01 = (v) => Math.min(Math.max(v, 0), 1);
+      const bg = volumeBarBg || volumeSliderContainer;
       const render = () => {
         const p = Math.round(audioPlayer.volume * 100);
         if (volumeBar) volumeBar.style.height = p + '%';
         if (volumeValue) volumeValue.textContent = p + '%';
-        volumeSliderContainer.setAttribute('aria-valuenow', String(p));
+        bg.setAttribute('aria-valuenow', String(p));
       };
-      volumeSliderContainer.addEventListener('wheel', (e) => {
+      bg.addEventListener('wheel', (e) => {
         e.preventDefault();
         audioPlayer.volume = clamp01(audioPlayer.volume + (e.deltaY > 0 ? -0.05 : 0.05));
         render();
       }, { passive: false });
-      volumeSliderContainer.addEventListener('keydown', (e) => {
+      bg.addEventListener('keydown', (e) => {
         const map = { ArrowUp: +0.05, ArrowDown: -0.05, PageUp: +0.25, PageDown: -0.25, Home: -1, End: +1 };
         if (!(e.code in map)) return;
         e.preventDefault();
@@ -580,21 +652,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Volumen — estado visual de mute por clases (CSS)
     const volumeSection = document.querySelector('.volume-section');
-    if (volumeSection) {
-      volumeSliderContainer.addEventListener('vc:mute', () => {
+    if (volumeSection && (volumeBarBg || volumeSliderContainer)) {
+      (volumeBarBg || volumeSliderContainer).addEventListener('vc:mute', () => {
         volumeSection.classList.add('muted');
       });
-      volumeSliderContainer.addEventListener('vc:unmute', () => {
+      (volumeBarBg || volumeSliderContainer).addEventListener('vc:unmute', () => {
         volumeSection.classList.remove('muted');
       });
     }
 
-    [allTracksList, secondList].forEach(el => {
+    // Scroll wheel suave en listas
+    [allTracksList, secondList].forEach((el) => {
       if (!el) return;
-      el.addEventListener('wheel', e => { e.preventDefault(); e.currentTarget.scrollTop += e.deltaY; }, { passive: false });
+      el.addEventListener('wheel', (e) => { e.preventDefault(); e.currentTarget.scrollTop += e.deltaY; }, { passive: false });
     });
 
-    // Unlock móvil
+    // Desbloqueo móvil de autoplay tras primer toque
     let unlocked = false;
     const unlock = async () => {
       if (unlocked) return;
@@ -606,10 +679,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', unlock, { passive: true });
   }
 
+  function safeRemoveByNode(itemNode) {
+    const id = Number(itemNode?.dataset?.catalogIndex);
+    if (!Number.isFinite(id) || !playQueue.includes(id)) return;
+    removeFromQueueByCatalogIndex(id);
+    itemNode?.remove?.();
+  }
+
   function removeFromQueueByCatalogIndex(removedCatalogIndex) {
     const pos = playQueue.indexOf(removedCatalogIndex);
     if (pos === -1) return;
-    const wasPlaying = (removedCatalogIndex === currentlyPlayingCatalogIndex);
+    const wasPlaying = removedCatalogIndex === currentlyPlayingCatalogIndex;
     playQueue.splice(pos, 1);
     reservedIndexSet = new Set(playQueue);
     if (!wasPlaying && pos < currentIndexInQueue) currentIndexInQueue = Math.max(0, currentIndexInQueue - 1);
@@ -621,118 +701,97 @@ document.addEventListener('DOMContentLoaded', () => {
     if (wasPlaying) {
       if (!playQueue.length) stopPlaybackAndResetUI();
       else {
-        currentIndexInQueue = (pos >= playQueue.length) ? 0 : pos;
+        currentIndexInQueue = pos >= playQueue.length ? 0 : pos;
         playSingleTrackByIndex(playQueue[currentIndexInQueue]);
       }
     }
   }
 
   function setupSortable() {
-  if (!allTracksList || !secondList) return console.error('Lists not found');
-  if (typeof Sortable === 'undefined') return console.error('Sortable.js library not loaded.');
+    if (!allTracksList || !secondList) return console.error('Lists not found');
+    if (typeof Sortable === 'undefined') return console.error('Sortable.js library not loaded.');
 
-  // 1) Detección muy fiable de entorno táctil
-  const isCoarse = window.matchMedia?.('(pointer: coarse)')?.matches || ('ontouchstart' in window);
+    const isCoarse = window.matchMedia?.('(pointer: coarse)')?.matches || ('ontouchstart' in window);
 
-  // 2) Montar plugins de spill si están disponibles en tu bundle
-  // (usa los módulos OnSpill de tu repo)
-  try {
-    if (Sortable.mount && window.RemoveOnSpill && window.RevertOnSpill) {
-      Sortable.mount(window.RemoveOnSpill, window.RevertOnSpill);
-    }
-  } catch (e) {
-    // Silencioso si no están expuestos en global; tu OnSpill ya maneja spill por drop()
-  }
+    try {
+      if (Sortable.mount && window.RemoveOnSpill && window.RevertOnSpill) {
+        Sortable.mount(window.RemoveOnSpill, window.RevertOnSpill);
+      }
+    } catch (_) {}
 
-  // 3) Opciones base para ambas listas
-  const filterNotDraggable = '.variant-btn, .track-faction, .track-duration';
-  const sharedGroup = { name: 'shared' }; // pull/put se define por lista
-  const common = {
-    animation: 150,
-    direction: 'vertical',
-    filter: filterNotDraggable,
-    preventOnFilter: true,
-    // Auto scroll mientras arrastras hacia los bordes
-    scroll: true,
-    bubbleScroll: true,
-    scrollSensitivity: isCoarse ? 90 : 60,
-    scrollSpeed: isCoarse ? 16 : 12,
-    // Clases visuales (opcional, ya tienes estilos propios)
-    dragClass: 'is-dragging',
-    ghostClass: 'is-ghost',
-    chosenClass: 'is-chosen',
-    // iOS/Android: ghost sobre body para evitar clipping
-    fallbackOnBody: isCoarse,
-    // Hooks para bloquear gestos de la página en táctil
-    onChoose: () => { if (isCoarse) document.body.classList.add('drag-touching'); },
-    onUnchoose: () => { if (isCoarse) document.body.classList.remove('drag-touching'); },
-    onEnd:   () => { if (isCoarse) document.body.classList.remove('drag-touching'); }
-  };
+    const filterNotDraggable = '.variant-btn, .track-faction, .track-duration';
+    const sharedGroup = { name: 'shared' };
+    const common = {
+      animation: 150,
+      direction: 'vertical',
+      filter: filterNotDraggable,
+      preventOnFilter: true,
+      scroll: true,
+      bubbleScroll: true,
+      scrollSensitivity: isCoarse ? 90 : 60,
+      scrollSpeed: isCoarse ? 16 : 12,
+      dragClass: 'is-dragging',
+      ghostClass: 'is-ghost',
+      chosenClass: 'is-chosen',
+      fallbackOnBody: isCoarse,
+      onChoose: () => { if (isCoarse) document.body.classList.add('drag-touching'); },
+      onUnchoose: () => { if (isCoarse) document.body.classList.remove('drag-touching'); },
+      onEnd:   () => { if (isCoarse) document.body.classList.remove('drag-touching'); }
+    };
 
-  // 4) Ajustes específicos para táctil
-  const touchTweaks = isCoarse ? {
-    forceFallback: true,           // Usa fallback para un drag más estable en móviles
-    delayOnTouchOnly: true,        // Espera un corto delay antes de iniciar drag (evita roces)
-    delay: 70,                     // 60–100 ms recomendado
-    touchStartThreshold: 8,        // px para distinguir scroll vs drag
-    fallbackTolerance: 14          // cuánto debes mover el dedo para "confirmar" el drag
-  } : {
-    // Desktop: sin fallback, drag nativo
-    forceFallback: false
-  };
+    const touchTweaks = isCoarse ? {
+      forceFallback: true,
+      delayOnTouchOnly: true,
+      delay: 70,
+      touchStartThreshold: 8,
+      fallbackTolerance: 14
+    } : { forceFallback: false };
 
-  // 5) Lista de biblioteca (solo clona hacia la playlist)
-  Sortable.create(allTracksList, {
-    ...common,
-    ...touchTweaks,
-    group: { ...sharedGroup, pull: 'clone', put: false },
-    sort: false,
-    revertOnSpill: true // si sueltas fuera, vuelve al origen (según plugin)
-  });
+    // Biblioteca: clona hacia la playlist
+    Sortable.create(allTracksList, {
+      ...common,
+      ...touchTweaks,
+      group: { ...sharedGroup, pull: 'clone', put: false },
+      sort: false,
+      revertOnSpill: true
+    });
 
-  const safeRemoveByNode = (itemNode) => {
-    const id = Number(itemNode?.dataset?.catalogIndex);
-    if (!Number.isFinite(id) || !playQueue.includes(id)) return;
-    removeFromQueueByCatalogIndex(id);
-    itemNode?.remove?.();
-  };
+    const isPointerOutsideSecondList = (evt) => {
+      const e = evt.originalEvent || evt;
+      const t = e?.changedTouches?.[0] || null;
+      const x = typeof e?.clientX === 'number' ? e.clientX : t?.clientX;
+      const y = typeof e?.clientY === 'number' ? e.clientY : t?.clientY;
+      if (typeof x === 'number' && typeof y === 'number') {
+        const under = document.elementFromPoint(x, y);
+        return !secondList.contains(under);
+      }
+      return evt.to !== secondList;
+    };
 
-  const isPointerOutsideSecondList = (evt) => {
-    const e = evt.originalEvent || evt;
-    const t = e?.changedTouches?.[0] || null;
-    const x = typeof e?.clientX === 'number' ? e.clientX : t?.clientX;
-    const y = typeof e?.clientY === 'number' ? e.clientY : t?.clientY;
-    if (typeof x === 'number' && typeof y === 'number') {
-      const under = document.elementFromPoint(x, y);
-      return !secondList.contains(under);
-    }
-    return evt.to !== secondList;
-  };
-
-  // 6) Playlist (acepta únicos, no duplica, permite reordenar)
-  Sortable.create(secondList, {
-    ...common,
-    ...touchTweaks,
-    group: {
-      ...sharedGroup,
-      put: (to, _from, dragged) => {
-        const id = dragged?.dataset?.catalogIndex;
-        if (!id) return false;
-        for (const li of to.el.children) if (li.dataset.catalogIndex === id) return false;
-        return true;
+    // Playlist: únicos, reordenable, elimina por derrame
+    Sortable.create(secondList, {
+      ...common,
+      ...touchTweaks,
+      group: {
+        ...sharedGroup,
+        put: (to, _from, dragged) => {
+          const id = dragged?.dataset?.catalogIndex;
+          if (!id) return false;
+          for (const li of to.el.children) if (li.dataset.catalogIndex === id) return false;
+          return true;
+        },
+        pull: true
       },
-      pull: true
-    },
-    removeOnSpill: true, // si se derrama, elimina (OnSpill)
-    onSpill: (evt) => safeRemoveByNode(evt.item),
-    onRemove: (evt) => safeRemoveByNode(evt.item),
-    onEnd: (evt) => {
-      if (evt.from === secondList && isPointerOutsideSecondList(evt)) safeRemoveByNode(evt.item);
-    },
-    onAdd: updateQueue,
-    onUpdate: updateQueue
-  });
-}
+      removeOnSpill: true,
+      onSpill: (evt) => safeRemoveByNode(evt.item),
+      onRemove: (evt) => safeRemoveByNode(evt.item),
+      onEnd: (evt) => {
+        if (evt.from === secondList && isPointerOutsideSecondList(evt)) safeRemoveByNode(evt.item);
+      },
+      onAdd: updateQueue,
+      onUpdate: updateQueue
+    });
+  }
 
   function setupSearchBar() {
     const listContainer = allTracksList?.closest('.manual-list');
@@ -761,12 +820,13 @@ document.addEventListener('DOMContentLoaded', () => {
           isMatch = (track.factions || []).includes(query.substring(1));
         } else if (query.startsWith('#')) {
           const gfs = factionGroups[query.substring(1)] || [];
-          isMatch = (track.factions || []).some(tf => gfs.includes(tf));
+          isMatch = (track.factions || []).some((tf) => gfs.includes(tf));
         } else {
           const normalizedQuery = normalizeString(query).toLowerCase();
           const tokens = (item.dataset.searchTokens || '').toLowerCase();
-          isMatch = tokens ? tokens.includes(normalizedQuery)
-                           : (track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase()).includes(normalizedQuery);
+          isMatch = tokens
+            ? tokens.includes(normalizedQuery)
+            : (track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase()).includes(normalizedQuery);
         }
         item.classList.toggle('hidden', !isMatch);
       }
@@ -781,7 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response;
       } catch (err) {
-        if (i < retries - 1) await new Promise(res => setTimeout(res, backoff));
+        if (i < retries - 1) await new Promise((res) => setTimeout(res, backoff));
         backoff *= 2;
       }
     }
@@ -799,7 +859,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function initializeApp() {
     try {
       const critical = [audioPlayer, allTracksList, secondList, btnPlayPause, imgPlayPause, btnLoop, imgLoop, trackName, factionName, timeDisplay, volumeSliderContainer];
-      if (critical.some(el => !el)) {
+      if (critical.some((el) => !el)) {
         (document.getElementById('appRoot') || document.body).innerHTML =
           `<div class="error-box"><h3>Initialization Error</h3><p>A critical UI component failed to load. Please check element IDs.</p></div>`;
         return;
@@ -807,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const response = await fetchWithRetry(`${dataURL}?_=${Date.now()}`, { cache: 'no-cache' });
       catalog = await response.json();
-      if (!Array.isArray(catalog)) throw new Error("Catalog data is not an array.");
+      if (!Array.isArray(catalog)) throw new Error('Catalog data is not an array.');
       window.catalog = catalog;
 
       for (const track of catalog) {
