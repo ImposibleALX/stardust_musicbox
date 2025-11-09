@@ -10,11 +10,29 @@ const [
   trackName, factionName, timeDisplay, volumeSliderContainer
 ] = ids.map((id) => document.getElementById(id));
 
+// ---------- Guardas de UI (mensaje de error si falta algo) ----------
+function missing(el, name) { return !el ? name : null; }
+const missingEls = [
+  missing(audioPlayer, 'audioPlayer'),
+  missing(trackName, 'trackName'),
+  missing(factionName, 'factionName'),
+  missing(timeDisplay, 'timeDisplay')
+].filter(Boolean);
+
+if (missingEls.length) {
+  console.error('[radioPlayer] Elementos faltantes:', missingEls.join(', '));
+  try {
+    if (trackName) trackName.textContent = 'Player init error';
+    if (factionName) factionName.textContent = `Missing: ${missingEls.join(', ')}`;
+  } catch {}
+  // No arrojamos excepción: dejamos que la página siga cargando sin romper todo.
+}
+
 // ---------- Config de sincronización ----------
 const SYNC_ANCHOR_MS      = Date.UTC(2025, 0, 1); // 2025-01-01T00:00:00Z
-const USE_UTC_FOR_SEED    = true;
+const USE_UTC_FOR_SEED    = true;                 // (1) UTC por tu preferencia
 const PERIOD_SEED         = 'day';                // cambio diario
-const DRIFT_TOLERANCE_SEC = 1.0;
+const DRIFT_TOLERANCE_SEC = 4.0;                  // (7) tolerancia 3–5s
 
 // Tuning
 const CORRECT_VISIBLE_MS = 1500;
@@ -24,42 +42,51 @@ const CORRECT_HIDDEN_MS  = 6000;
 function nowMs() { return Date.now(); }
 function getGlobalClockSec() { return (nowMs() - SYNC_ANCHOR_MS) / 1000; }
 
-// ---------- Seed periodica ----------
+// ---------- Seed periódica ----------
 let cachedPeriodSeed = null;
 let nextSeedUpdateTimer = null;
 
+// Semana lunes–domingo basada en UTC (simple, no ISO 8601 de desborde de año)
+function mondayBasedWeekSeedUTC(y, mo, da) {
+  const d = new Date(Date.UTC(y, mo - 1, da));
+  const yearStart = new Date(Date.UTC(y, 0, 1));
+  const yearStartDowMon0 = (yearStart.getUTCDay() + 6) % 7; // 0=lunes
+  const firstMonday = new Date(Date.UTC(y, 0, 1 + ((7 - yearStartDowMon0) % 7)));
+  const weeks = Math.max(0, Math.floor((d - firstMonday) / (7 * 86400000)));
+  return (y * 100 + weeks) | 0; // YYYYWW (lunes–domingo simple)
+}
+
 function computePeriodSeed(period = PERIOD_SEED) {
   const d = new Date();
-  const y  = USE_UTC_FOR_SEED ? d.getUTCFullYear()  : d.getFullYear();
-  const mo = (USE_UTC_FOR_SEED ? d.getUTCMonth()    : d.getMonth()) + 1;
-  const da = USE_UTC_FOR_SEED ? d.getUTCDate()      : d.getDate();
-  const ho = USE_UTC_FOR_SEED ? d.getUTCHours()     : d.getHours();
-  if (period === 'hour') return (y * 1e6 + mo * 1e4 + da * 1e2 + ho) | 0;       // YYYYMMDDHH
-  if (period === 'week') {
-    const utcDate   = new Date(Date.UTC(y, mo - 1, da));
-    const startYear = new Date(Date.UTC(y, 0, 1));
-    const days = Math.floor((utcDate - startYear) / 86400000);
-    const week = Math.floor((days + ((utcDate.getUTCDay() + 6) % 7)) / 7);
-    return (y * 100 + week) | 0; // YYYYWW
-  }
-  return (y * 1e4 + mo * 1e2 + da) | 0;                                         // YYYYMMDD
+  const get = USE_UTC_FOR_SEED
+    ? { y: d.getUTCFullYear(), mo: d.getUTCMonth() + 1, da: d.getUTCDate(), ho: d.getUTCHours() }
+    : { y: d.getFullYear(),    mo: d.getMonth() + 1,     da: d.getDate(),     ho: d.getHours()    };
+
+  if (period === 'hour') return (get.y * 1e6 + get.mo * 1e4 + get.da * 1e2 + get.ho) | 0; // YYYYMMDDHH
+  if (period === 'week')  return mondayBasedWeekSeedUTC(get.y, get.mo, get.da);            // lunes–domingo
+  return (get.y * 1e4 + get.mo * 1e2 + get.da) | 0;                                        // YYYYMMDD
 }
+
 function msToNextUtcDay() {
   const n = new Date();
   const next = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate() + 1, 0, 0, 0));
   return next.getTime() - n.getTime();
 }
+
 function primePeriodSeed() {
   cachedPeriodSeed = computePeriodSeed(PERIOD_SEED);
   if (nextSeedUpdateTimer) clearTimeout(nextSeedUpdateTimer);
   nextSeedUpdateTimer = setTimeout(() => {
     cachedPeriodSeed = computePeriodSeed(PERIOD_SEED);
     purgeOldFactionCache();
-    if (currentFaction) forceResync();
+    if (currentFaction) forceResync(); // (2) al cruzar día, re-sincroniza
     scheduleSeedTick();
   }, msToNextUtcDay() + 50);
 }
-function scheduleSeedTick() { if (document.visibilityState === 'visible') primePeriodSeed(); }
+function scheduleSeedTick() {
+  // Si volvemos a visible, re-primea para actualizar “el siguiente día”.
+  if (document.visibilityState === 'visible') primePeriodSeed();
+}
 primePeriodSeed();
 document.addEventListener('visibilitychange', scheduleSeedTick, { passive: true });
 
@@ -78,6 +105,16 @@ let endedAbort = null;
 const DEFAULT_AUDIO_BASE = '../assets/music/';
 const audioBase = window.AUDIO_BASE_PATH || DEFAULT_AUDIO_BASE;
 const audioRoot = audioBase.endsWith('/') ? audioBase : `${audioBase}/`;
+
+// Limpieza de rutas (10)
+function sanitizeSeg(s) { return String(s || '').replace(/^\/+|\/+$/g, ''); }
+function joinPath(root, folder, file) {
+  const r = root.endsWith('/') ? root : root + '/';
+  const f = sanitizeSeg(folder);
+  const fi = String(file || '').replace(/^\/+/, '');
+  // Evita '//' colapsando, respetando '://'
+  return (r + (f ? f + '/' : '') + fi).replace(/([^:])\/{2,}/g, '$1/');
+}
 
 // ---------- Display names ----------
 const baseFactionDisplayNames = {
@@ -129,33 +166,64 @@ function computeIndexAndOffsetByPrefix(prefix, durations, t0) {
   return { idx, offset };
 }
 
+// ---------- Autoplay policy ----------
+let lastActionWasUserGesture = false; // (14) solo intentamos play() tras gesto
+
 // ---------- Reproducción ----------
-function handleCanPlay() { if (audioPlayer._playRequestId === lastPlayRequestId) audioPlayer.play().catch(()=>{}); }
-audioPlayer.addEventListener('canplay', handleCanPlay, { passive: true });
+function handleCanPlay() {
+  // Evita intentar autoplay si no hubo gesto de usuario
+  if (audioPlayer._playRequestId === lastPlayRequestId && lastActionWasUserGesture) {
+    audioPlayer.play().catch(() => {});
+  }
+}
+audioPlayer.addEventListener('canplay', handleCanPlay);
 
 function playFaction(faction) {
-  if (currentFaction === faction) return;
-  audioPlayer.pause();
+  lastActionWasUserGesture = true; // click del usuario
+  if (currentFaction === faction) {
+    // (8) Si eligen la misma facción, reinicia/sincroniza de nuevo
+    startFactionRadio(faction);
+    return;
+  }
+  if (audioPlayer) audioPlayer.pause();
   currentFaction = faction;
   startFactionRadio(faction);
 }
 
 let lastSrc = '';
+function whenReadyToSeek(cb) {
+  if (!audioPlayer) return;
+  if (audioPlayer.readyState >= 1) { cb(); return; } // HAVE_METADATA
+  const onMeta = () => { audioPlayer.removeEventListener('loadedmetadata', onMeta); cb(); };
+  audioPlayer.addEventListener('loadedmetadata', onMeta, { once: true });
+}
+
 function playTrack(track, offset = 0, faction, playRequestId, dispName = names[faction] || faction) {
-  const filePath = `${audioRoot}${track.folder}/${track.file}`;
-  if (lastSrc !== filePath) { lastSrc = audioPlayer.src = filePath; audioPlayer.load(); }
+  const filePath = joinPath(audioRoot, track.folder, track.file); // (10) rutas limpias
+  if (lastSrc !== filePath) {
+    lastSrc = filePath;
+    audioPlayer.src = filePath;
+    audioPlayer.load();
+  }
   audioPlayer._playRequestId = playRequestId;
-  audioPlayer.currentTime = offset;
+
+  // (6) Espera a metadata antes de hacer seek
+  whenReadyToSeek(() => {
+    try { audioPlayer.currentTime = Math.max(0, offset || 0); } catch {}
+  });
+
+  // UI
   requestAnimationFrame(() => {
     const title = (track.titles?.en ?? '').trim();
     const newTitle = title || 'Unknown Title';
-    if (trackName.textContent !== newTitle) trackName.textContent = newTitle;
+    if (trackName && trackName.textContent !== newTitle) trackName.textContent = newTitle;
     const facText = faction === 'NoFactions'
       ? `Factions: ${(track.factions || []).map((f) => names[f] || f).join(', ') || 'Unknown'}`
       : `Faction: ${dispName}`;
-    if (factionName.textContent !== facText) factionName.textContent = facText;
+    if (factionName && factionName.textContent !== facText) factionName.textContent = facText;
   });
 }
+
 function cleanupEndedListener() { if (endedAbort) { endedAbort.abort(); endedAbort = null; } }
 
 function playFactionTrack(faction, shuffledTracks, trackIndex, offset = 0, dispName = null) {
@@ -225,8 +293,12 @@ function startFactionRadio(faction) {
 }
 
 function playNoFactions() {
-  if (currentFaction === 'NoFactions') return;
-  audioPlayer.pause();
+  lastActionWasUserGesture = true; // invocación manual por usuario
+  if (currentFaction === 'NoFactions') {
+    startFactionRadio('NoFactions'); // (8) re-inicia si vuelve a elegir
+    return;
+  }
+  if (audioPlayer) audioPlayer.pause();
   currentFaction = 'NoFactions';
 
   const seed = cachedPeriodSeed;
@@ -236,6 +308,7 @@ function playNoFactions() {
       const out = [];
       for (let i = 0; i < all.length; i++) {
         const t = all[i];
+        // (11) asumimos ID presente por tu preferencia; filtramos por duration>0
         if (t.file && !bannedNoFactions.has(t.id) && (t.duration > 0)) out.push(t);
       }
       return out;
@@ -244,8 +317,8 @@ function playNoFactions() {
   );
 
   if (!info.tracks.length) {
-    trackName.textContent  = 'No tracks available';
-    factionName.textContent = 'No Factions';
+    if (trackName) trackName.textContent  = 'No tracks available';
+    if (factionName) factionName.textContent = 'No Factions';
     currentPlaylist = { faction: 'NoFactions', tracks: [], durations: [], prefix: [], index: 0, totalDuration: 0 };
     return;
   }
@@ -278,34 +351,38 @@ function shuffleArray(array, rng) {
   return a;
 }
 
-const HASH_NO_FACTIONS = hashCode('NoFactions');
-
 // ---------- UI: tiempo ----------
 let lastRenderSec = -1;
-audioPlayer.ontimeupdate = () => {
-  const sec = (audioPlayer.currentTime | 0);
-  if (sec === lastRenderSec) return;
-  lastRenderSec = sec;
-  const m = (sec / 60) | 0;
-  const s2  = (sec % 60 + 100).toString().slice(1);
-  const txt = `${m}:${s2}`;
-  if (timeDisplay.textContent !== txt) timeDisplay.textContent = txt;
-  updateSyncDebug();
-};
+if (audioPlayer) {
+  audioPlayer.ontimeupdate = () => {
+    const sec = (audioPlayer.currentTime | 0);
+    if (sec === lastRenderSec) return;
+    lastRenderSec = sec;
+    const m = (sec / 60) | 0;
+    const s2  = (sec % 60 + 100).toString().slice(1);
+    const txt = `${m}:${s2}`;
+    if (timeDisplay && timeDisplay.textContent !== txt) timeDisplay.textContent = txt;
+    updateSyncDebug();
+  };
+}
 
-// Media keys Play/Pause: re-sync exacto
+// Media keys Play/Pause: re-sync exacto (gesto del usuario)
 document.addEventListener('keydown', function (e) {
   if (e.code === 'MediaPlayPause' || e.keyCode === 179) {
-    if (audioPlayer.paused) { forceResync(); }
-    else audioPlayer.pause();
+    lastActionWasUserGesture = true;
+    if (audioPlayer && audioPlayer.paused) { forceResync(); }
+    else if (audioPlayer) audioPlayer.pause();
     e.preventDefault();
   }
 }, { passive: false });
 
-// ---------- Debug UI ----------
+// ---------- Debug UI (15) ----------
+let SYNC_DEBUG_ENABLED = false; // apagado por defecto
 let syncDebugEl = null;
 let lastDebugText = '';
+
 function ensureSyncDebugEl() {
+  if (!SYNC_DEBUG_ENABLED) return null;
   if (syncDebugEl) return syncDebugEl;
   syncDebugEl = document.createElement('div');
   syncDebugEl.id = 'syncDebug';
@@ -327,13 +404,24 @@ function formatMMSS(sec) {
   return `${m}:${r}`;
 }
 function updateSyncDebug() {
+  if (!SYNC_DEBUG_ENABLED) {
+    if (syncDebugEl && syncDebugEl.parentNode) syncDebugEl.parentNode.removeChild(syncDebugEl);
+    syncDebugEl = null; lastDebugText = '';
+    return;
+  }
   const el = ensureSyncDebugEl();
-  const periodLabel = (PERIOD_SEED === 'day' ? 'Daily' : PERIOD_SEED === 'hour' ? 'Hourly' : 'Weekly') + (USE_UTC_FOR_SEED ? ' UTC' : ' Local');
+  if (!el) return;
+  const periodLabel =
+    (PERIOD_SEED === 'day' ? 'Daily' : PERIOD_SEED === 'hour' ? 'Hourly' : 'Weekly') +
+    (USE_UTC_FOR_SEED ? ' UTC' : ' Local');
   const td = currentPlaylist.totalDuration || 0;
   const t0 = td > 0 ? getT0(td) : 0;
   const text = `Shuffle: ${periodLabel} | t0=${formatMMSS(t0)}`;
   if (text !== lastDebugText) { lastDebugText = text; el.textContent = text; }
 }
+// Controles de consola para el HUD
+window.enableSyncDebug = function (flag) { SYNC_DEBUG_ENABLED = !!flag; updateSyncDebug(); };
+window.toggleSyncDebug = function () { SYNC_DEBUG_ENABLED = !SYNC_DEBUG_ENABLED; updateSyncDebug(); };
 
 // ---------- Corrección de deriva ----------
 let correctTimer = null;
@@ -360,7 +448,7 @@ function computeIndexAndOffset(tracks, totalDuration) {
 }
 function correctDriftIfNeeded() {
   if (!currentPlaylist.tracks.length) return;
-  if (audioPlayer.paused) return;
+  if (audioPlayer && audioPlayer.paused) return;
 
   const expected = computeIndexAndOffset(currentPlaylist.tracks, currentPlaylist.totalDuration);
   const playingIdx = currentPlaylist.index;
@@ -381,9 +469,10 @@ function correctDriftIfNeeded() {
 // ---------- Público ----------
 function forceResync() {
   if (!currentFaction) return;
+  lastActionWasUserGesture = true; // Media key o acción manual
   if (currentFaction === 'NoFactions') playNoFactions();
   else startFactionRadio(currentFaction);
-  audioPlayer.play().catch(()=>{});
+  // El intento de play se realiza en handleCanPlay solo si hubo gesto
 }
 window.forceResync = forceResync;
 
@@ -401,16 +490,35 @@ function initVolumeControllerOnce() {
   if (!audioPlayer || !bgEl) return;
   try {
     bgEl.setAttribute('role', 'slider');
+    bgEl.setAttribute('aria-label', 'Volume');
     bgEl.setAttribute('aria-valuemin', '0');
     bgEl.setAttribute('aria-valuemax', '100');
     bgEl.setAttribute('tabindex', '0');
   } catch {}
   const vc = initVolumeControl({ audioEl: audioPlayer, bgEl, barEl: volumeBar || null, labelEl: volumeValue || null });
+  const clamp = (x) => Math.min(1, Math.max(0, x));
   const updateAria = () => {
-    const v = vc.getVolume ? vc.getVolume() : audioPlayer.volume || 0;
+    const v = vc.getVolume ? vc.getVolume() : (audioPlayer.volume ?? 0);
     const p = Math.round(v * 100);
     bgEl.setAttribute('aria-valuenow', String(p));
+    if (volumeValue) volumeValue.textContent = `${p}%`;
   };
+  // (5) Teclado accesible
+  bgEl.addEventListener('keydown', (e) => {
+    const stepSmall = 0.02, step = 0.05, stepBig = 0.10;
+    let v = vc.getVolume ? vc.getVolume() : (audioPlayer.volume ?? 0);
+    if (e.key === 'ArrowUp' || e.key === 'ArrowRight') v = v + step;
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') v = v - step;
+    else if (e.key === 'PageUp') v = v + stepBig;
+    else if (e.key === 'PageDown') v = v - stepBig;
+    else if (e.key === 'Home') v = 0;
+    else if (e.key === 'End') v = 1;
+    else return;
+    e.preventDefault();
+    if (vc.setVolume) vc.setVolume(clamp(v)); else audioPlayer.volume = clamp(v);
+    bgEl.dispatchEvent(new Event('vc:change'));
+  });
+
   bgEl.addEventListener('vc:change', updateAria);
   audioPlayer.addEventListener('volumechange', updateAria);
   updateAria();
@@ -420,9 +528,11 @@ initVolumeControllerOnce();
 
 window.setCatalog = function (data) {
   catalog = data;
-  trackName.textContent   = 'Choose your faction to start';
-  factionName.textContent = 'Choose your faction to start';
+  if (trackName) trackName.textContent   = 'Choose your faction to start';
+  if (factionName) factionName.textContent = 'Choose your faction to start';
   if (typeof initVolumeControl === 'function' && window.volumeController == null) initVolumeControllerOnce();
   purgeOldFactionCache();
-  updateSyncDebug();
+  // (13) Si ya hay facción, re-sincroniza para reflejar el nuevo catálogo
+  if (currentFaction) { forceResync(); } else { updateSyncDebug(); }
 };
+// radioPlayer.js ends here

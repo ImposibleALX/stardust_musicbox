@@ -896,7 +896,5 @@ document.addEventListener('DOMContentLoaded', () => {
       root.innerHTML = `<div class="error-box"><h3>Failed to load catalog</h3><p>${String(err?.message || err)}</p></div>`;
     }
   }
-
-  setupEventListeners();
   initializeApp();
 });
