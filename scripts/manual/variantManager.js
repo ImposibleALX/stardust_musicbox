@@ -1,3 +1,4 @@
+/*variantManager.js*/
 (function (global) {
   function normalize(str = '') {
     return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -23,36 +24,42 @@
     function buildTrackIndex(catalog = []) {
       catalogRef = Array.isArray(catalog) ? catalog : [];
       trackIdToIndex.clear();
-      catalogRef.forEach((track, index) => { if (track && typeof track.id === 'string') trackIdToIndex.set(track.id, index); });
+      for (let i = 0; i < catalogRef.length; i++) {
+        const track = catalogRef[i];
+        if (track && typeof track.id === 'string') trackIdToIndex.set(track.id, i);
+      }
     }
     function buildGroupSearchTokens(title, variants) {
       const tokens = new Set();
       if (title) tokens.add(normalize(title));
-      variants.forEach((v) => {
+      for (let i = 0; i < variants.length; i++) {
+        const v = variants[i];
         if (v.normalizedLabel) tokens.add(v.normalizedLabel);
         const t = catalogRef[v.catalogIndex];
         if (t && typeof t._normalizedTitle === 'string') tokens.add(t._normalizedTitle);
         else if (t?.titles?.en) tokens.add(normalize(t.titles.en));
-      });
+      }
       return Array.from(tokens).filter(Boolean).join(' ');
     }
     function hydrateGroups(rawGroups = []) {
       if (!Array.isArray(rawGroups)) return;
-      for (const raw of rawGroups) {
+      for (let ri = 0; ri < rawGroups.length; ri++) {
+        const raw = rawGroups[ri];
         if (!raw || typeof raw !== 'object') continue;
         const groupId = raw.groupId || raw.id;
         if (!groupId || groupMap.has(groupId)) continue;
         const variants = Array.isArray(raw.variants) ? raw.variants : [];
         if (variants.length < 2) continue;
         const hydrated = [];
-        variants.forEach((variant, variantIndex) => {
+        for (let variantIndex = 0; variantIndex < variants.length; variantIndex++) {
+          const variant = variants[variantIndex];
           const variantId = variant?.id;
-          if (!variantId) return;
+          if (!variantId) continue;
           const catalogIndex = trackIdToIndex.get(variantId);
-          if (typeof catalogIndex !== 'number') return;
+          if (typeof catalogIndex !== 'number') continue;
           const variantLabel = (typeof variant.variantLabel === 'string' && variant.variantLabel.trim()) ? variant.variantLabel.trim() : 'Original';
           hydrated.push({ id: variantId, catalogIndex, variantIndex, variantLabel, normalizedLabel: normalize(variantLabel) });
-        });
+        }
         if (hydrated.length < 2) continue;
 
         let activeIndex = 0;
@@ -66,22 +73,26 @@
         const group = { groupId, title, variants: hydrated, activeIndex, searchTokens: buildGroupSearchTokens(title, hydrated) };
         groupMap.set(groupId, group);
 
-        hydrated.forEach((v) => { catalogIndexToVariant.set(v.catalogIndex, { groupId, variantLabel: v.variantLabel, variantIndex: v.variantIndex }); });
+        for (let j = 0; j < hydrated.length; j++) {
+          const v = hydrated[j];
+          catalogIndexToVariant.set(v.catalogIndex, { groupId, variantLabel: v.variantLabel, variantIndex: v.variantIndex });
+        }
       }
     }
     function buildLibraryEntries() {
       const seen = new Set();
       libraryEntries = [];
-      catalogRef.forEach((track, index) => {
-        const meta = catalogIndexToVariant.get(index);
-        if (!meta) { libraryEntries.push({ type: 'single', catalogIndex: index }); return; }
+      for (let i = 0; i < catalogRef.length; i++) {
+        const track = catalogRef[i];
+        const meta = catalogIndexToVariant.get(i);
+        if (!meta) { libraryEntries.push({ type: 'single', catalogIndex: i }); continue; }
         const { groupId } = meta;
-        if (seen.has(groupId)) return;
+        if (seen.has(groupId)) continue;
         const g = groupMap.get(groupId);
-        if (!g || g.variants.length < 2) { libraryEntries.push({ type: 'single', catalogIndex: index }); return; }
+        if (!g || g.variants.length < 2) { libraryEntries.push({ type: 'single', catalogIndex: i }); continue; }
         libraryEntries.push({ type: 'group', groupId });
         seen.add(groupId);
-      });
+      }
       bus.emit('entriesChanged', { total: libraryEntries.length });
     }
 
@@ -96,8 +107,9 @@
         const group = groupMap.get(groupId);
         if (!group || !group.variants || group.variants.length === 0) return null;
         const len = group.variants.length;
-        const next = ((group.activeIndex || 0) + delta) % len;
-        group.activeIndex = next < 0 ? next + len : next;
+        let next = ((group.activeIndex || 0) + delta) % len;
+        if (next < 0) next += len;
+        group.activeIndex = next;
         const active = group.variants[group.activeIndex];
         bus.emit('activeChanged', { groupId, activeIndex: group.activeIndex, activeCatalogIndex: active?.catalogIndex, variantLabel: active?.variantLabel });
         return group;

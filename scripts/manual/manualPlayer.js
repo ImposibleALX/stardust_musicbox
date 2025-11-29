@@ -20,15 +20,15 @@ function waitForCanPlay(audio) {
   return new Promise((resolve) => {
     if (!audio) return resolve();
     if (audio.readyState >= 3) return resolve();
-    const h = () => {
-      audio.removeEventListener('canplaythrough', h);
+    const cb = () => {
+      audio.removeEventListener('canplaythrough', cb);
       resolve();
     };
-    audio.addEventListener('canplaythrough', h, { once: true });
+    audio.addEventListener('canplaythrough', cb, { once: true });
   });
 }
 function debounce(fn, delay = 300) {
-  let t;
+  let t = 0;
   return (...a) => {
     clearTimeout(t);
     t = setTimeout(() => fn(...a), delay);
@@ -311,18 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     li.append(titleSpan, durationSpan, factionSpan);
 
-    // Accesible: Enter/Space reproducen si está en playlist
-    li.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        const idx = Number(li.dataset.catalogIndex);
-        if (!Number.isFinite(idx)) return;
-        if (li.closest('#secondList')) {
-          if (idx !== currentlyPlayingCatalogIndex || audioPlayer.paused) playSingleTrackByIndex(idx);
-        }
-        e.preventDefault();
-      }
-    });
-
+    // NOTE: accessibility — key handling is delegated centrally (see setupEventListeners)
     return { li, titleSpan };
   }
 
@@ -392,21 +381,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const prevBtn = createElement('button', { className: 'variant-btn prev', type: 'button', title: 'Previous version', 'aria-label': 'Previous version' });
     prevBtn.textContent = '◀';
+    prevBtn.dataset.groupId = group.groupId;
+    prevBtn.dataset.delta = '-1';
+    prevBtn.dataset.focus = 'prev';
+
     const label = createElement('span', { className: 'variant-label', text: allReserved ? 'All queued' : (activeVariant.variantLabel || 'Original') });
     const nextBtn = createElement('button', { className: 'variant-btn next', type: 'button', title: 'Next version', 'aria-label': 'Next version' });
     nextBtn.textContent = '▶';
+    nextBtn.dataset.groupId = group.groupId;
+    nextBtn.dataset.delta = '1';
+    nextBtn.dataset.focus = 'next';
 
     controls.append(prevBtn, label, nextBtn);
     if (allReserved) { prevBtn.disabled = true; nextBtn.disabled = true; }
     base.titleSpan.append(mainTitle, controls);
 
-    const attachHandler = (delta, focusSide) => (event) => {
-      event.preventDefault(); event.stopPropagation();
-      handleVariantToggle(group.groupId, delta, focusSide, base.li);
-    };
-    prevBtn.addEventListener('click', attachHandler(-1, 'prev'));
-    nextBtn.addEventListener('click', attachHandler(1, 'next'));
-
+    // no per-button closures — handler is delegated (see setupEventListeners)
     return base.li;
   }
 
@@ -441,6 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (node) frag.appendChild(node);
     }
+    // Single DOM write
     allTracksList.replaceChildren(frag);
     updateActiveTrackVisuals();
   }
@@ -456,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateActiveTrackVisuals();
   }
 
-  function handleVariantToggle(groupId, delta, focusSide = 'next', currentNode) {
+  async function handleVariantToggle(groupId, delta, focusSide = 'next', currentNode) {
     if (!variantManager || !allTracksList || !currentNode) return;
     let group = variantManager.stepActiveVariant(groupId, delta);
     if (!group) return;
@@ -507,7 +498,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateQueue() {
-    playQueue = Array.from(secondList.children).map((li) => Number(li.dataset.catalogIndex));
+    // Read DOM once to compute new queue
+    const children = secondList.children;
+    const newQueue = new Array(children.length);
+    for (let i = 0; i < children.length; i++) newQueue[i] = Number(children[i].dataset.catalogIndex);
+    playQueue = newQueue;
     reservedIndexSet = new Set(playQueue);
     if (currentlyPlayingCatalogIndex !== -1) {
       const newIdx = playQueue.indexOf(currentlyPlayingCatalogIndex);
@@ -526,6 +521,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!audioPlayer.paused) {
         timeDisplay.textContent = formatTime(audioPlayer.currentTime);
         animationFrameId_timer = requestAnimationFrame(update);
+      } else {
+        animationFrameId_timer = null;
       }
     };
     animationFrameId_timer = requestAnimationFrame(update);
@@ -536,8 +533,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateActiveTrackVisuals() {
-    // Marca activo en playlist
-    for (const item of secondList.children) {
+    // Marca activo en playlist — batch DOM writes as toggles, read once
+    const children = secondList.children;
+    for (let i = 0; i < children.length; i++) {
+      const item = children[i];
       const itemIndex = Number(item.dataset.catalogIndex);
       const playing = itemIndex === currentlyPlayingCatalogIndex;
       item.classList.toggle('active', playing);
@@ -548,7 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setupEventListeners() {
-    // Click al item en playlist reproduce
+    // Click al item en playlist reproduce — delegation
     secondList.addEventListener('click', (e) => {
       const li = e.target.closest('li[data-catalog-index]');
       if (!li) return;
@@ -556,7 +555,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (idx !== currentlyPlayingCatalogIndex || audioPlayer.paused) playSingleTrackByIndex(idx);
     });
 
-    // Preload en hover en la biblioteca
+    // Keyboard: delegated Enter/Space on both lists (accessible)
+    document.addEventListener('keydown', (e) => {
+      if (!(e.code === 'Enter' || e.key === ' ' || e.key === 'Spacebar')) return;
+      const el = document.activeElement;
+      if (!el) return;
+      const li = el.closest && el.closest('li[data-catalog-index]');
+      if (!li) return;
+      const idx = Number(li.dataset.catalogIndex);
+      if (isNaN(idx)) return;
+      // only allow activation from playlist
+      if (li.closest('#secondList')) {
+        if (idx !== currentlyPlayingCatalogIndex || audioPlayer.paused) playSingleTrackByIndex(idx);
+        e.preventDefault();
+      }
+    });
+
+    // Preload en hover en la biblioteca (use pointerenter on container, delegated)
     allTracksList.addEventListener('pointerenter', (e) => {
       const li = e.target.closest('li[data-catalog-index]');
       if (!li) return;
@@ -603,6 +618,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentIndexInQueue = (currentIndexInQueue + 1) % playQueue.length;
         playSingleTrackByIndex(playQueue[currentIndexInQueue]);
       }
+    });
+
+    // Variant button clicks — delegated (avoids closures per button)
+    allTracksList.addEventListener('click', (e) => {
+      const btn = e.target.closest('.variant-btn');
+      if (!btn) return;
+      e.preventDefault(); e.stopPropagation();
+      const gid = btn.dataset.groupId;
+      const delta = Number(btn.dataset.delta) || 0;
+      const focusSide = btn.dataset.focus || 'next';
+      const parentLi = btn.closest('li[data-group-id]');
+      if (gid && parentLi) handleVariantToggle(gid, delta, focusSide, parentLi);
     });
 
     // Volumen: usa módulo si existe, si no fallback accesible
@@ -808,26 +835,43 @@ document.addEventListener('DOMContentLoaded', () => {
     heading.after(searchContainer);
 
     const handleSearch = (event) => {
-      const query = event.target.value.toLowerCase().trim();
+      const queryRaw = event.target.value || '';
+      const query = queryRaw.toLowerCase().trim();
       const items = allTracksList.children;
-      for (const item of items) {
+      if (!query) {
+        // show all — single pass
+        for (let i = 0; i < items.length; i++) items[i].classList.remove('hidden');
+        return;
+      }
+
+      if (query.startsWith('/')) {
+        const factionKey = query.substring(1);
+        for (let i = 0; i < items.length; i++) {
+          const idx = parseInt(items[i].dataset.catalogIndex, 10);
+          const t = catalog[idx];
+          const match = t && (t.factions || []).includes(factionKey);
+          items[i].classList.toggle('hidden', !match);
+        }
+        return;
+      }
+      if (query.startsWith('#')) {
+        const gf = factionGroups[query.substring(1)] || [];
+        for (let i = 0; i < items.length; i++) {
+          const idx = parseInt(items[i].dataset.catalogIndex, 10);
+          const t = catalog[idx];
+          const match = t && (t.factions || []).some((tf) => gf.includes(tf));
+          items[i].classList.toggle('hidden', !match);
+        }
+        return;
+      }
+
+      const normalizedQuery = normalizeString(query).toLowerCase();
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
         const idx = parseInt(item.dataset.catalogIndex, 10);
         if (isNaN(idx)) continue;
-        const track = catalog[idx]; if (!track) continue;
-        let isMatch = false;
-        if (!query) isMatch = true;
-        else if (query.startsWith('/')) {
-          isMatch = (track.factions || []).includes(query.substring(1));
-        } else if (query.startsWith('#')) {
-          const gfs = factionGroups[query.substring(1)] || [];
-          isMatch = (track.factions || []).some((tf) => gfs.includes(tf));
-        } else {
-          const normalizedQuery = normalizeString(query).toLowerCase();
-          const tokens = (item.dataset.searchTokens || '').toLowerCase();
-          isMatch = tokens
-            ? tokens.includes(normalizedQuery)
-            : (track._normalizedTitle || normalizeString(track.titles?.en || '').toLowerCase()).includes(normalizedQuery);
-        }
+        const tokens = item.dataset.searchTokens || (catalog[idx]?._normalizedTitle || '');
+        const isMatch = tokens.toLowerCase().includes(normalizedQuery);
         item.classList.toggle('hidden', !isMatch);
       }
     };
@@ -870,7 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!Array.isArray(catalog)) throw new Error('Catalog data is not an array.');
       window.catalog = catalog;
 
-      for (const track of catalog) {
+      for (let i = 0; i < catalog.length; i++) {
+        const track = catalog[i];
         const title = track?.titles?.en || '';
         track._normalizedTitle = normalizeString(title).toLowerCase();
       }

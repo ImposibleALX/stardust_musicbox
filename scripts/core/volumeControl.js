@@ -169,7 +169,7 @@
 
     function setCurve(fn, invFn) {
       if (typeof fn === 'function') {
-        // Nota: mantenemos "stateful": solo cambiamos mapping, no forzamos re-linearizar.
+        // Nota: mantenimos "stateful": solo cambiamos mapping, no forzamos re-linearizar.
         // Si pasas invFn la usaremos; si no, seguimos con la inversa numérica.
         applyAudio();
         schedule();
@@ -297,16 +297,13 @@
 
     // Sincroniza si alguien cambia audioEl.volume por fuera (p.ej. controles del sistema)
     function onAudioVolumeChange() {
-      // Mantén módulo con estado propio: mapea solo si el cambio vino de “fuera” (cuando no estamos arrastrando)
       if (isDragging) return;
       const expected = curve(linear);
       const actual = clamp(audioEl.volume);
       if (Math.abs(actual - expected) > 0.005) {
-        // trae “linear” hacia la inversa de actual
         const ln = clamp(inverseCurve(actual));
         setLinear(ln);
       } else {
-        // solo reflejar UI si el porcentaje cambió por redondeos
         schedule();
       }
     }
