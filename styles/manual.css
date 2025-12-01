@@ -177,7 +177,7 @@ h1{ font-size:2.8rem; font-weight:700; color:#fff; }
   h1{ font-size:2.2rem; }
   .manual-list, .playlist-container{ min-height:auto; max-height:none; border-radius:10px; }
   .player-container{ padding:16px; border-radius:10px; }
-  .player-sections{ grid-template-columns:1fr auto; gap:12px; }
+  .player-sections{grid-template-columns:minmax(0,1.4fr) auto 56px;grid-auto-rows:minmax(40px, auto);gap:12px 12px;}
   .track-name-section #trackName{ font-size:1.15rem; }
   .faction-section #factionName, .timer-section #timeDisplay, #volumeValue{ font-size:1rem; }
   .controls{ gap:10px; }
@@ -191,16 +191,48 @@ h1{ font-size:2.8rem; font-weight:700; color:#fff; }
 }
 @media (max-width:768px){
   h1{ font-size:2rem; }
-  .player-sections{ grid-template-columns:1fr; grid-template-rows:auto auto auto; gap:10px; }
-  .track-name-section{ text-align:left; }
-  .timer-section{ width:auto; justify-self:start; }
-  .volume-section{ width:52px; }
+
+  /* Player en una sola columna, cajas apiladas */
+  .player-sections{
+    grid-template-columns:1fr;
+    grid-auto-rows:minmax(32px, auto);
+    row-gap:10px;
+    column-gap:0;
+  }
+  .track-name-section{
+    grid-column:1;
+    grid-row:1;
+    text-align:left;
+  }
+  .faction-section{
+    grid-column:1;
+    grid-row:2;
+  }
+  .timer-section{
+    grid-column:1;
+    grid-row:3;
+    width:auto;
+    justify-self:flex-start;
+  }
+  .volume-section{
+    grid-column:1;
+    grid-row:4;
+    width:52px;
+    margin-left:0;
+  }
+
   #volumeBarBg{ width:30px; height:92px; }
   #volumeValue{ width:52px; font-size:.95rem; }
-  .manual-track-list li{ padding:11px 12px; grid-template-columns:1fr 52px 36px; font-size:1rem; }
+
+  .manual-track-list li{
+    padding:11px 12px;
+    grid-template-columns:minmax(0,1fr) 52px 36px;
+    font-size:1rem;
+  }
   .variant-controls{ padding:2px 6px; }
   .variant-label{ font-size:.74rem; }
 }
+
 @media (max-width:480px){
   h1{ font-size:1.75rem; }
   .main-container{ gap:14px; padding:14px; }
