@@ -1,5 +1,5 @@
 'use strict';
-// manualPlayer.js
+// manualPlayer.js (updated to support ?track_id URL presets)
 
 // ---------- Helpers ----------
 function createElement(tag, { className, text, html, ...attrs } = {}) {
@@ -65,6 +65,63 @@ let isLooping = false;
 let animationFrameId_timer = null;
 let reservedIndexSet = new Set(); // cache de la playlist (para “agotados”)
 const variantManager = typeof createVariantManager === 'function' ? createVariantManager() : null;
+
+// ---------- URL helpers para presets ----------
+/**
+ * Lee ?track_id del querystring.
+ * Soporta:
+ *   ?track_id=a,b,c   (lista separada por comas)
+ *   ?track_id=a&track_id=b   (múltiples parámetros)
+ */
+function getRequestedTrackIdsFromURL() {
+  const params = new URLSearchParams(window.location.search || '');
+  const raw = params.getAll('track_id');
+  if (!raw.length) return [];
+
+  const ids = [];
+  for (const chunk of raw) {
+    if (!chunk) continue;
+    const parts = String(chunk).split(',');
+    for (const part of parts) {
+      const id = part.trim();
+      if (id) ids.push(id);
+    }
+  }
+  return ids;
+}
+
+/**
+ * Construye la cola inicial (playQueue) basándose en los ids solicitados y el catálogo cargado.
+ * Ignora ids que no existan en el catálogo y evita duplicados.
+ */
+function buildInitialQueueFromTrackIds(trackIds) {
+  if (!Array.isArray(catalog) || !catalog.length) return;
+  if (!Array.isArray(trackIds) || !trackIds.length) return;
+
+  // Mapa id -> índice de catálogo
+  const idToIndex = new Map();
+  for (let i = 0; i < catalog.length; i++) {
+    const t = catalog[i];
+    if (t && t.id) {
+      // El último que aparezca con ese id quedará registrado, lo cual es
+      // razonable si hay entradas "clon" en el catálogo.
+      idToIndex.set(String(t.id), i);
+    }
+  }
+
+  const newQueue = [];
+  for (const rawId of trackIds) {
+    const id = String(rawId);
+    if (!idToIndex.has(id)) continue;
+    const idx = idToIndex.get(id);
+    if (!newQueue.includes(idx)) newQueue.push(idx);
+  }
+
+  if (!newQueue.length) return;
+
+  playQueue = newQueue;
+  reservedIndexSet = new Set(playQueue);
+}
 
 // ---------- Facciones ----------
 const factionDisplayNames = {
@@ -923,8 +980,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const variantGroups = await fetchVariantGroupsData();
       if (variantManager) variantManager.load({ catalog, variantGroups });
 
+      // --- Cola inicial ---
       playQueue = [];
       reservedIndexSet = new Set();
+
+      // Si el enlace incluye ?track_id=... construimos una playlist inicial
+      const idsFromURL = getRequestedTrackIdsFromURL();
+      if (idsFromURL.length) {
+        buildInitialQueueFromTrackIds(idsFromURL);
+        if (playQueue.length) {
+          // Feedback visual mínimo: el botón ya no está deshabilitado y
+          // el usuario sólo tiene que dar Play.
+          trackName.textContent = 'Shared playlist loaded — press Play';
+          factionName.textContent = 'Preset from URL parameter ?track_id';
+        }
+      }
+
       renderLibrary();
       renderPlaylist();
 
