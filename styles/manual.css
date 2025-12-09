@@ -57,7 +57,10 @@ h1{ font-size:2.8rem; font-weight:700; color:#fff; }
   scrollbar-width:thin; scrollbar-color:#1a1a2e transparent;
 }
 .manual-track-list::-webkit-scrollbar{ width:8px; height:8px; }
-.manual-track-list::-webkit-scrollbar-thumb{ background:linear-gradient(180deg,#1f1f3b,#1a1a2e); border-radius:8px; }
+.manual-track-list::-webkit-scrollbar-thumb {
+  background-color: #1f2134;  
+  border-radius: 8px;
+}
 .manual-track-list::-webkit-scrollbar-track{ background:transparent; }
 
 .manual-track-list li{
@@ -83,12 +86,6 @@ h1{ font-size:2.8rem; font-weight:700; color:#fff; }
 .manual-track-list .track-duration{ justify-self:end; text-align:right; color:var(--accent); white-space:nowrap; }
 .manual-track-list .track-faction{ justify-self:end; }
 .manual-track-list .track-faction img{ width:28px; height:28px; object-fit:contain; filter:drop-shadow(0 0 2px #000); }
-
-/* Foco accesible */
-.manual-track-list li:focus-visible{
-  box-shadow:0 0 0 2px rgba(108,207,255,.35) inset, 0 0 0 2px rgba(108,207,255,.15);
-  border-radius:6px;
-}
 
 /* Estado “now playing” */
 .manual-track-list li.is-playing{
@@ -150,7 +147,7 @@ h1{ font-size:2.8rem; font-weight:700; color:#fff; }
   box-shadow:0 0 25px rgba(108,255,255,.1); position:relative; backdrop-filter:saturate(110%) blur(.6px);
 }
 
-.player-sections{ display:grid; grid-template-columns:1fr auto; grid-template-rows:40px auto; align-items:center; gap:16px; }
+.player-sections{display:grid;grid-template-columns:minmax(0,1.4fr) auto 56px;grid-auto-rows:minmax(40px,auto);align-items:center;gap:16px 16px}
 .track-name-section{ grid-column:1 / span 2; background:var(--panel); padding:15px; border:1px solid var(--border); text-align:center; }
 .track-name-section #trackName{ font-size:1.3rem; font-weight:600; color:#fff; }
 .faction-section{ grid-column:1 / 2; background:var(--panel); padding:15px; border:1px solid var(--border); text-align:left; }

@@ -183,7 +183,10 @@ function createPlayerLogoRotator(imageElement) {
   let timerId = null;
   const stop = () => {
     if (timerId) clearInterval(timerId);
-    if (imageElement) imageElement.src = '';
+    if (imageElement) {
+      imageElement.src = '';
+      imageElement.alt = '';
+    }
     timerId = null;
   };
   const start = (track) => {
@@ -257,6 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
     allTracksList, secondList, volumeSliderContainer,
     volumeValue, volumeBar, volumeBarBg
   } = ctx;
+  const volumeBg = volumeBarBg || volumeSliderContainer;
+
 
   const playerLogoRotator = createPlayerLogoRotator(document.querySelector('.faction-section img'));
   const listLogoManager = createListLogoManager();
@@ -689,40 +694,39 @@ document.addEventListener('DOMContentLoaded', () => {
       if (gid && parentLi) handleVariantToggle(gid, delta, focusSide, parentLi);
     });
 
-    // Volumen: usa módulo si existe, si no fallback accesible
+    // Volumen: usa modulo si existe, si no fallback accesible
     if (typeof initVolumeControl === 'function' && volumeSliderContainer) {
       const vc = initVolumeControl({
         audioEl: audioPlayer,
-        bgEl: volumeBarBg || volumeSliderContainer,
+        bgEl: volumeBg,
         barEl: volumeBar || null,
         labelEl: volumeValue || null
       });
       const updateAria = () => {
         const percent = Math.round((vc.getVolume?.() || 0) * 100);
-        (volumeBarBg || volumeSliderContainer).setAttribute('aria-valuenow', String(percent));
-        (volumeBarBg || volumeSliderContainer).setAttribute('aria-valuemin', '0');
-        (volumeBarBg || volumeSliderContainer).setAttribute('aria-valuemax', '100');
+        volumeBg.setAttribute('aria-valuenow', String(percent));
+        volumeBg.setAttribute('aria-valuemin', '0');
+        volumeBg.setAttribute('aria-valuemax', '100');
       };
-      (volumeBarBg || volumeSliderContainer).addEventListener('vc:change', updateAria);
+      volumeBg.addEventListener('vc:change', updateAria);
       audioPlayer.addEventListener('volumechange', updateAria);
       updateAria();
       window.volumeController = vc;
     } else if (volumeSliderContainer) {
       // Fallback simple (rueda + teclado) con ARIA
       const clamp01 = (v) => Math.min(Math.max(v, 0), 1);
-      const bg = volumeBarBg || volumeSliderContainer;
       const render = () => {
         const p = Math.round(audioPlayer.volume * 100);
         if (volumeBar) volumeBar.style.height = p + '%';
         if (volumeValue) volumeValue.textContent = p + '%';
-        bg.setAttribute('aria-valuenow', String(p));
+        volumeBg.setAttribute('aria-valuenow', String(p));
       };
-      bg.addEventListener('wheel', (e) => {
+      volumeBg.addEventListener('wheel', (e) => {
         e.preventDefault();
         audioPlayer.volume = clamp01(audioPlayer.volume + (e.deltaY > 0 ? -0.05 : 0.05));
         render();
       }, { passive: false });
-      bg.addEventListener('keydown', (e) => {
+      volumeBg.addEventListener('keydown', (e) => {
         const map = { ArrowUp: +0.05, ArrowDown: -0.05, PageUp: +0.25, PageDown: -0.25, Home: -1, End: +1 };
         if (!(e.code in map)) return;
         e.preventDefault();
@@ -736,11 +740,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Volumen — estado visual de mute por clases (CSS)
     const volumeSection = document.querySelector('.volume-section');
-    if (volumeSection && (volumeBarBg || volumeSliderContainer)) {
-      (volumeBarBg || volumeSliderContainer).addEventListener('vc:mute', () => {
+    if (volumeSection && volumeBg) {
+      volumeBg.addEventListener('vc:mute', () => {
         volumeSection.classList.add('muted');
       });
-      (volumeBarBg || volumeSliderContainer).addEventListener('vc:unmute', () => {
+      volumeBg.addEventListener('vc:unmute', () => {
         volumeSection.classList.remove('muted');
       });
     }
